@@ -261,6 +261,92 @@ function RuleEditor({
         )}
       </div>
 
+      {/* ELSE */}
+      <div style={{ marginTop: 12, paddingTop: 10, borderTop: '1px solid rgba(184,206,207,0.3)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+          <span
+            style={{
+              display: 'inline-block',
+              background: '#fef3c7',
+              color: '#92400e',
+              borderRadius: 4,
+              padding: '2px 8px',
+              fontSize: 11,
+              fontWeight: 600,
+            }}
+          >
+            ELSE
+          </span>
+          {!rule.elseAction ? (
+            <button
+              type="button"
+              onClick={() =>
+                onUpdate({
+                  elseAction: {
+                    type: 'show',
+                    targetQuestionId: fields[0]?.id,
+                  },
+                })
+              }
+              style={{ fontSize: 11, color: '#4F7C7A', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}
+            >
+              + Add ELSE condition
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => onUpdate({ elseAction: undefined })}
+              style={{ fontSize: 11, color: '#f87171', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}
+            >
+              Remove ELSE
+            </button>
+          )}
+        </div>
+
+        {rule.elseAction && (
+          <div>
+            <select
+              className="select"
+              value={rule.elseAction.type}
+              onChange={(e) =>
+                onUpdate({
+                  elseAction: {
+                    ...rule.elseAction!,
+                    type: e.target.value as LogicAction['type'],
+                  },
+                })
+              }
+              style={{ fontSize: 13, marginBottom: 6 }}
+            >
+              {ACTION_TYPES.map((a) => (
+                <option key={a.value} value={a.value}>{a.label}</option>
+              ))}
+            </select>
+
+            {rule.elseAction.type !== 'end_form' && (
+              <select
+                className="select"
+                value={rule.elseAction.targetQuestionId || ''}
+                onChange={(e) =>
+                  onUpdate({
+                    elseAction: {
+                      ...rule.elseAction!,
+                      targetQuestionId: e.target.value,
+                    },
+                  })
+                }
+                style={{ fontSize: 13 }}
+              >
+                <option value="">Select question...</option>
+                {fields.map((f) => (
+                  <option key={f.id} value={f.id}>{f.label}</option>
+                ))}
+              </select>
+            )}
+          </div>
+        )}
+      </div>
+
       {/* Delete */}
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
         <button onClick={onDelete} className="btn btn-ghost btn-sm" style={{ color: '#f87171', padding: 4 }}>

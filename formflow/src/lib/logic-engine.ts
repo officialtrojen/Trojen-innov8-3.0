@@ -16,39 +16,42 @@ export function evaluateCondition(
   condition: LogicCondition,
   answers: Record<string, AnswerValue>
 ): boolean {
-  const answer = answers[condition.questionId];
+  const qId = condition.questionId || (condition as any).fieldId;
+  const answer = answers[qId];
   const { operator, value } = condition;
 
   switch (operator) {
     case 'is_answered':
+    case 'is_not_empty':
       return answer !== undefined && answer !== null && answer !== '';
 
     case 'is_not_answered':
+    case 'is_empty':
       return answer === undefined || answer === null || answer === '';
 
     case 'equals':
       if (Array.isArray(answer)) {
         return answer.includes(String(value));
       }
-      return String(answer) === String(value);
+      return String(answer ?? '') === String(value ?? '');
 
     case 'not_equals':
       if (Array.isArray(answer)) {
         return !answer.includes(String(value));
       }
-      return String(answer) !== String(value);
+      return String(answer ?? '') !== String(value ?? '');
 
     case 'contains':
       if (Array.isArray(answer)) {
         return answer.some((a) => String(a).includes(String(value)));
       }
-      return String(answer ?? '').includes(String(value));
+      return String(answer ?? '').includes(String(value ?? ''));
 
     case 'not_contains':
       if (Array.isArray(answer)) {
         return !answer.some((a) => String(a).includes(String(value)));
       }
-      return !String(answer ?? '').includes(String(value));
+      return !String(answer ?? '').includes(String(value ?? ''));
 
     case 'greater_than':
       return Number(answer) > Number(value);
@@ -67,7 +70,8 @@ export function evaluateCondition(
  */
 export function evaluateRules(
   rules: LogicRule[],
-  answers: Record<string, AnswerValue>
+  answers: Record<string, AnswerValue>,
+  fields?: FormField[]
 ): {
   showFields: Set<string>;
   hideFields: Set<string>;
@@ -79,28 +83,45 @@ export function evaluateRules(
   let jumpTo: string | null = null;
   let endForm = false;
 
+  if (!rules || rules.length === 0) {
+    return { showFields, hideFields, jumpTo, endForm };
+  }
+
   for (const rule of rules) {
+    const srcId = rule.condition.questionId || (rule.condition as any).fieldId || (rule as any).sourceFieldId;
+    if (!srcId) continue;
+
+    const answer = answers[srcId];
+    const isAnswered = answer !== undefined && answer !== null && answer !== '';
+    if (!isAnswered) continue;
+
     const matches = evaluateCondition(rule.condition, answers);
-    if (matches) {
-      switch (rule.action.type) {
-        case 'show':
-          if (rule.action.targetQuestionId) {
-            showFields.add(rule.action.targetQuestionId);
+    const actionToApply = matches ? rule.action : rule.elseAction;
+
+    if (actionToApply) {
+      const targetId = actionToApply.targetQuestionId || (actionToApply as any).targetFieldId;
+      const actionType = actionToApply.type;
+
+      if (actionType === 'show') {
+        if (targetId) showFields.add(targetId);
+      } else if (actionType === 'hide') {
+        if (targetId) hideFields.add(targetId);
+      } else if (actionType === 'jump' || actionType === 'jump_to') {
+        if (targetId) {
+          jumpTo = targetId;
+          // Hide intermediate fields between source and target jump destination
+          if (fields && fields.length > 0) {
+            const srcIdx = fields.findIndex((f) => f.id === srcId);
+            const tgtIdx = fields.findIndex((f) => f.id === targetId);
+            if (srcIdx !== -1 && tgtIdx !== -1 && tgtIdx > srcIdx) {
+              for (let i = srcIdx + 1; i < tgtIdx; i++) {
+                hideFields.add(fields[i].id);
+              }
+            }
           }
-          break;
-        case 'hide':
-          if (rule.action.targetQuestionId) {
-            hideFields.add(rule.action.targetQuestionId);
-          }
-          break;
-        case 'jump':
-          if (rule.action.targetQuestionId) {
-            jumpTo = rule.action.targetQuestionId;
-          }
-          break;
-        case 'end_form':
-          endForm = true;
-          break;
+        }
+      } else if (actionType === 'end_form') {
+        endForm = true;
       }
     }
   }
@@ -120,9 +141,9 @@ export function getVisibleFields(
   rules: LogicRule[],
   answers: Record<string, AnswerValue>
 ): FormField[] {
-  if (rules.length === 0) return fields;
+  if (!rules || rules.length === 0) return fields;
 
-  const { showFields, hideFields } = evaluateRules(rules, answers);
+  const { showFields, hideFields } = evaluateRules(rules, answers, fields);
 
   return fields.filter((field) => {
     // Explicit show overrides hide
@@ -142,7 +163,7 @@ export function getNextQuestion(
   answers: Record<string, AnswerValue>,
   currentIndex: number
 ): number | 'end' {
-  const { jumpTo, endForm } = evaluateRules(rules, answers);
+  const { jumpTo, endForm } = evaluateRules(rules, answers, fields);
 
   if (endForm) return 'end';
 
@@ -170,12 +191,13 @@ export const LOGIC_OPERATORS: {
   label: string;
   requiresValue: boolean;
 }[] = [
-  { value: 'equals', label: 'Equals', requiresValue: true },
-  { value: 'not_equals', label: 'Does not equal', requiresValue: true },
-  { value: 'contains', label: 'Contains', requiresValue: true },
+  { value: 'equals', label: 'Equals (==)', requiresValue: true },
+  { value: 'not_equals', label: 'Does not equal (!=)', requiresValue: true },
+  { value: 'contains', label: 'Contains text', requiresValue: true },
   { value: 'not_contains', label: 'Does not contain', requiresValue: true },
   { value: 'greater_than', label: 'Greater than', requiresValue: true },
   { value: 'less_than', label: 'Less than', requiresValue: true },
   { value: 'is_answered', label: 'Is answered', requiresValue: false },
   { value: 'is_not_answered', label: 'Is not answered', requiresValue: false },
 ];
+
