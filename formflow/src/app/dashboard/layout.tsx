@@ -23,7 +23,6 @@ const navItems = [
   { href: '/dashboard/forms', label: 'My Forms', icon: FileText },
   { href: '/dashboard/forms/new', label: 'Create Form', icon: PlusCircle },
   { href: '/dashboard/responses', label: 'Responses', icon: MessageSquare },
-  { href: '/dashboard/analytics', label: 'Analytics', icon: BarChart3 },
   { href: '/dashboard/integrations', label: 'Integrations', icon: Webhook },
   { href: '/dashboard/settings', label: 'Settings', icon: Settings },
 ];
