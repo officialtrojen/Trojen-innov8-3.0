@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Save, Globe, Eye, GitBranch, Palette, Link as LinkIcon, Check, Sparkles, Share2 } from 'lucide-react';
+import ShareModal from '@/components/builder/ShareModal';
 
 interface BuilderToolbarProps {
   title: string;
@@ -218,9 +219,14 @@ export default function BuilderToolbar({
         )}
 
         {formStatus === 'published' && (
-          <button onClick={handleCopyLink} className="btn btn-ghost btn-sm" title="Copy public link">
-            {copied ? <Check size={15} style={{ color: '#28a745' }} /> : <LinkIcon size={15} />}
-            {copied ? 'Copied!' : 'Share'}
+          <button
+            onClick={() => setIsShareModalOpen(true)}
+            className="btn btn-ghost btn-sm"
+            title="Share public link"
+            style={{ color: '#2A2E33', fontWeight: 600 }}
+          >
+            <Share2 size={15} />
+            <span>Share</span>
           </button>
         )}
       </div>

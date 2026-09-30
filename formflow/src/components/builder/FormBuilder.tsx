@@ -81,7 +81,25 @@ export default function FormBuilder({
   const [dragPointer, setDragPointer] = useState<{ x: number; y: number } | null>(null);
   const [isOverTrash, setIsOverTrash] = useState(false);
   const [isCrumpling, setIsCrumpling] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const trashBinRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Debounced auto-save to database
+  const isFirstRender = useRef(true);
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    const timer = setTimeout(() => {
+      onSave(schema).catch(() => {});
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, [schema, onSave]);
 
   // Global pointer tracking when dragging armed form to trash
   useEffect(() => {
@@ -327,6 +345,15 @@ export default function FormBuilder({
       setSaving(false);
     }
   };
+
+  if (!mounted) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 64px)', background: '#FFFEF9', alignItems: 'center', justifyContent: 'center', gap: 12 }}>
+        <div className="spinner" style={{ width: 36, height: 36, borderColor: '#8B5CF6', borderRightColor: 'transparent' }} />
+        <span style={{ fontSize: 14, color: '#64748B', fontWeight: 500 }}>Initializing Form Studio...</span>
+      </div>
+    );
+  }
 
   return (
     <DndContext

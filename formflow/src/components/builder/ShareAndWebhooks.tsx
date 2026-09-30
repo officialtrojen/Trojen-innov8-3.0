@@ -35,6 +35,8 @@ export const ShareAndWebhooks: React.FC<ShareAndWebhooksProps> = ({
   const [newWebhookUrl, setNewWebhookUrl] = useState('');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingUrl, setEditingUrl] = useState('');
+  const [testingWebhookId, setTestingWebhookId] = useState<string | null>(null);
+  const [testResult, setTestResult] = useState<{ id: string; success: boolean; msg: string } | null>(null);
 
   const handleSaveEdit = (id: string) => {
     if (!editingUrl) return;

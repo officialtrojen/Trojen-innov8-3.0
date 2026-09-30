@@ -267,6 +267,7 @@ interface FormCanvasProps {
   onSelectField: (id: string | null) => void;
   onDeleteField: (id: string) => void;
   onDuplicateField: (id: string) => void;
+  onMoveField?: (fieldId: string, direction: 'up' | 'down') => void;
   theme?: FormTheme;
   title?: string;
   description?: string;

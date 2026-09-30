@@ -49,9 +49,11 @@ export type LogicOperator =
   | 'greater_than'
   | 'less_than'
   | 'is_answered'
-  | 'is_not_answered';
+  | 'is_not_answered'
+  | 'is_not_empty'
+  | 'is_empty';
 
-export type LogicActionType = 'show' | 'hide' | 'jump' | 'end_form';
+export type LogicActionType = 'show' | 'hide' | 'jump' | 'jump_to' | 'end_form';
 
 export interface LogicCondition {
   questionId: string;
@@ -82,6 +84,8 @@ export interface FormTheme {
   layout: 'single-page' | 'conversational';
   logoUrl?: string;
   bannerUrl?: string;
+  bannerColor?: string;
+  posterColor?: string;
   // Background customization options
   backgroundType?: 'solid' | 'gradient' | 'pattern' | 'image';
   backgroundGradient?: string;

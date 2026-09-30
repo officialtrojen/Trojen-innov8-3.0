@@ -30,11 +30,7 @@ export default function EditFormPage() {
 
       // 1. Try Supabase direct query
       try {
-        const query = supabase.from('forms').select('*').eq('id', formId);
-        if (user?.id) {
-          query.eq('owner_id', user.id);
-        }
-        const { data, error } = await query.single();
+        const { data, error } = await supabase.from('forms').select('*').eq('id', formId).single();
         if (!error && data) {
           foundForm = data as DBForm;
         }
@@ -131,8 +127,9 @@ export default function EditFormPage() {
       } catch {}
     }
 
+    let savedToDb = false;
     try {
-      await supabase
+      const { error } = await supabase
         .from('forms')
         .update({
           title: schema.title,
@@ -142,8 +139,17 @@ export default function EditFormPage() {
           updated_at: new Date().toISOString(),
         })
         .eq('id', form.id);
+
+      if (!error) {
+        savedToDb = true;
+      } else {
+        console.warn('Direct Supabase save returned error:', error);
+      }
     } catch (saveErr) {
-      console.warn('Direct Supabase save failed, attempting API save:', saveErr);
+      console.warn('Direct Supabase save failed:', saveErr);
+    }
+
+    if (!savedToDb) {
       try {
         await fetch(`/api/forms/${form.id}`, {
           method: 'PUT',
@@ -155,7 +161,9 @@ export default function EditFormPage() {
             theme: schema.theme,
           }),
         });
-      } catch {}
+      } catch (apiErr) {
+        console.warn('API save fallback failed:', apiErr);
+      }
     }
 
     setForm((prev) =>
@@ -176,6 +184,14 @@ export default function EditFormPage() {
           updated_at: new Date().toISOString(),
         })
         .eq('id', form.id);
+    } catch {}
+
+    try {
+      await fetch(`/api/forms/${form.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      });
     } catch {}
 
     setForm((prev) => (prev ? { ...prev, status: newStatus } : null));
