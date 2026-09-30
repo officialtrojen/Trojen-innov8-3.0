@@ -1,8 +1,24 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { FormTheme } from '@/lib/types';
-import { Palette } from 'lucide-react';
+import {
+  Palette,
+  Image as ImageIcon,
+  Sliders,
+  Sparkles,
+  Upload,
+  Trash2,
+  Layers,
+  Layout,
+  Type,
+  Check,
+} from 'lucide-react';
+import {
+  POSTER_PRESETS,
+  GRADIENT_PRESETS,
+  PATTERN_PRESETS,
+} from '@/lib/theme-presets';
 
 interface ThemePanelProps {
   theme: FormTheme;
@@ -17,125 +33,784 @@ const sizeOptions: { value: 'small' | 'medium' | 'large'; label: string }[] = [
 ];
 
 export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
+  const [activeTab, setActiveTab] = useState<'background' | 'poster' | 'colors'>('background');
+  const posterFileInputRef = useRef<HTMLInputElement>(null);
+  const bgFileInputRef = useRef<HTMLInputElement>(null);
+
+  // Handle local poster file upload as base64
+  const handlePosterFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File size exceeds 5MB. Please choose a smaller image.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const result = event.target?.result as string;
+      onUpdate({
+        posterUrl: result,
+        bannerUrl: result,
+        posterStyle: theme.posterStyle || 'card-top',
+        posterHeight: theme.posterHeight || 180,
+      });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Handle local background image upload as base64
+  const handleBgFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File size exceeds 5MB. Please choose a smaller image.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const result = event.target?.result as string;
+      onUpdate({
+        backgroundType: 'image',
+        backgroundImage: result,
+      });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const currentPoster = theme.posterUrl || theme.bannerUrl;
+
   return (
-    <div style={{ padding: 20 }}>
+    <div style={{ padding: '20px 16px' }}>
+      {/* Header */}
       <div
         style={{
           fontSize: 11,
-          fontWeight: 600,
+          fontWeight: 700,
           color: '#52796F',
           textTransform: 'uppercase',
-          letterSpacing: 1,
-          marginBottom: 20,
+          letterSpacing: 1.2,
+          marginBottom: 16,
           display: 'flex',
           alignItems: 'center',
           gap: 8,
         }}
       >
-        <Palette size={14} />
-        Theme & Customization
+        <Palette size={15} />
+        Form Appearance & Styling
       </div>
 
-      {/* Colors */}
-      <div style={{ marginBottom: 20 }}>
-        <label className="label" style={{ fontSize: 13, fontWeight: 600, marginBottom: 12 }}>Colors</label>
+      {/* Navigation Sub-Tabs */}
+      <div
+        style={{
+          display: 'flex',
+          background: 'rgba(207,229,227,0.35)',
+          borderRadius: 10,
+          padding: 3,
+          marginBottom: 20,
+          gap: 2,
+        }}
+      >
+        <button
+          type="button"
+          onClick={() => setActiveTab('background')}
+          style={{
+            flex: 1,
+            padding: '8px 4px',
+            fontSize: 12,
+            fontWeight: 600,
+            borderRadius: 8,
+            border: 'none',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 6,
+            background: activeTab === 'background' ? 'white' : 'transparent',
+            color: activeTab === 'background' ? '#263B3B' : '#52796F',
+            boxShadow: activeTab === 'background' ? '0 2px 5px rgba(0,0,0,0.06)' : 'none',
+            transition: 'all 0.15s ease',
+          }}
+        >
+          <Layers size={13} />
+          Background
+        </button>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <ColorPicker label="Background" value={theme.background} onChange={(v) => onUpdate({ background: v })} />
-          <ColorPicker label="Primary" value={theme.primary} onChange={(v) => onUpdate({ primary: v })} />
-          <ColorPicker label="Secondary" value={theme.secondary} onChange={(v) => onUpdate({ secondary: v })} />
-          <ColorPicker label="Text" value={theme.text} onChange={(v) => onUpdate({ text: v })} />
-        </div>
+        <button
+          type="button"
+          onClick={() => setActiveTab('poster')}
+          style={{
+            flex: 1,
+            padding: '8px 4px',
+            fontSize: 12,
+            fontWeight: 600,
+            borderRadius: 8,
+            border: 'none',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 6,
+            background: activeTab === 'poster' ? 'white' : 'transparent',
+            color: activeTab === 'poster' ? '#263B3B' : '#52796F',
+            boxShadow: activeTab === 'poster' ? '0 2px 5px rgba(0,0,0,0.06)' : 'none',
+            transition: 'all 0.15s ease',
+          }}
+        >
+          <ImageIcon size={13} />
+          Poster
+          {currentPoster && (
+            <span
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: '50%',
+                background: '#4F7C7A',
+              }}
+            />
+          )}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('colors')}
+          style={{
+            flex: 1,
+            padding: '8px 4px',
+            fontSize: 12,
+            fontWeight: 600,
+            borderRadius: 8,
+            border: 'none',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 6,
+            background: activeTab === 'colors' ? 'white' : 'transparent',
+            color: activeTab === 'colors' ? '#263B3B' : '#52796F',
+            boxShadow: activeTab === 'colors' ? '0 2px 5px rgba(0,0,0,0.06)' : 'none',
+            transition: 'all 0.15s ease',
+          }}
+        >
+          <Sliders size={13} />
+          Colors & Text
+        </button>
       </div>
 
-      {/* Typography */}
-      <div style={{ marginBottom: 20 }}>
-        <label className="label" style={{ fontSize: 13, fontWeight: 600, marginBottom: 12 }}>Typography</label>
+      {/* ======================================================== */}
+      {/* TAB 1: BACKGROUND CUSTOMIZATION                          */}
+      {/* ======================================================== */}
+      {activeTab === 'background' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+          {/* Background Type Selector */}
+          <div>
+            <label className="label" style={{ fontSize: 12, fontWeight: 600, marginBottom: 8 }}>
+              Background Type
+            </label>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
+              {[
+                { id: 'solid', label: 'Solid' },
+                { id: 'gradient', label: 'Gradient' },
+                { id: 'pattern', label: 'Pattern' },
+                { id: 'image', label: 'Image' },
+              ].map((t) => {
+                const isSelected = (theme.backgroundType || 'solid') === t.id;
+                return (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => onUpdate({ backgroundType: t.id as FormTheme['backgroundType'] })}
+                    style={{
+                      padding: '7px 4px',
+                      fontSize: 11,
+                      fontWeight: 600,
+                      borderRadius: 8,
+                      border: `1.5px solid ${isSelected ? 'var(--primary)' : 'rgba(184,206,207,0.6)'}`,
+                      background: isSelected ? 'var(--accent)' : 'transparent',
+                      color: isSelected ? 'var(--primary)' : '#263B3B',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease',
+                    }}
+                  >
+                    {t.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
-        <div style={{ marginBottom: 10 }}>
-          <label className="label">Font Family</label>
-          <select
-            className="select"
-            value={theme.fontFamily}
-            onChange={(e) => onUpdate({ fontFamily: e.target.value })}
-          >
-            {fontOptions.map((f) => (
-              <option key={f} value={f}>{f}</option>
-            ))}
-          </select>
-        </div>
+          {/* Sub-options based on type */}
+          {(theme.backgroundType === 'solid' || !theme.backgroundType) && (
+            <div>
+              <label className="label" style={{ fontSize: 12, fontWeight: 600, marginBottom: 8 }}>
+                Solid Color
+              </label>
+              <ColorPicker
+                label="Background Canvas"
+                value={theme.background || '#EAF4F4'}
+                onChange={(v) => onUpdate({ background: v })}
+              />
 
-        <div>
-          <label className="label">Font Size</label>
-          <div style={{ display: 'flex', gap: 6 }}>
-            {sizeOptions.map((s) => (
+              <div style={{ marginTop: 12 }}>
+                <span style={{ fontSize: 11, color: '#52796F', display: 'block', marginBottom: 6 }}>
+                  Quick Palette
+                </span>
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                  {['#EAF4F4', '#F8FAFC', '#FEF3C7', '#EDE9FE', '#FCE7F3', '#DCFCE7', '#1E293B'].map((hex) => (
+                    <button
+                      key={hex}
+                      type="button"
+                      onClick={() => onUpdate({ background: hex })}
+                      style={{
+                        width: 24,
+                        height: 24,
+                        borderRadius: 6,
+                        background: hex,
+                        border: theme.background === hex ? '2px solid #4F7C7A' : '1px solid rgba(0,0,0,0.15)',
+                        cursor: 'pointer',
+                      }}
+                      title={hex}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {theme.backgroundType === 'gradient' && (
+            <div>
+              <label className="label" style={{ fontSize: 12, fontWeight: 600, marginBottom: 8 }}>
+                Curated Gradients
+              </label>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                {GRADIENT_PRESETS.map((g) => {
+                  const isSelected = theme.backgroundGradient === g.gradient;
+                  return (
+                    <button
+                      key={g.id}
+                      type="button"
+                      onClick={() =>
+                        onUpdate({
+                          backgroundGradient: g.gradient,
+                          primary: g.primary,
+                        })
+                      }
+                      style={{
+                        padding: '10px 8px',
+                        borderRadius: 10,
+                        border: `1.5px solid ${isSelected ? 'var(--primary)' : 'rgba(184,206,207,0.5)'}`,
+                        background: 'white',
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 6,
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: '100%',
+                          height: 28,
+                          borderRadius: 6,
+                          background: g.gradient,
+                          border: '1px solid rgba(0,0,0,0.08)',
+                        }}
+                      />
+                      <span style={{ fontSize: 11, fontWeight: 600, color: '#263B3B' }}>{g.name}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Custom gradient code */}
+              <div style={{ marginTop: 14 }}>
+                <label className="label" style={{ fontSize: 11 }}>Custom CSS Gradient</label>
+                <input
+                  className="input"
+                  value={theme.backgroundGradient || ''}
+                  onChange={(e) => onUpdate({ backgroundGradient: e.target.value })}
+                  placeholder="linear-gradient(135deg, #FFF, #EEE)"
+                  style={{ fontSize: 11, fontFamily: 'monospace' }}
+                />
+              </div>
+            </div>
+          )}
+
+          {theme.backgroundType === 'pattern' && (
+            <div>
+              <label className="label" style={{ fontSize: 12, fontWeight: 600, marginBottom: 8 }}>
+                Background Patterns
+              </label>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 14 }}>
+                {PATTERN_PRESETS.map((p) => {
+                  const isSelected = (theme.backgroundPattern || 'none') === p.id;
+                  return (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => onUpdate({ backgroundPattern: p.id })}
+                      style={{
+                        padding: '12px 10px',
+                        borderRadius: 10,
+                        border: `1.5px solid ${isSelected ? 'var(--primary)' : 'rgba(184,206,207,0.6)'}`,
+                        background: 'white',
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                      }}
+                    >
+                      <span style={{ fontSize: 12, fontWeight: 500, color: '#263B3B' }}>{p.name}</span>
+                      {isSelected && <Check size={14} color="#4F7C7A" />}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <ColorPicker
+                label="Base Pattern Tint"
+                value={theme.background || '#EAF4F4'}
+                onChange={(v) => onUpdate({ background: v })}
+              />
+            </div>
+          )}
+
+          {theme.backgroundType === 'image' && (
+            <div>
+              <label className="label" style={{ fontSize: 12, fontWeight: 600, marginBottom: 8 }}>
+                Custom Background Image
+              </label>
+
+              {/* Upload trigger */}
+              <input
+                ref={bgFileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleBgFileUpload}
+                style={{ display: 'none' }}
+              />
+
               <button
-                key={s.value}
-                onClick={() => onUpdate({ fontSize: s.value })}
-                className="btn btn-sm"
+                type="button"
+                onClick={() => bgFileInputRef.current?.click()}
+                className="btn btn-secondary"
                 style={{
-                  flex: 1,
-                  background: theme.fontSize === s.value ? 'var(--primary)' : 'transparent',
-                  color: theme.fontSize === s.value ? 'white' : 'var(--text-main)',
-                  border: `1px solid ${theme.fontSize === s.value ? 'var(--primary)' : 'var(--input-border)'}`,
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                  marginBottom: 10,
+                  fontSize: 12,
                 }}
               >
-                {s.label}
+                <Upload size={14} />
+                Upload Background Image
               </button>
-            ))}
-          </div>
-        </div>
-      </div>
 
-      {/* Layout */}
-      <div style={{ marginBottom: 20 }}>
-        <label className="label" style={{ fontSize: 13, fontWeight: 600, marginBottom: 12 }}>Layout</label>
-        <div style={{ display: 'flex', gap: 8 }}>
-          {(['single-page', 'conversational'] as const).map((layout) => (
+              <div style={{ marginBottom: 10 }}>
+                <span style={{ fontSize: 11, color: '#52796F', display: 'block', marginBottom: 4 }}>
+                  Or paste image URL
+                </span>
+                <input
+                  className="input"
+                  value={theme.backgroundImage || ''}
+                  onChange={(e) => onUpdate({ backgroundImage: e.target.value })}
+                  placeholder="https://images.unsplash.com/..."
+                  style={{ fontSize: 12 }}
+                />
+              </div>
+
+              {theme.backgroundImage && (
+                <div style={{ position: 'relative', marginTop: 10, borderRadius: 8, overflow: 'hidden' }}>
+                  <img
+                    src={theme.backgroundImage}
+                    alt="Background preview"
+                    style={{ width: '100%', height: 90, objectFit: 'cover' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => onUpdate({ backgroundImage: '' })}
+                    style={{
+                      position: 'absolute',
+                      top: 6,
+                      right: 6,
+                      background: 'rgba(0,0,0,0.65)',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: 6,
+                      padding: 4,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* TAB 2: POSTER IN FORM                                    */}
+      {/* ======================================================== */}
+      {activeTab === 'poster' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+              <label className="label" style={{ fontSize: 12, fontWeight: 600, margin: 0 }}>
+                Form Poster / Banner
+              </label>
+              {currentPoster && (
+                <button
+                  type="button"
+                  onClick={() => onUpdate({ posterUrl: undefined, bannerUrl: undefined })}
+                  style={{
+                    border: 'none',
+                    background: 'transparent',
+                    color: '#e74c3c',
+                    fontSize: 11,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 4,
+                  }}
+                >
+                  <Trash2 size={12} /> Remove Poster
+                </button>
+              )}
+            </div>
+
+            {/* Hidden file input */}
+            <input
+              ref={posterFileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handlePosterFileUpload}
+              style={{ display: 'none' }}
+            />
+
+            {/* Upload Button */}
             <button
-              key={layout}
-              onClick={() => onUpdate({ layout })}
-              className="btn btn-sm"
+              type="button"
+              onClick={() => posterFileInputRef.current?.click()}
+              className="btn btn-primary"
               style={{
-                flex: 1,
-                background: theme.layout === layout ? 'var(--primary)' : 'transparent',
-                color: theme.layout === layout ? 'white' : 'var(--text-main)',
-                border: `1px solid ${theme.layout === layout ? 'var(--primary)' : 'var(--input-border)'}`,
-                fontSize: 12,
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8,
+                fontSize: 13,
+                marginBottom: 12,
               }}
             >
-              {layout === 'single-page' ? 'Single Page' : 'Conversational'}
+              <Upload size={15} />
+              Upload Poster Image
             </button>
-          ))}
-        </div>
-      </div>
 
-      {/* Quick presets */}
-      <div>
-        <label className="label" style={{ fontSize: 13, fontWeight: 600, marginBottom: 12 }}>Quick Presets</label>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-          <PresetButton
-            label="FormFlow"
-            colors={['#EAF4F4', '#4F7C7A', '#CFE5E3', '#263B3B']}
-            onClick={() => onUpdate({ background: '#EAF4F4', primary: '#4F7C7A', secondary: '#CFE5E3', text: '#263B3B' })}
-          />
-          <PresetButton
-            label="Sage"
-            colors={['#E8F0E6', '#52796F', '#C8DDD0', '#263B3B']}
-            onClick={() => onUpdate({ background: '#E8F0E6', primary: '#52796F', secondary: '#C8DDD0', text: '#263B3B' })}
-          />
-          <PresetButton
-            label="Ocean"
-            colors={['#E8F4FD', '#2E86AB', '#D4ECFC', '#1A3A4A']}
-            onClick={() => onUpdate({ background: '#E8F4FD', primary: '#2E86AB', secondary: '#D4ECFC', text: '#1A3A4A' })}
-          />
-          <PresetButton
-            label="Warm"
-            colors={['#FFF5EE', '#C77B5A', '#FFE8D6', '#3D2B1F']}
-            onClick={() => onUpdate({ background: '#FFF5EE', primary: '#C77B5A', secondary: '#FFE8D6', text: '#3D2B1F' })}
-          />
+            {/* Poster URL fallback */}
+            <div style={{ marginBottom: 16 }}>
+              <span style={{ fontSize: 11, color: '#52796F', display: 'block', marginBottom: 4 }}>
+                Or Image URL
+              </span>
+              <input
+                className="input"
+                value={currentPoster || ''}
+                onChange={(e) => onUpdate({ posterUrl: e.target.value, bannerUrl: e.target.value })}
+                placeholder="https://example.com/poster.jpg"
+                style={{ fontSize: 12 }}
+              />
+            </div>
+
+            {/* Current Poster Preview */}
+            {currentPoster && (
+              <div
+                style={{
+                  position: 'relative',
+                  borderRadius: 10,
+                  overflow: 'hidden',
+                  marginBottom: 16,
+                  border: '1px solid rgba(184,206,207,0.5)',
+                }}
+              >
+                <img
+                  src={currentPoster}
+                  alt="Poster preview"
+                  style={{
+                    width: '100%',
+                    height: 120,
+                    objectFit: 'cover',
+                  }}
+                />
+                <div
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    background: `rgba(0,0,0, ${(theme.posterOverlay || 20) / 100})`,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'flex-end',
+                    padding: 10,
+                    color: 'white',
+                  }}
+                >
+                  {theme.posterTitle && (
+                    <div style={{ fontWeight: 700, fontSize: 13, textShadow: '0 1px 3px rgba(0,0,0,0.6)' }}>
+                      {theme.posterTitle}
+                    </div>
+                  )}
+                  {theme.posterSubtitle && (
+                    <div style={{ fontSize: 11, opacity: 0.9, textShadow: '0 1px 3px rgba(0,0,0,0.6)' }}>
+                      {theme.posterSubtitle}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Poster Style Selector */}
+            {currentPoster && (
+              <div style={{ marginBottom: 14 }}>
+                <label className="label" style={{ fontSize: 11, fontWeight: 600 }}>Poster Position & Style</label>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                  {[
+                    { id: 'card-top', label: 'Top of Card' },
+                    { id: 'banner', label: 'Full Header' },
+                    { id: 'floating', label: 'Floating Poster' },
+                    { id: 'background', label: 'Cover Blur' },
+                  ].map((s) => {
+                    const isSelected = (theme.posterStyle || 'card-top') === s.id;
+                    return (
+                      <button
+                        key={s.id}
+                        type="button"
+                        onClick={() => onUpdate({ posterStyle: s.id as FormTheme['posterStyle'] })}
+                        style={{
+                          padding: '6px 8px',
+                          fontSize: 11,
+                          fontWeight: 500,
+                          borderRadius: 6,
+                          border: `1.5px solid ${isSelected ? 'var(--primary)' : 'rgba(184,206,207,0.6)'}`,
+                          background: isSelected ? 'var(--accent)' : 'transparent',
+                          color: isSelected ? 'var(--primary)' : '#263B3B',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        {s.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Poster Height Slider */}
+            {currentPoster && (
+              <div style={{ marginBottom: 14 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#52796F', marginBottom: 4 }}>
+                  <span>Poster Height</span>
+                  <span>{theme.posterHeight || 180}px</span>
+                </div>
+                <input
+                  type="range"
+                  min="100"
+                  max="320"
+                  step="10"
+                  value={theme.posterHeight || 180}
+                  onChange={(e) => onUpdate({ posterHeight: Number(e.target.value) })}
+                  style={{ width: '100%', cursor: 'pointer', accentColor: '#4F7C7A' }}
+                />
+              </div>
+            )}
+
+            {/* Poster Text Overlay */}
+            {currentPoster && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 14 }}>
+                <div>
+                  <label className="label" style={{ fontSize: 11 }}>Poster Title Overlay (Optional)</label>
+                  <input
+                    className="input"
+                    value={theme.posterTitle || ''}
+                    onChange={(e) => onUpdate({ posterTitle: e.target.value })}
+                    placeholder="e.g. Innov8 Hackathon"
+                    style={{ fontSize: 12 }}
+                  />
+                </div>
+                <div>
+                  <label className="label" style={{ fontSize: 11 }}>Poster Subtitle / Tagline</label>
+                  <input
+                    className="input"
+                    value={theme.posterSubtitle || ''}
+                    onChange={(e) => onUpdate({ posterSubtitle: e.target.value })}
+                    placeholder="e.g. Official Registration"
+                    style={{ fontSize: 12 }}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Curated Aesthetic Poster Presets */}
+            <div>
+              <label className="label" style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+                <Sparkles size={13} color="#4F7C7A" />
+                Or Pick a Curated Preset
+              </label>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                {POSTER_PRESETS.map((p) => {
+                  const isCurrent = currentPoster === p.url;
+                  return (
+                    <div
+                      key={p.id}
+                      onClick={() =>
+                        onUpdate({
+                          posterUrl: p.url,
+                          bannerUrl: p.url,
+                          posterTitle: p.suggestedTitle,
+                          posterSubtitle: p.suggestedSubtitle,
+                          posterStyle: theme.posterStyle || 'card-top',
+                          posterHeight: theme.posterHeight || 180,
+                        })
+                      }
+                      style={{
+                        borderRadius: 8,
+                        overflow: 'hidden',
+                        cursor: 'pointer',
+                        border: `2px solid ${isCurrent ? '#4F7C7A' : 'rgba(184,206,207,0.4)'}`,
+                        position: 'relative',
+                        transition: 'transform 0.15s ease',
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.transform = 'none'; }}
+                    >
+                      <img
+                        src={p.url}
+                        alt={p.name}
+                        style={{ width: '100%', height: 64, objectFit: 'cover' }}
+                      />
+                      <div
+                        style={{
+                          padding: '4px 6px',
+                          background: 'white',
+                          fontSize: 10,
+                          fontWeight: 600,
+                          color: '#263B3B',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                        }}
+                      >
+                        {p.name}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* TAB 3: COLORS & TYPOGRAPHY                               */}
+      {/* ======================================================== */}
+      {activeTab === 'colors' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+          {/* Colors */}
+          <div>
+            <label className="label" style={{ fontSize: 12, fontWeight: 600, marginBottom: 10 }}>Theme Accent Colors</label>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <ColorPicker label="Primary Brand Color" value={theme.primary} onChange={(v) => onUpdate({ primary: v })} />
+              <ColorPicker label="Secondary Accent" value={theme.secondary} onChange={(v) => onUpdate({ secondary: v })} />
+              <ColorPicker label="Text Color" value={theme.text} onChange={(v) => onUpdate({ text: v })} />
+            </div>
+          </div>
+
+          {/* Typography */}
+          <div>
+            <label className="label" style={{ fontSize: 12, fontWeight: 600, marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <Type size={13} />
+              Typography
+            </label>
+
+            <div style={{ marginBottom: 10 }}>
+              <label className="label" style={{ fontSize: 11 }}>Font Family</label>
+              <select
+                className="select"
+                value={theme.fontFamily}
+                onChange={(e) => onUpdate({ fontFamily: e.target.value })}
+                style={{ fontSize: 12 }}
+              >
+                {fontOptions.map((f) => (
+                  <option key={f} value={f}>{f}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="label" style={{ fontSize: 11 }}>Text Scale</label>
+              <div style={{ display: 'flex', gap: 6 }}>
+                {sizeOptions.map((s) => (
+                  <button
+                    key={s.value}
+                    type="button"
+                    onClick={() => onUpdate({ fontSize: s.value })}
+                    style={{
+                      flex: 1,
+                      padding: '6px 4px',
+                      borderRadius: 6,
+                      fontSize: 11,
+                      fontWeight: 600,
+                      background: theme.fontSize === s.value ? 'var(--primary)' : 'transparent',
+                      color: theme.fontSize === s.value ? 'white' : 'var(--text-main)',
+                      border: `1px solid ${theme.fontSize === s.value ? 'var(--primary)' : 'var(--input-border)'}`,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {s.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Form Layout */}
+          <div>
+            <label className="label" style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <Layout size={13} />
+              Form Experience Layout
+            </label>
+            <div style={{ display: 'flex', gap: 8 }}>
+              {(['single-page', 'conversational'] as const).map((layout) => (
+                <button
+                  key={layout}
+                  type="button"
+                  onClick={() => onUpdate({ layout })}
+                  style={{
+                    flex: 1,
+                    padding: '8px 6px',
+                    borderRadius: 8,
+                    fontSize: 11,
+                    fontWeight: 600,
+                    background: theme.layout === layout ? 'var(--primary)' : 'transparent',
+                    color: theme.layout === layout ? 'white' : 'var(--text-main)',
+                    border: `1.5px solid ${theme.layout === layout ? 'var(--primary)' : 'var(--input-border)'}`,
+                    cursor: 'pointer',
+                  }}
+                >
+                  {layout === 'single-page' ? '📄 Single Page' : '💬 Conversational'}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -157,7 +832,7 @@ function ColorPicker({ label, value, onChange }: { label: string; value: string;
         }}
       />
       <div style={{ flex: 1 }}>
-        <div style={{ fontSize: 12, color: '#52796F', marginBottom: 2 }}>{label}</div>
+        <div style={{ fontSize: 11, color: '#52796F', marginBottom: 2 }}>{label}</div>
         <input
           className="input"
           value={value}
@@ -166,36 +841,5 @@ function ColorPicker({ label, value, onChange }: { label: string; value: string;
         />
       </div>
     </div>
-  );
-}
-
-function PresetButton({ label, colors, onClick }: { label: string; colors: string[]; onClick: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 8,
-        padding: '8px 10px',
-        borderRadius: 8,
-        border: '1px solid rgba(184,206,207,0.5)',
-        background: 'transparent',
-        cursor: 'pointer',
-        transition: 'all 0.15s ease',
-        fontSize: 12,
-        fontWeight: 500,
-        color: '#263B3B',
-      }}
-      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'var(--accent)'; }}
-      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
-    >
-      <div style={{ display: 'flex', gap: 2 }}>
-        {colors.map((c, i) => (
-          <div key={i} style={{ width: 12, height: 12, borderRadius: 3, background: c, border: '1px solid rgba(0,0,0,0.1)' }} />
-        ))}
-      </div>
-      {label}
-    </button>
   );
 }

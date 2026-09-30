@@ -3,7 +3,9 @@
 import React, { useState, useCallback } from 'react';
 import { FormSchema, FormField } from '@/lib/types';
 import { getVisibleFields, getNextQuestion } from '@/lib/logic-engine';
-import { Star, Upload, CheckCircle2 } from 'lucide-react';
+import { Star, Upload, CheckCircle2, Image as ImageIcon } from 'lucide-react';
+import { getBackgroundStyle } from '@/lib/theme-presets';
+import TypeformRenderer from './TypeformRenderer';
 
 interface FormRendererProps {
   schema: FormSchema;
@@ -373,100 +375,94 @@ export default function FormRenderer({ schema, onSubmit, readOnly = false }: For
     );
   };
 
-  // ---------- Conversational Layout ----------
-  if (isConversational && visibleFields.length > 0) {
-    const currentField = visibleFields[currentIndex];
-    if (!currentField) return null;
-
-    return (
-      <div
-        style={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: schema.theme.background,
-          fontFamily: schema.theme.fontFamily,
-          padding: 24,
-        }}
-      >
-        <div style={{ maxWidth: 600, width: '100%' }}>
-          {/* Progress */}
-          <div style={{ marginBottom: 40 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, color: '#52796F', marginBottom: 6 }}>
-              <span>{currentIndex + 1} of {visibleFields.length}</span>
-              <span>{Math.round(((currentIndex + 1) / visibleFields.length) * 100)}%</span>
-            </div>
-            <div style={{ height: 4, borderRadius: 2, background: 'rgba(0,0,0,0.08)' }}>
-              <div
-                style={{
-                  height: '100%',
-                  borderRadius: 2,
-                  background: schema.theme.primary,
-                  width: `${((currentIndex + 1) / visibleFields.length) * 100}%`,
-                  transition: 'width 0.3s ease',
-                }}
-              />
-            </div>
-          </div>
-
-          {renderField(currentField)}
-
-          <div style={{ display: 'flex', gap: 12 }}>
-            {currentIndex > 0 && (
-              <button
-                type="button"
-                onClick={() => setCurrentIndex(currentIndex - 1)}
-                className="btn btn-secondary"
-                style={{ borderColor: schema.theme.primary, color: schema.theme.primary }}
-              >
-                Back
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={handleNext}
-              className="btn btn-primary"
-              style={{ background: schema.theme.primary }}
-              disabled={submitting}
-            >
-              {submitting ? <span className="spinner" /> : currentIndex === visibleFields.length - 1 ? (schema.settings.submitButtonText || 'Submit') : 'Next'}
-            </button>
-          </div>
-        </div>
-      </div>
-    );
+  // ---------- Conversational Layout (Typeform Renderer) ----------
+  if (isConversational && schema.fields.length > 0) {
+    return <TypeformRenderer schema={schema} onSubmit={onSubmit} />;
   }
+
+  const currentPoster = schema.theme.posterUrl || schema.theme.bannerUrl;
+  const posterHeight = schema.theme.posterHeight || 180;
+  const overlayOpacity = (schema.theme.posterOverlay ?? 20) / 100;
 
   // ---------- Single Page Layout ----------
   return (
     <div
       style={{
         minHeight: '100vh',
-        background: schema.theme.background,
         fontFamily: schema.theme.fontFamily,
         padding: '40px 24px',
+        ...getBackgroundStyle(schema.theme),
       }}
     >
-      <form onSubmit={handleSubmit} style={{ maxWidth: 640, margin: '0 auto' }}>
+      <form onSubmit={handleSubmit} style={{ maxWidth: 680, margin: '0 auto' }}>
         <div
           style={{
             background: 'white',
             borderRadius: 16,
-            padding: '40px 36px',
-            boxShadow: '0 4px 16px rgba(0,0,0,0.06)',
+            overflow: 'hidden',
+            boxShadow: '0 8px 30px rgba(0,0,0,0.08)',
             marginBottom: 24,
+            border: '1px solid rgba(184,206,207,0.35)',
           }}
         >
-          {/* Header */}
-          <h1 style={{ fontSize: baseFontSize + 8, fontWeight: 700, color: schema.theme.text, marginBottom: 8 }}>
-            {schema.title}
-          </h1>
-          {schema.description && (
-            <p style={{ color: '#52796F', fontSize: baseFontSize - 1, marginBottom: 32, lineHeight: 1.6 }}>
-              {schema.description}
-            </p>
+          {/* POSTER DISPLAY */}
+          {currentPoster && (
+            <div
+              style={{
+                position: 'relative',
+                width: '100%',
+                height: posterHeight,
+                overflow: 'hidden',
+                background: '#0F172A',
+              }}
+            >
+              <img
+                src={currentPoster}
+                alt="Form poster"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  display: 'block',
+                }}
+              />
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: `linear-gradient(to top, rgba(0,0,0, ${Math.max(0.4, overlayOpacity + 0.2)}), rgba(0,0,0, ${overlayOpacity}))`,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'flex-end',
+                  padding: '24px 32px',
+                  color: 'white',
+                }}
+              >
+                {schema.theme.posterTitle && (
+                  <h2 style={{ fontSize: 24, fontWeight: 800, margin: '0 0 4px 0', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
+                    {schema.theme.posterTitle}
+                  </h2>
+                )}
+                {schema.theme.posterSubtitle && (
+                  <p style={{ fontSize: 13, margin: 0, opacity: 0.9, textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}>
+                    {schema.theme.posterSubtitle}
+                  </p>
+                )}
+              </div>
+            </div>
           )}
+
+          <div style={{ padding: '36px 36px 20px' }}>
+            {/* Header */}
+            <h1 style={{ fontSize: baseFontSize + 8, fontWeight: 800, color: schema.theme.text, marginBottom: 8 }}>
+              {schema.title}
+            </h1>
+            {schema.description && (
+              <p style={{ color: '#52796F', fontSize: baseFontSize - 1, marginBottom: 28, lineHeight: 1.6 }}>
+                {schema.description}
+              </p>
+            )}
+          </div>
 
           {/* Progress bar */}
           {schema.settings.showProgressBar && visibleFields.length > 0 && (

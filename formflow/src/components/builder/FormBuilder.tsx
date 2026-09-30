@@ -27,6 +27,7 @@ import PropertiesPanel from '@/components/builder/PropertiesPanel';
 import LogicPanel from '@/components/builder/LogicPanel';
 import ThemePanel from '@/components/builder/ThemePanel';
 import BuilderToolbar from '@/components/builder/BuilderToolbar';
+import { getBackgroundStyle } from '@/lib/theme-presets';
 
 interface FormBuilderProps {
   initialSchema: FormSchema;
@@ -220,14 +221,27 @@ export default function FormBuilder({
             <FieldPalette onAddField={addField} />
           </div>
 
-          {/* Center: Canvas */}
-          <div style={{ flex: 1, overflowY: 'auto', padding: '24px 32px', background: 'transparent' }} className="builder-canvas">
+          {/* Center: Canvas with live customized background */}
+          <div
+            style={{
+              flex: 1,
+              overflowY: 'auto',
+              padding: '24px 32px',
+              transition: 'background 0.3s ease',
+              ...getBackgroundStyle(schema.theme),
+            }}
+            className="builder-canvas"
+          >
             <FormCanvas
               fields={schema.fields}
               selectedFieldId={selectedFieldId}
               onSelectField={setSelectedFieldId}
               onDeleteField={deleteField}
               onDuplicateField={duplicateField}
+              theme={schema.theme}
+              title={schema.title}
+              description={schema.description}
+              onOpenThemePanel={() => setActivePanel('theme')}
             />
           </div>
 

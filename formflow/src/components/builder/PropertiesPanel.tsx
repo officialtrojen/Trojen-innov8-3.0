@@ -27,13 +27,37 @@ export default function PropertiesPanel({ field, onUpdate }: PropertiesPanelProp
 
       {/* Question Label */}
       <div style={{ marginBottom: 16 }}>
-        <label className="label">Question</label>
+        <label className="label">Question Title</label>
         <input
           className="input"
           value={field.label}
           onChange={(e) => onUpdate({ label: e.target.value })}
         />
       </div>
+
+      {/* Question Description / Helper Text */}
+      <div style={{ marginBottom: 16 }}>
+        <label className="label">Description / Subtitle</label>
+        <textarea
+          className="textarea"
+          rows={2}
+          value={field.description || ''}
+          onChange={(e) => onUpdate({ description: e.target.value })}
+          placeholder="Optional helper text or instructions..."
+        />
+      </div>
+
+      {/* Welcome Screen Button Text */}
+      {field.type === 'welcome_screen' && (
+        <div style={{ marginBottom: 16 }}>
+          <label className="label">Start Button Text</label>
+          <input
+            className="input"
+            value={field.buttonText || 'Start Quiz'}
+            onChange={(e) => onUpdate({ buttonText: e.target.value })}
+          />
+        </div>
+      )}
 
       {/* Required Toggle */}
       <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>

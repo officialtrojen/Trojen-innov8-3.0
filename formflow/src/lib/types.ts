@@ -4,9 +4,11 @@
 
 // ---------- Field Types ----------
 export type FieldType =
+  | 'welcome_screen'
   | 'short_text'
   | 'paragraph'
   | 'multiple_choice'
+  | 'yes_no'
   | 'rating'
   | 'file_upload'
   | 'date_picker';
@@ -26,11 +28,13 @@ export interface FormField {
   id: string;
   type: FieldType;
   label: string;
+  description?: string;
   required: boolean;
   placeholder?: string;
   options?: string[];
   selectionMode?: 'single' | 'multiple';
   maxStars?: number;
+  buttonText?: string;
   validation?: FieldValidation;
 }
 
@@ -75,6 +79,19 @@ export interface FormTheme {
   layout: 'single-page' | 'conversational';
   logoUrl?: string;
   bannerUrl?: string;
+  // Background customization options
+  backgroundType?: 'solid' | 'gradient' | 'pattern' | 'image';
+  backgroundGradient?: string;
+  backgroundPattern?: 'dots' | 'grid' | 'mesh' | 'stripes' | 'none';
+  backgroundImage?: string;
+  backgroundBlur?: number;
+  // Poster in form options
+  posterUrl?: string;
+  posterStyle?: 'banner' | 'card-top' | 'floating' | 'background';
+  posterHeight?: number;
+  posterOverlay?: number;
+  posterTitle?: string;
+  posterSubtitle?: string;
 }
 
 export const DEFAULT_THEME: FormTheme = {
@@ -85,6 +102,12 @@ export const DEFAULT_THEME: FormTheme = {
   fontFamily: 'Inter',
   fontSize: 'medium',
   layout: 'single-page',
+  backgroundType: 'solid',
+  backgroundGradient: 'linear-gradient(135deg, #EAF4F4 0%, #CFE5E3 100%)',
+  backgroundPattern: 'none',
+  posterHeight: 180,
+  posterStyle: 'card-top',
+  posterOverlay: 20,
 };
 
 // ---------- Form Settings ----------
@@ -184,6 +207,18 @@ export interface PaletteItem {
 
 export const FIELD_PALETTE: PaletteItem[] = [
   {
+    type: 'welcome_screen',
+    label: 'Welcome Screen',
+    icon: 'Sparkles',
+    defaultField: {
+      type: 'welcome_screen',
+      label: 'Welcome to our Form',
+      description: 'Please answer the following questions to help us understand your needs.',
+      required: false,
+      buttonText: 'Start Quiz',
+    },
+  },
+  {
     type: 'short_text',
     label: 'Short Text',
     icon: 'Type',
@@ -216,6 +251,17 @@ export const FIELD_PALETTE: PaletteItem[] = [
       required: false,
       options: ['Option 1', 'Option 2', 'Option 3'],
       selectionMode: 'single',
+    },
+  },
+  {
+    type: 'yes_no',
+    label: 'Yes / No',
+    icon: 'CheckSquare',
+    defaultField: {
+      type: 'yes_no',
+      label: 'Do you agree?',
+      description: 'Press Y for Yes or N for No',
+      required: false,
     },
   },
   {

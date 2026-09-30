@@ -9,6 +9,8 @@ import {
   Star,
   Upload,
   Calendar,
+  Sparkles,
+  CheckSquare,
 } from 'lucide-react';
 import { FIELD_PALETTE } from '@/lib/types';
 
@@ -19,6 +21,8 @@ const iconMap: Record<string, React.ElementType> = {
   Star,
   Upload,
   Calendar,
+  Sparkles,
+  CheckSquare,
 };
 
 function PaletteItem({ type, label, icon, onAdd }: { type: string; label: string; icon: string; onAdd: () => void }) {

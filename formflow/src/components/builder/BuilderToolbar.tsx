@@ -77,9 +77,9 @@ export default function BuilderToolbar({
       {/* Center: Panel toggles */}
       <div style={{ display: 'flex', gap: 4, background: 'var(--accent)', borderRadius: 8, padding: 3 }}>
         {([
-          { key: 'properties', label: 'Properties', icon: null },
+          { key: 'properties', label: 'Fields', icon: null },
           { key: 'logic', label: 'Logic', icon: GitBranch },
-          { key: 'theme', label: 'Theme', icon: Palette },
+          { key: 'theme', label: 'Theme & Poster', icon: Palette },
         ] as const).map((tab) => (
           <button
             key={tab.key}
