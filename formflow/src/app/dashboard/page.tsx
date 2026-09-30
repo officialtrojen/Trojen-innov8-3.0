@@ -114,7 +114,7 @@ export default function DashboardPage() {
           <h1 style={{ fontSize: 26, fontWeight: 700, color: '#F8FAFC', marginBottom: 4, letterSpacing: '-0.02em' }}>Dashboard</h1>
           <p style={{ color: '#94A3B8', fontSize: 14 }}>Welcome back! Here&apos;s an overview of your forms.</p>
         </div>
-        <Link href="/dashboard/forms/new" className="btn btn-primary">
+        <Link href="/builder" className="btn btn-primary">
           <PlusCircle size={18} /> Create Form
         </Link>
       </div>
@@ -147,7 +147,7 @@ export default function DashboardPage() {
           <FileText size={40} style={{ color: '#64748B', marginBottom: 16 }} />
           <h3 style={{ fontSize: 18, fontWeight: 600, color: '#F8FAFC', marginBottom: 8 }}>No forms yet</h3>
           <p style={{ color: '#94A3B8', fontSize: 14, marginBottom: 24 }}>Create your first form to get started.</p>
-          <Link href="/dashboard/forms/new" className="btn btn-primary">
+          <Link href="/builder" className="btn btn-primary">
             <PlusCircle size={18} /> Create Your First Form
           </Link>
         </div>

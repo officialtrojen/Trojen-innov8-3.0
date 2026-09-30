@@ -144,7 +144,7 @@ function Sidebar() {
       {/* Primary CTA - Create Form Button matching Landing Page primary button */}
       <div style={{ padding: '0 12px', marginBottom: 18 }}>
         <Link
-          href="/dashboard/forms/new"
+          href="/builder"
           onClick={() => setMobileOpen(false)}
           className="create-form-btn-glow"
           style={{

@@ -59,7 +59,7 @@ export default function MyFormsPage() {
         </div>
         
         <div style={{ display: 'flex', gap: 12 }}>
-          <Link href="/dashboard/forms/new" className="btn btn-primary" style={{ padding: '10px 20px', borderRadius: 8 }}>
+          <Link href="/builder" className="btn btn-primary" style={{ padding: '10px 20px', borderRadius: 8 }}>
             <Plus size={16} /> Create Form
           </Link>
         </div>
@@ -83,24 +83,14 @@ export default function MyFormsPage() {
             </div>
             <h2 style={{ fontSize: 22, fontWeight: 700, color: '#F8FAFC', marginBottom: 12 }}>No Forms Yet</h2>
             <p style={{ fontSize: 14, color: '#94A3B8', maxWidth: 360, margin: '0 auto 32px', lineHeight: 1.6 }}>
-              You haven't created any forms. Click the button below to start building your first one.
+              You haven&apos;t created any forms. Click the button below to start building your first one.
             </p>
             <div style={{ display: 'flex', gap: 16, justifyContent: 'center' }}>
-              <Link href="/dashboard/forms/new">
-                <button style={{
-                  background: '#8B5CF6', color: 'white', border: 'none', padding: '10px 24px', borderRadius: '8px',
-                  fontSize: 14, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer'
-                }}>
-                  <Plus size={16} /> Create Form
-                </button>
+              <Link href="/builder" className="btn btn-primary" style={{ padding: '10px 24px', borderRadius: 8 }}>
+                <Plus size={16} /> Create Form
               </Link>
-              <Link href="/dashboard/forms/new">
-                <button style={{
-                  background: 'rgba(255,255,255,0.05)', color: '#F8FAFC', border: '1px solid rgba(255,255,255,0.1)', padding: '10px 24px', borderRadius: '8px',
-                  fontSize: 14, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer'
-                }}>
-                  <LayoutTemplate size={16} /> View Templates
-                </button>
+              <Link href="/builder" className="btn btn-secondary" style={{ padding: '10px 24px', borderRadius: 8, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
+                <LayoutTemplate size={16} /> Studio Templates
               </Link>
             </div>
           </motion.div>
