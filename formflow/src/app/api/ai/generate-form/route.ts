@@ -132,6 +132,18 @@ JSON Structure required:
               const cleanedText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
               const parsed = JSON.parse(cleanedText);
               if (parsed.schema && parsed.schema.fields) {
+                // Ensure schema theme merges with existing theme properties
+                const mergedTheme: FormTheme = {
+                  ...DEFAULT_THEME,
+                  ...(currentSchema?.theme || {}),
+                  ...(parsed.schema.theme || {}),
+                };
+
+                if (parsed.schema.theme?.primary && !mergedTheme.bannerColor) {
+                  mergedTheme.bannerColor = `linear-gradient(135deg, ${parsed.schema.theme.primary} 0%, #0F172A 100%)`;
+                }
+
+                parsed.schema.theme = mergedTheme;
                 return NextResponse.json(parsed);
               }
             }
@@ -151,36 +163,79 @@ JSON Structure required:
     let description = currentSchema?.description || 'Form generated with AI Assistant.';
 
     // Intent 1: Theme & Visual Updates
-    if (lowerPrompt.includes('theme') || lowerPrompt.includes('color') || lowerPrompt.includes('poster') || lowerPrompt.includes('dark') || lowerPrompt.includes('cyberpunk')) {
+    if (
+      lowerPrompt.includes('theme') ||
+      lowerPrompt.includes('color') ||
+      lowerPrompt.includes('poster') ||
+      lowerPrompt.includes('banner') ||
+      lowerPrompt.includes('dark') ||
+      lowerPrompt.includes('cyberpunk') ||
+      lowerPrompt.includes('purple') ||
+      lowerPrompt.includes('blue') ||
+      lowerPrompt.includes('yellow') ||
+      lowerPrompt.includes('red') ||
+      lowerPrompt.includes('green') ||
+      lowerPrompt.includes('amber')
+    ) {
       actionType = 'theme';
-      if (lowerPrompt.includes('cyberpunk') || lowerPrompt.includes('dark') || lowerPrompt.includes('purple')) {
+      if (lowerPrompt.includes('purple') || lowerPrompt.includes('cyberpunk') || lowerPrompt.includes('violet')) {
         updatedTheme = {
           ...updatedTheme,
           primary: '#8B5CF6',
-          background: '#05070D',
+          background: '#0F172A',
+          cardBackground: '#1E293B',
           backgroundType: 'solid',
-          posterTitle: 'Cyberpunk Portal',
-          posterSubtitle: 'Interactive AI Form Experience',
+          bannerColor: 'linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%)',
+          posterTitle: updatedTheme.posterTitle || 'Electric Purple Theme',
+          posterSubtitle: updatedTheme.posterSubtitle || 'Custom AI Form Styling',
         };
-        replyMessage = '✨ Applied Cyberpunk Midnight Obsidian & Electric Purple theme!';
-      } else if (lowerPrompt.includes('ocean') || lowerPrompt.includes('blue')) {
+        replyMessage = '✨ Applied Electric Purple Banner & Background Theme!';
+      } else if (lowerPrompt.includes('ocean') || lowerPrompt.includes('blue') || lowerPrompt.includes('cyan')) {
         updatedTheme = {
           ...updatedTheme,
           primary: '#38BDF8',
           background: '#0F172A',
+          cardBackground: '#1E293B',
           backgroundType: 'solid',
-          posterTitle: 'Oceanic Wave',
-          posterSubtitle: 'Clean & Modern Survey',
+          bannerColor: 'linear-gradient(135deg, #0284C7 0%, #0369A1 100%)',
+          posterTitle: updatedTheme.posterTitle || 'Oceanic Blue Theme',
+          posterSubtitle: updatedTheme.posterSubtitle || 'Clean & Modern Survey',
         };
-        replyMessage = '✨ Applied Deep Ocean Blue Theme!';
-      } else {
+        replyMessage = '✨ Applied Deep Ocean Blue Banner Theme!';
+      } else if (lowerPrompt.includes('emerald') || lowerPrompt.includes('green')) {
         updatedTheme = {
           ...updatedTheme,
-          primary: '#A855F7',
-          background: '#0F172A',
+          primary: '#10B981',
+          background: '#064E3B',
+          cardBackground: '#065F46',
           backgroundType: 'solid',
+          bannerColor: 'linear-gradient(135deg, #10B981 0%, #047857 100%)',
+          posterTitle: updatedTheme.posterTitle || 'Emerald Green Theme',
+          posterSubtitle: updatedTheme.posterSubtitle || 'Fresh Organic Theme',
         };
-        replyMessage = '✨ Updated form styling and theme colors!';
+        replyMessage = '✨ Applied Emerald Green Banner Theme!';
+      } else if (lowerPrompt.includes('amber') || lowerPrompt.includes('yellow') || lowerPrompt.includes('gold')) {
+        updatedTheme = {
+          ...updatedTheme,
+          primary: '#F59E0B',
+          background: '#451A03',
+          cardBackground: '#78350F',
+          backgroundType: 'solid',
+          bannerColor: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
+          posterTitle: updatedTheme.posterTitle || 'Warm Gold Amber Theme',
+          posterSubtitle: updatedTheme.posterSubtitle || 'Vibrant Warm Styling',
+        };
+        replyMessage = '✨ Applied Warm Amber Gold Banner Theme!';
+      } else {
+        const hexMatch = lowerPrompt.match(/#(?:[0-9a-fA-F]{3}){1,2}/);
+        const hex = hexMatch ? hexMatch[0] : '#8B5CF6';
+        updatedTheme = {
+          ...updatedTheme,
+          primary: hex,
+          bannerColor: `linear-gradient(135deg, ${hex} 0%, #0F172A 100%)`,
+          posterTitle: updatedTheme.posterTitle || 'Custom Theme Color',
+        };
+        replyMessage = `✨ Updated theme color and banner to ${hex}!`;
       }
 
       const mergedSchema: FormSchema = {
