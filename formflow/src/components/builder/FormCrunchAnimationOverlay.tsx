@@ -85,6 +85,7 @@ export default function FormCrunchAnimationOverlay({
           width={320}
           height={400}
           sceneHeight={440}
+          autoCrumple={true}
           crumpleAmount={0.96}
           crumpleDuration={0.4}
           releaseBehavior="stay"

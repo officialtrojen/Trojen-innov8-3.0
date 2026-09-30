@@ -293,6 +293,7 @@ export interface PaperCrumpleProps {
   seed?: number;
   detail?: number;
   disabled?: boolean;
+  autoCrumple?: boolean;
   resetKey?: number;
   onStateChange?: (state: string) => void;
   onError?: (error: Error) => void;
@@ -333,6 +334,7 @@ const PaperCrumple: React.FC<PaperCrumpleProps> = ({
   seed = 7,
   detail = 64,
   disabled = false,
+  autoCrumple = false,
   resetKey = 0,
   onStateChange,
   onError,
@@ -360,6 +362,7 @@ const PaperCrumple: React.FC<PaperCrumpleProps> = ({
     dragRadius,
     returnToOrigin,
     disabled,
+    autoCrumple,
     onStateChange,
     onError,
     onDragMove,
@@ -377,6 +380,7 @@ const PaperCrumple: React.FC<PaperCrumpleProps> = ({
     dragRadius,
     returnToOrigin,
     disabled,
+    autoCrumple,
     onStateChange,
     onError,
     onDragMove,
@@ -1134,6 +1138,9 @@ const PaperCrumple: React.FC<PaperCrumpleProps> = ({
           ready = true;
           setStatus('ready');
           hitEl.disabled = options.current.disabled;
+          if (options.current.autoCrumple) {
+            start();
+          }
           wake();
         })
         .catch((error) => {
