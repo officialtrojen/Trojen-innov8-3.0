@@ -173,7 +173,7 @@ function Hero() {
       <p
         style={{
           fontSize: 'clamp(1rem, 2vw, 1.2rem)',
-          color: '#9CA3AF',
+          color: '#E2E8F0',
           maxWidth: 600,
           margin: '0 auto 40px',
           lineHeight: 1.7,
@@ -365,101 +365,104 @@ function BuilderShowcaseSection() {
         >
           ✨ New Visual Studio
         </div>
-        <h2 style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)', fontWeight: 800, color: '#263B3B', marginBottom: 14 }}>
+        <h2 style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)', fontWeight: 800, color: '#FFFFFF', marginBottom: 14 }}>
           Drag-and-Drop Building, Custom Backgrounds & Posters
         </h2>
-        <p style={{ color: '#52796F', maxWidth: 640, margin: '0 auto', fontSize: 16, lineHeight: 1.6 }}>
+        <p style={{ color: '#E2E8F0', maxWidth: 640, margin: '0 auto', fontSize: 16, lineHeight: 1.6 }}>
           Design stunning, on-brand forms in seconds with our fluid drag-and-drop canvas, customizable backdrop styling, and visual header posters.
         </p>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 24, marginBottom: 40 }}>
         {/* Feature 1: Drag and drop */}
-        <div className="card" style={{ padding: 32, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+        <div className="card" style={{ padding: 32, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(99, 102, 241, 0.25)' }}>
           <div>
             <div
               style={{
                 width: 52,
                 height: 52,
                 borderRadius: 14,
-                background: 'linear-gradient(135deg, #EAF4F4, #CFE5E3)',
+                background: 'rgba(99, 102, 241, 0.15)',
+                border: '1px solid rgba(99, 102, 241, 0.3)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: 'var(--primary)',
+                color: '#818CF8',
                 marginBottom: 20,
               }}
             >
               <MousePointerClick size={26} />
             </div>
-            <h3 style={{ fontSize: 20, fontWeight: 700, color: '#263B3B', marginBottom: 10 }}>
+            <h3 style={{ fontSize: 20, fontWeight: 700, color: '#FFFFFF', marginBottom: 10 }}>
               Drag & Drop Questions
             </h3>
-            <p style={{ color: '#52796F', fontSize: 14, lineHeight: 1.7, marginBottom: 20 }}>
-              Powered by <strong>@dnd-kit</strong>. Seamlessly drag question blocks onto the canvas, grab handles to reorder questions in real-time, and duplicate or delete with a single click.
+            <p style={{ color: '#E2E8F0', fontSize: 14, lineHeight: 1.7, marginBottom: 20 }}>
+              Powered by <strong style={{ color: '#A5B4FC' }}>@dnd-kit</strong>. Seamlessly drag question blocks onto the canvas, grab handles to reorder questions in real-time, and duplicate or delete with a single click.
             </p>
           </div>
-          <div style={{ background: '#F8FAFC', borderRadius: 10, padding: 14, border: '1px solid rgba(184,206,207,0.4)', fontSize: 12, color: '#475569' }}>
+          <div style={{ background: 'rgba(30, 41, 59, 0.8)', borderRadius: 10, padding: 14, border: '1px solid rgba(255,255,255,0.1)', fontSize: 12, color: '#CBD5E1' }}>
             ✓ Short text, paragraphs, ratings, multiple choices, dates & files
           </div>
         </div>
 
         {/* Feature 2: Background Customizer */}
-        <div className="card" style={{ padding: 32, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+        <div className="card" style={{ padding: 32, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(99, 102, 241, 0.25)' }}>
           <div>
             <div
               style={{
                 width: 52,
                 height: 52,
                 borderRadius: 14,
-                background: 'linear-gradient(135deg, #F0FDF4, #DCFCE7)',
+                background: 'rgba(16, 185, 129, 0.15)',
+                border: '1px solid rgba(16, 185, 129, 0.3)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#16A34A',
+                color: '#34D399',
                 marginBottom: 20,
               }}
             >
               <Palette size={26} />
             </div>
-            <h3 style={{ fontSize: 20, fontWeight: 700, color: '#263B3B', marginBottom: 10 }}>
+            <h3 style={{ fontSize: 20, fontWeight: 700, color: '#FFFFFF', marginBottom: 10 }}>
               Custom Backgrounds & Gradients
             </h3>
-            <p style={{ color: '#52796F', fontSize: 14, lineHeight: 1.7, marginBottom: 20 }}>
+            <p style={{ color: '#E2E8F0', fontSize: 14, lineHeight: 1.7, marginBottom: 20 }}>
               Elevate your forms beyond plain white pages. Switch between curated color themes, smooth CSS gradients (Sunset, Aurora, Deep Ocean), subtle dot/grid architectural patterns, or upload custom wallpaper.
             </p>
           </div>
-          <div style={{ background: '#F8FAFC', borderRadius: 10, padding: 14, border: '1px solid rgba(184,206,207,0.4)', fontSize: 12, color: '#475569' }}>
+          <div style={{ background: 'rgba(30, 41, 59, 0.8)', borderRadius: 10, padding: 14, border: '1px solid rgba(255,255,255,0.1)', fontSize: 12, color: '#CBD5E1' }}>
             ✓ Solid colors, multi-stop gradients, mesh patterns & custom images
           </div>
         </div>
 
         {/* Feature 3: Posters & Header Banners */}
-        <div className="card" style={{ padding: 32, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+        <div className="card" style={{ padding: 32, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(99, 102, 241, 0.25)' }}>
           <div>
             <div
               style={{
                 width: 52,
                 height: 52,
                 borderRadius: 14,
-                background: 'linear-gradient(135deg, #FFF7ED, #FFEDD5)',
+                background: 'rgba(249, 115, 22, 0.15)',
+                border: '1px solid rgba(249, 115, 22, 0.3)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#EA580C',
+                color: '#FB923C',
                 marginBottom: 20,
               }}
             >
               <Eye size={26} />
             </div>
-            <h3 style={{ fontSize: 20, fontWeight: 700, color: '#263B3B', marginBottom: 10 }}>
+            <h3 style={{ fontSize: 20, fontWeight: 700, color: '#FFFFFF', marginBottom: 10 }}>
               Add Posters & Cover Banners
             </h3>
-            <p style={{ color: '#52796F', fontSize: 14, lineHeight: 1.7, marginBottom: 20 }}>
+            <p style={{ color: '#E2E8F0', fontSize: 14, lineHeight: 1.7, marginBottom: 20 }}>
               Upload your event, hackathon, or organization poster directly into the form header. Choose custom banner heights, tint overlays, and display custom event titles and subtitles on top.
             </p>
           </div>
-          <div style={{ background: '#F8FAFC', borderRadius: 10, padding: 14, border: '1px solid rgba(184,206,207,0.4)', fontSize: 12, color: '#475569' }}>
+          <div style={{ background: 'rgba(30, 41, 59, 0.8)', borderRadius: 10, padding: 14, border: '1px solid rgba(255,255,255,0.1)', fontSize: 12, color: '#CBD5E1' }}>
             ✓ Direct image file upload, curated presets, overlay dimming & titles
           </div>
         </div>
@@ -468,7 +471,7 @@ function BuilderShowcaseSection() {
       {/* Direct CTA Banner */}
       <div
         style={{
-          background: 'linear-gradient(135deg, #4F7C7A 0%, #365F5D 100%)',
+          background: 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)',
           borderRadius: 16,
           padding: '40px 32px',
           color: 'white',
@@ -477,14 +480,14 @@ function BuilderShowcaseSection() {
           justifyContent: 'space-between',
           flexWrap: 'wrap',
           gap: 24,
-          boxShadow: '0 12px 32px rgba(38, 59, 59, 0.16)',
+          boxShadow: '0 12px 32px rgba(99, 102, 241, 0.3)',
         }}
       >
         <div>
-          <h3 style={{ fontSize: 22, fontWeight: 800, margin: '0 0 8px 0' }}>
+          <h3 style={{ fontSize: 22, fontWeight: 800, margin: '0 0 8px 0', color: '#FFFFFF' }}>
             Ready to design your customized form?
           </h3>
-          <p style={{ margin: 0, opacity: 0.9, fontSize: 15, maxWidth: 520 }}>
+          <p style={{ margin: 0, color: '#E0E7FF', fontSize: 15, maxWidth: 520 }}>
             Open the visual drag & drop builder immediately. Add questions, pick your background, and upload a poster in real time.
           </p>
         </div>
@@ -496,8 +499,8 @@ function BuilderShowcaseSection() {
             fontSize: 15,
             fontWeight: 700,
             borderRadius: 10,
-            background: 'white',
-            color: '#263B3B',
+            background: '#FFFFFF',
+            color: '#4F46E5',
             border: 'none',
             display: 'flex',
             alignItems: 'center',
@@ -528,7 +531,7 @@ function Features() {
         <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', fontWeight: 700, color: '#F3F4F6', marginBottom: 12 }}>
           Everything you need to build powerful forms
         </h2>
-        <p style={{ color: '#9CA3AF', maxWidth: 600, margin: '0 auto', fontSize: 16 }}>
+        <p style={{ color: '#E2E8F0', maxWidth: 600, margin: '0 auto', fontSize: 16 }}>
           A complete toolkit for creating, distributing, and analyzing forms and surveys.
         </p>
       </div>
@@ -560,7 +563,7 @@ function Features() {
                 <f.icon size={24} />
               </div>
               <h3 style={{ fontSize: 18, fontWeight: 600, color: '#F3F4F6', marginBottom: 8 }}>{f.title}</h3>
-              <p style={{ color: '#9CA3AF', fontSize: 14, lineHeight: 1.7 }}>{f.desc}</p>
+              <p style={{ color: '#E2E8F0', fontSize: 14, lineHeight: 1.7 }}>{f.desc}</p>
             </div>
           </Scroll3DCard>
         ))}
@@ -582,7 +585,7 @@ function HowItWorks() {
     <section id="how-it-works" style={{ padding: '80px 24px', maxWidth: 900, margin: '0 auto', position: 'relative', zIndex: 1 }}>
       <div style={{ textAlign: 'center', marginBottom: 60 }}>
         <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', fontWeight: 700, color: '#F3F4F6', marginBottom: 12 }}>How It Works</h2>
-        <p style={{ color: '#9CA3AF', maxWidth: 500, margin: '0 auto', fontSize: 16 }}>Four simple steps from idea to insights.</p>
+        <p style={{ color: '#E2E8F0', maxWidth: 500, margin: '0 auto', fontSize: 16 }}>Four simple steps from idea to insights.</p>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
@@ -635,7 +638,7 @@ function HowItWorks() {
                   <span style={{ color: '#818CF8', marginRight: 8 }}>0{i + 1}</span>
                   {s.title}
                 </h3>
-                <p style={{ color: '#9CA3AF', fontSize: 14, lineHeight: 1.7 }}>{s.desc}</p>
+                <p style={{ color: '#E2E8F0', fontSize: 14, lineHeight: 1.7 }}>{s.desc}</p>
               </div>
             </div>
           </Scroll3DCard>
@@ -653,7 +656,7 @@ function LogicDemo() {
         <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', fontWeight: 700, color: '#F3F4F6', marginBottom: 12 }}>
           Conditional Logic That Actually Works
         </h2>
-        <p style={{ color: '#9CA3AF', maxWidth: 500, margin: '0 auto', fontSize: 16 }}>
+        <p style={{ color: '#E2E8F0', maxWidth: 500, margin: '0 auto', fontSize: 16 }}>
           Build branching paths so respondents only see relevant questions.
         </p>
       </div>
@@ -734,7 +737,7 @@ function Integrations() {
       <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', fontWeight: 700, color: '#F3F4F6', marginBottom: 12 }}>
         Connect to Your Favorite Tools
       </h2>
-      <p style={{ color: '#9CA3AF', maxWidth: 500, margin: '0 auto 40px', fontSize: 16 }}>
+      <p style={{ color: '#E2E8F0', maxWidth: 500, margin: '0 auto 40px', fontSize: 16 }}>
         Trigger webhooks on every form submission. Integrate with Slack, Discord, Zapier, and any custom endpoint.
       </p>
 
@@ -783,7 +786,7 @@ function CTA() {
           <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2rem)', fontWeight: 700, color: '#F3F4F6', marginBottom: 12 }}>
             Ready to build smarter forms?
           </h2>
-          <p style={{ color: '#9CA3AF', marginBottom: 32, fontSize: 16 }}>
+          <p style={{ color: '#E2E8F0', marginBottom: 32, fontSize: 16 }}>
             Start creating in minutes. No credit card required.
           </p>
           <Link href="/signup" className="btn btn-primary btn-lg" style={{ fontSize: 16, borderRadius: 12 }}>
