@@ -18,8 +18,7 @@ import {
   X,
 } from 'lucide-react';
 import LiveBackground from '@/components/LiveBackground';
-import Hero3DCanvas from '@/components/Hero3DCanvas';
-import Scroll3DCanvas from '@/components/Scroll3DCanvas';
+import Unified3DCanvas from '@/components/Unified3DCanvas';
 import Scroll3DCard from '@/components/Scroll3DCard';
 
 /* ── Navigation ── */
@@ -187,9 +186,6 @@ function Hero() {
           Explore Demo
         </Link>
       </div>
-
-      {/* 3D Interactive Hero Canvas */}
-      <Hero3DCanvas />
 
       {/* Product Preview */}
       <div
@@ -628,7 +624,7 @@ export default function LandingPage() {
   return (
     <>
       <LiveBackground />
-      <Scroll3DCanvas />
+      <Unified3DCanvas />
       <Navbar />
       <main>
         <Hero />

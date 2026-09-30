@@ -19,36 +19,18 @@ export default function Scroll3DCard({ children, className = '', style = {} }: S
     const card = cardRef.current;
     if (!card) return;
 
-    // IntersectionObserver to activate 3D entry animation on scroll into view
+    // Use IntersectionObserver only (no scroll event listeners for card positioning)
     const observer = new IntersectionObserver(
       ([entry]) => {
         setIsInView(entry.isIntersecting);
       },
-      { threshold: 0.15 }
+      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
     );
 
     observer.observe(card);
 
-    // Scroll tilt effect based on element position relative to viewport center
-    const handleScroll = () => {
-      if (!card) return;
-      const rect = card.getBoundingClientRect();
-      const windowHeight = window.innerHeight;
-      const cardCenterY = rect.top + rect.height / 2;
-      const offsetFromCenter = (cardCenterY - windowHeight / 2) / (windowHeight / 2);
-
-      // Subtle tilt based on scroll position in viewport
-      if (rect.top < windowHeight && rect.bottom > 0) {
-        setRotateX(offsetFromCenter * -6); // max 6 deg tilt
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-
     return () => {
       observer.disconnect();
-      window.removeEventListener('scroll', handleScroll);
     };
   }, []);
 
@@ -61,12 +43,12 @@ export default function Scroll3DCard({ children, className = '', style = {} }: S
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
 
-    const rY = ((x - centerX) / centerX) * 12; // max 12 deg
-    const rX = ((centerY - y) / centerY) * 12;
+    const rY = ((x - centerX) / centerX) * 8; // Max 8 deg for smooth movement
+    const rX = ((centerY - y) / centerY) * 8;
 
     setRotateX(rX);
     setRotateY(rY);
-    setScale(1.02);
+    setScale(1.015);
   };
 
   const handleMouseLeave = () => {
@@ -84,9 +66,9 @@ export default function Scroll3DCard({ children, className = '', style = {} }: S
       style={{
         perspective: 1000,
         transformStyle: 'preserve-3d',
-        transition: 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease, filter 0.6s ease',
-        transform: `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(${scale}) translateY(${isInView ? 0 : 30}px)`,
-        opacity: isInView ? 1 : 0.4,
+        transition: 'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease',
+        transform: `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(${scale}) translate3d(0, ${isInView ? 0 : 20}px, 0)`,
+        opacity: isInView ? 1 : 0.3,
         willChange: 'transform, opacity',
         ...style,
       }}
