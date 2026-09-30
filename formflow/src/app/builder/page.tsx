@@ -590,6 +590,21 @@ function BuilderCanvasInner() {
           });
         }
       } else {
+        // Check if form with same title already exists
+        const { data: duplicate } = await supabase
+          .from('forms')
+          .select('id')
+          .eq('owner_id', ownerId)
+          .ilike('title', schema.title.trim())
+          .maybeSingle();
+
+        if (duplicate) {
+          alert(`A form named "${schema.title.trim()}" already exists in your account. Please change the form title.`);
+          setCloudSyncStatus('unsaved');
+          setSaving(false);
+          return;
+        }
+
         const slug = generateSlug();
         const { data, error } = await supabase
           .from('forms')

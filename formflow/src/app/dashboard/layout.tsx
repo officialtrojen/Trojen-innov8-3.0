@@ -19,6 +19,7 @@ import {
   ChevronRight,
   Zap,
   ShieldCheck,
+  AlertCircle,
 } from 'lucide-react';
 import { AuthProvider, useAuth } from '@/components/AuthProvider';
 import LiveBackground from '@/components/LiveBackground';
@@ -87,6 +88,7 @@ function Sidebar() {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [formName, setFormName] = useState('');
   const [formDesc, setFormDesc] = useState('');
+  const [formNameError, setFormNameError] = useState<string | null>(null);
   const [creatingForm, setCreatingForm] = useState(false);
 
   const handleSignOut = () => {
@@ -100,6 +102,7 @@ function Sidebar() {
 
     const title = formName.trim();
     const description = formDesc.trim();
+    setFormNameError(null);
     setCreatingForm(true);
 
     try {
@@ -116,6 +119,20 @@ function Sidebar() {
           if (typeof window !== 'undefined') localStorage.setItem('formflow_guest_id', guestId);
         }
         ownerId = guestId;
+      }
+
+      // Check if a form with the same name already exists for this user
+      const { data: existingForm } = await supabase
+        .from('forms')
+        .select('id')
+        .eq('owner_id', ownerId)
+        .ilike('title', title)
+        .maybeSingle();
+
+      if (existingForm) {
+        setFormNameError(`A form named "${title}" already exists. Please choose a different name.`);
+        setCreatingForm(false);
+        return;
       }
 
       const freshSchema = {
@@ -698,20 +715,45 @@ function Sidebar() {
                   required
                   autoFocus
                   value={formName}
-                  onChange={(e) => setFormName(e.target.value)}
+                  onChange={(e) => {
+                    setFormName(e.target.value);
+                    if (formNameError) setFormNameError(null);
+                  }}
                   placeholder="e.g., Customer Feedback, Event RSVP"
                   style={{
                     width: '100%',
                     padding: '10px 14px',
                     borderRadius: 8,
                     background: 'rgba(255, 255, 255, 0.04)',
-                    border: '1px solid rgba(255, 255, 255, 0.14)',
+                    border: formNameError
+                      ? '1px solid #EF4444'
+                      : '1px solid rgba(255, 255, 255, 0.14)',
                     color: '#FFFFFF',
                     fontSize: 14,
                     outline: 'none',
                     boxSizing: 'border-box',
                   }}
                 />
+                {formNameError && (
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 6,
+                      marginTop: 8,
+                      color: '#F87171',
+                      fontSize: 12.5,
+                      fontWeight: 500,
+                      background: 'rgba(239, 68, 68, 0.1)',
+                      padding: '6px 12px',
+                      borderRadius: 6,
+                      border: '1px solid rgba(239, 68, 68, 0.25)',
+                    }}
+                  >
+                    <AlertCircle size={15} color="#F87171" style={{ flexShrink: 0 }} />
+                    <span>{formNameError}</span>
+                  </div>
+                )}
               </div>
 
               <div style={{ marginBottom: 24 }}>
