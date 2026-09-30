@@ -328,19 +328,30 @@ function BuilderCanvasInner() {
           });
         initialized = true;
       } else if (urlTitle || isNew) {
+        const starterId = 'q_' + Math.random().toString(36).substring(2, 8);
         const freshSchema: FormSchema = {
           title: urlTitle ? decodeURIComponent(urlTitle) : 'Untitled Form',
           description: urlDesc ? decodeURIComponent(urlDesc) : '',
-          fields: [],
+          fields: [
+            {
+              id: starterId,
+              type: 'short_text',
+              label: 'What is your full name?',
+              required: true,
+              placeholder: 'Type your answer here...',
+            },
+          ],
           logic: [],
           theme: DEFAULT_THEME,
           settings: DEFAULT_SETTINGS,
         };
         setSchema(freshSchema);
+        setExistingFormId(null);
+        setExistingPublicSlug(null);
         try {
           localStorage.setItem('formflow_builder_draft', JSON.stringify(freshSchema));
         } catch {}
-        setSelectedFieldId(null);
+        setSelectedFieldId(starterId);
         setActivePanel('properties');
         initialized = true;
       }

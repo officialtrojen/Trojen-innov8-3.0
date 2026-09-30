@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { createClient } from '@/lib/supabase/client';
 import {
   Layers,
   ArrowRight,
@@ -13,14 +15,65 @@ import {
   Cpu,
   Satellite,
   Globe2,
+  X,
+  PlusCircle,
+  AlertCircle,
 } from 'lucide-react';
 import ReorderingFeatures from '@/components/ReorderingFeatures';
 
 export default function ParallaxDeepSpaceLandingPage() {
+  const router = useRouter();
   const [scrollY, setScrollY] = useState(0);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [activeSection, setActiveSection] = useState('hero');
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  // Form creation modal state
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [formName, setFormName] = useState('');
+  const [formDesc, setFormDesc] = useState('');
+  const [formNameError, setFormNameError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  const handleModalSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = formName.trim();
+    if (!trimmed) {
+      setFormNameError('Please provide a form name.');
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const supabase = createClient();
+      const { data: authData } = await supabase.auth.getUser();
+      if (authData?.user) {
+        const { data: existing } = await supabase
+          .from('forms')
+          .select('id')
+          .eq('owner_id', authData.user.id)
+          .ilike('title', trimmed)
+          .maybeSingle();
+
+        if (existing) {
+          setFormNameError(`A form named "${trimmed}" already exists in your account.`);
+          setSubmitting(false);
+          return;
+        }
+      }
+
+      setCreateModalOpen(false);
+      const titleParam = encodeURIComponent(trimmed);
+      const descParam = encodeURIComponent(formDesc.trim());
+      router.push(`/builder?title=${titleParam}&description=${descParam}&new=true`);
+    } catch (err) {
+      console.error('Error checking form name:', err);
+      setCreateModalOpen(false);
+      router.push(`/builder?title=${encodeURIComponent(trimmed)}&description=${encodeURIComponent(formDesc.trim())}&new=true`);
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   // Smooth scroll listener via requestAnimationFrame
   useEffect(() => {
@@ -267,8 +320,14 @@ export default function ParallaxDeepSpaceLandingPage() {
             >
               Sign In
             </Link>
-            <Link
-              href="/builder"
+            <button
+              type="button"
+              onClick={() => {
+                setFormName('');
+                setFormDesc('');
+                setFormNameError(null);
+                setCreateModalOpen(true);
+              }}
               style={{
                 fontSize: 13,
                 fontWeight: 600,
@@ -276,13 +335,16 @@ export default function ParallaxDeepSpaceLandingPage() {
                 background: '#F8FAFC',
                 padding: '9px 18px',
                 borderRadius: 8,
-                textDecoration: 'none',
+                border: 'none',
                 boxShadow: '0 0 20px rgba(255, 255, 255, 0.15)',
                 transition: 'all 0.2s ease',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
               }}
             >
               Launch Studio →
-            </Link>
+            </button>
           </div>
         </header>
 
@@ -327,8 +389,14 @@ export default function ParallaxDeepSpaceLandingPage() {
           </p>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
-            <Link
-              href="/builder"
+            <button
+              type="button"
+              onClick={() => {
+                setFormName('');
+                setFormDesc('');
+                setFormNameError(null);
+                setCreateModalOpen(true);
+              }}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -339,12 +407,13 @@ export default function ParallaxDeepSpaceLandingPage() {
                 borderRadius: 10,
                 fontWeight: 700,
                 fontSize: 14,
-                textDecoration: 'none',
+                border: 'none',
                 boxShadow: '0 4px 24px rgba(255, 255, 255, 0.18)',
+                cursor: 'pointer',
               }}
             >
               Build New Form <ArrowRight size={16} />
-            </Link>
+            </button>
 
             <Link
               href="/dashboard"
@@ -584,8 +653,14 @@ export default function ParallaxDeepSpaceLandingPage() {
               flexWrap: 'wrap',
             }}
           >
-            <Link
-              href="/builder"
+            <button
+              type="button"
+              onClick={() => {
+                setFormName('');
+                setFormDesc('');
+                setFormNameError(null);
+                setCreateModalOpen(true);
+              }}
               style={{
                 background: '#FFFFFF',
                 color: '#020306',
@@ -593,12 +668,13 @@ export default function ParallaxDeepSpaceLandingPage() {
                 borderRadius: 10,
                 fontWeight: 700,
                 fontSize: 14,
-                textDecoration: 'none',
+                border: 'none',
                 boxShadow: '0 4px 28px rgba(255, 255, 255, 0.2)',
+                cursor: 'pointer',
               }}
             >
               Start Building Free →
-            </Link>
+            </button>
 
             <Link
               href="/login"
@@ -653,6 +729,191 @@ export default function ParallaxDeepSpaceLandingPage() {
         </footer>
       </div>
 
+
+      {/* Create Form Modal asking for Form Name and Description */}
+      {createModalOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 100,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 20,
+            background: 'rgba(2, 3, 6, 0.85)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+          }}
+          onClick={() => setCreateModalOpen(false)}
+        >
+          <div
+            style={{
+              width: '100%',
+              maxWidth: 480,
+              background: '#080C1A',
+              border: '1px solid rgba(255, 255, 255, 0.12)',
+              borderRadius: 16,
+              padding: '28px 24px',
+              boxShadow: '0 25px 60px rgba(0, 0, 0, 0.85)',
+              position: 'relative',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setCreateModalOpen(false)}
+              style={{
+                position: 'absolute',
+                top: 18,
+                right: 18,
+                background: 'transparent',
+                border: 'none',
+                color: '#94A3B8',
+                cursor: 'pointer',
+                padding: 4,
+              }}
+            >
+              <X size={20} />
+            </button>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+              <div
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: 8,
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#FFFFFF',
+                }}
+              >
+                <PlusCircle size={18} />
+              </div>
+              <h2 style={{ fontSize: 18, fontWeight: 700, color: '#F8FAFC', margin: 0 }}>
+                Launch Form Studio
+              </h2>
+            </div>
+
+            <p style={{ color: '#94A3B8', fontSize: 13, marginBottom: 20, lineHeight: 1.5 }}>
+              Enter a form name and optional description to launch into the studio canvas.
+            </p>
+
+            <form onSubmit={handleModalSubmit}>
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ display: 'block', fontSize: 12.5, fontWeight: 600, color: '#E2E8F0', marginBottom: 6 }}>
+                  Form Name <span style={{ color: '#F87171' }}>*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  autoFocus
+                  value={formName}
+                  onChange={(e) => {
+                    setFormName(e.target.value);
+                    if (formNameError) setFormNameError(null);
+                  }}
+                  placeholder="e.g., Customer Feedback, Event RSVP"
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    borderRadius: 8,
+                    background: 'rgba(255, 255, 255, 0.04)',
+                    border: formNameError
+                      ? '1px solid #EF4444'
+                      : '1px solid rgba(255, 255, 255, 0.14)',
+                    color: '#FFFFFF',
+                    fontSize: 14,
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                  }}
+                />
+                {formNameError && (
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 6,
+                      marginTop: 8,
+                      color: '#F87171',
+                      fontSize: 12.5,
+                      fontWeight: 500,
+                      background: 'rgba(239, 68, 68, 0.1)',
+                      padding: '6px 12px',
+                      borderRadius: 6,
+                      border: '1px solid rgba(239, 68, 68, 0.25)',
+                    }}
+                  >
+                    <AlertCircle size={15} color="#F87171" style={{ flexShrink: 0 }} />
+                    <span>{formNameError}</span>
+                  </div>
+                )}
+              </div>
+
+              <div style={{ marginBottom: 24 }}>
+                <label style={{ display: 'block', fontSize: 12.5, fontWeight: 600, color: '#E2E8F0', marginBottom: 6 }}>
+                  Description <span style={{ color: '#64748B', fontWeight: 400 }}>(Optional)</span>
+                </label>
+                <textarea
+                  rows={3}
+                  value={formDesc}
+                  onChange={(e) => setFormDesc(e.target.value)}
+                  placeholder="Briefly describe what this form is for..."
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    borderRadius: 8,
+                    background: 'rgba(255, 255, 255, 0.04)',
+                    border: '1px solid rgba(255, 255, 255, 0.14)',
+                    color: '#FFFFFF',
+                    fontSize: 14,
+                    outline: 'none',
+                    resize: 'vertical',
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+                <button
+                  type="button"
+                  onClick={() => setCreateModalOpen(false)}
+                  className="btn btn-ghost"
+                  style={{ padding: '9px 18px', color: '#94A3B8' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={!formName.trim() || submitting}
+                  className="btn btn-primary"
+                  style={{
+                    padding: '9px 20px',
+                    borderRadius: 8,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    cursor: !formName.trim() || submitting ? 'not-allowed' : 'pointer',
+                    opacity: !formName.trim() || submitting ? 0.7 : 1,
+                  }}
+                >
+                  {submitting ? (
+                    <>
+                      <span className="spinner" style={{ width: 14, height: 14 }} />
+                      <span>Checking...</span>
+                    </>
+                  ) : (
+                    <span>Launch Studio →</span>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       <style>{`
         @keyframes bounce {
