@@ -193,13 +193,18 @@ export const SortableFieldItem: React.FC<SortableFieldItemProps> = ({
       </div>
 
       {/* Question Label */}
-      <div className="mb-2">
-        <h3 className="text-sm font-semibold text-white flex items-baseline gap-1">
+      <div className="mb-2" style={{ fontFamily: field.fontFamily || undefined }}>
+        <h3 className="text-sm font-semibold text-white flex items-baseline gap-1" style={{ fontFamily: field.fontFamily || undefined }}>
           {field.label || 'Untitled Question'}
           {field.required && <span className="text-rose-400">*</span>}
+          {field.fontFamily && (
+            <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400 font-normal ml-1">
+              🔤 {field.fontFamily}
+            </span>
+          )}
         </h3>
         {field.description && (
-          <p className="text-xs text-zinc-400 mt-0.5">{field.description}</p>
+          <p className="text-xs text-zinc-400 mt-0.5" style={{ fontFamily: field.fontFamily || undefined }}>{field.description}</p>
         )}
       </div>
 
