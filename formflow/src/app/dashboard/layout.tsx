@@ -97,10 +97,11 @@ function Sidebar() {
 
   const sidebarContent = (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: '100%' }}>
-      {/* Brand Header - EXACT match with Landing Page logo */}
-      <div style={{ padding: '0 20px', marginBottom: 20 }}>
+      {/* Brand Header - links to Landing Page */}
+      <div style={{ padding: '0 20px', marginBottom: 24 }}>
         <Link
-          href="/dashboard"
+          href="/"
+          title="Return to Landing Page"
           style={{
             textDecoration: 'none',
             display: 'flex',
@@ -138,26 +139,6 @@ function Sidebar() {
             FormFlow
           </span>
         </Link>
-
-        {/* Live Workspace Status indicator */}
-        <div
-          style={{
-            marginTop: 12,
-            padding: '5px 10px',
-            background: 'rgba(255, 255, 255, 0.03)',
-            border: '1px solid rgba(255, 255, 255, 0.07)',
-            borderRadius: 8,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 7, fontSize: 11, color: '#94A3B8' }}>
-            <span className="sidebar-pulse-dot" />
-            <span>Workspace Active</span>
-          </div>
-          <span style={{ fontSize: 10, color: '#64748B', fontWeight: 600 }}>v3.0</span>
-        </div>
       </div>
 
       {/* Primary CTA - Create Form Button matching Landing Page primary button */}
@@ -481,7 +462,7 @@ function Sidebar() {
         }}
         className="mobile-header"
       >
-        <Link href="/dashboard" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
+        <Link href="/" title="Return to Landing Page" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
           <div
             style={{
               width: 30,
