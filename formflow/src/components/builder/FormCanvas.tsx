@@ -240,26 +240,33 @@ function SortableFieldCard({
           <button
             type="button"
             disabled={isFirst}
+            onPointerDown={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => {
               e.stopPropagation();
-              onMoveUp?.();
+              e.preventDefault();
+              if (!isFirst) onMoveUp?.();
             }}
             className="btn btn-ghost btn-sm"
-            style={{ padding: 6, opacity: isFirst ? 0.3 : 1, cursor: isFirst ? 'default' : 'pointer' }}
-            title="Move question up"
+            style={{ padding: 6, opacity: isFirst ? 0.35 : 1, cursor: isFirst ? 'not-allowed' : 'pointer' }}
+            title={isFirst ? "First question (cannot move higher)" : "Move question up"}
           >
             <ChevronUp size={16} />
           </button>
+
           <button
             type="button"
             disabled={isLast}
+            onPointerDown={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => {
               e.stopPropagation();
-              onMoveDown?.();
+              e.preventDefault();
+              if (!isLast) onMoveDown?.();
             }}
             className="btn btn-ghost btn-sm"
-            style={{ padding: 6, opacity: isLast ? 0.3 : 1, cursor: isLast ? 'default' : 'pointer' }}
-            title="Move question down"
+            style={{ padding: 6, opacity: isLast ? 0.35 : 1, cursor: isLast ? 'not-allowed' : 'pointer' }}
+            title={isLast ? "Last question (cannot move lower)" : "Move question down"}
           >
             <ChevronDown size={16} />
           </button>
@@ -268,7 +275,13 @@ function SortableFieldCard({
 
           <button
             type="button"
-            onClick={(e) => { e.stopPropagation(); onDuplicate(); }}
+            onPointerDown={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              onDuplicate();
+            }}
             className="btn btn-ghost btn-sm"
             style={{ padding: 6 }}
             title="Duplicate question"
@@ -277,7 +290,13 @@ function SortableFieldCard({
           </button>
           <button
             type="button"
-            onClick={(e) => { e.stopPropagation(); onDelete(); }}
+            onPointerDown={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              onDelete();
+            }}
             className="btn btn-ghost btn-sm"
             style={{ padding: 6, color: '#F87171' }}
             title="Delete question"
