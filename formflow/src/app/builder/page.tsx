@@ -107,7 +107,19 @@ const INITIAL_DEMO_SCHEMA: FormSchema = {
 
 export default function StandaloneBuilderPage() {
   const router = useRouter();
-  const [schema, setSchema] = useState<FormSchema>(INITIAL_DEMO_SCHEMA);
+  const [schema, setSchema] = useState<FormSchema>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('formflow_builder_draft');
+        if (saved) {
+          return JSON.parse(saved);
+        }
+      } catch {
+        // Ignore parse error
+      }
+    }
+    return INITIAL_DEMO_SCHEMA;
+  });
   const [selectedFieldId, setSelectedFieldId] = useState<string | null>('q_name');
   const [activePanel, setActivePanel] = useState<'properties' | 'logic' | 'theme'>('theme');
   const [activeId, setActiveId] = useState<string | null>(null);
