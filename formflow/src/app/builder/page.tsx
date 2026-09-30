@@ -27,7 +27,7 @@ import {
   DEFAULT_THEME,
   DEFAULT_SETTINGS,
 } from '@/lib/types';
-import { generateId, generateSlug, formSchemaToCSV, downloadFile } from '@/lib/utils';
+import { generateId, generateSlug, formSchemaToCSV, downloadFile, downloadExcel } from '@/lib/utils';
 import FieldPalette from '@/components/builder/FieldPalette';
 import FormCanvas from '@/components/builder/FormCanvas';
 import PropertiesPanel from '@/components/builder/PropertiesPanel';
@@ -351,6 +351,10 @@ export default function StandaloneBuilderPage() {
     downloadFile(csv, filename, 'text/csv;charset=utf-8;');
   };
 
+  const handleExportExcel = () => {
+    downloadExcel(schema);
+  };
+
   const handleExportJson = () => {
     const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(schema, null, 2));
     const downloadAnchor = document.createElement('a');
@@ -576,6 +580,23 @@ export default function StandaloneBuilderPage() {
                 title="Download Form Questions & Structure as CSV"
               >
                 <Download size={14} /> Export CSV
+              </button>
+              <div style={{ width: 1, height: 18, background: '#B8CECF' }} />
+              <button
+                type="button"
+                onClick={handleExportExcel}
+                style={{
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: '#365F5D',
+                  background: 'transparent',
+                  border: 'none',
+                  padding: '6px 9px',
+                  cursor: 'pointer',
+                }}
+                title="Download as Excel"
+              >
+                Excel
               </button>
               <div style={{ width: 1, height: 18, background: '#B8CECF' }} />
               <button
