@@ -103,7 +103,7 @@ export default function SignUpPage() {
     } else {
       setSuccessMsg('Account created successfully!');
       setTimeout(() => {
-        router.push('/dashboard');
+        window.location.href = '/dashboard';
       }, 500);
     }
   };
@@ -139,7 +139,7 @@ export default function SignUpPage() {
       setError(err);
       setGoogleLoading(false);
     } else {
-      router.push('/dashboard');
+      window.location.href = '/dashboard';
     }
   };
 

@@ -46,7 +46,7 @@ export default function LoginPage() {
       setError(err);
       setLoading(false);
     } else {
-      router.push('/dashboard');
+      window.location.href = '/dashboard';
     }
   };
 
@@ -95,7 +95,7 @@ export default function LoginPage() {
       setError(err);
       setLoading(false);
     } else {
-      router.push('/dashboard');
+      window.location.href = '/dashboard';
     }
   };
 
@@ -107,7 +107,7 @@ export default function LoginPage() {
       setError(err);
       setGoogleLoading(false);
     } else {
-      router.push('/dashboard');
+      window.location.href = '/dashboard';
     }
   };
 
