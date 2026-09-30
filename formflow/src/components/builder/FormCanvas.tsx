@@ -208,6 +208,7 @@ interface FormCanvasProps {
   title?: string;
   description?: string;
   onOpenThemePanel?: () => void;
+  onOpenCrumple?: () => void;
 }
 
 export default function FormCanvas({
@@ -220,6 +221,7 @@ export default function FormCanvas({
   title,
   description,
   onOpenThemePanel,
+  onOpenCrumple,
 }: FormCanvasProps) {
   const { setNodeRef, isOver } = useDroppable({ id: 'canvas-drop-zone' });
 
@@ -399,6 +401,85 @@ export default function FormCanvas({
                 />
               ))}
             </SortableContext>
+          )}
+
+          {/* 3D Paper Crumple & Discard Drop Zone */}
+          {onOpenCrumple && (
+            <div
+              onClick={onOpenCrumple}
+              style={{
+                marginTop: 24,
+                padding: '16px 20px',
+                borderRadius: 12,
+                border: '2px dashed #B8CECF',
+                background: '#EAF4F4',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 14,
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = '#4F7C7A';
+                e.currentTarget.style.background = '#CFE5E3';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = '#B8CECF';
+                e.currentTarget.style.background = '#EAF4F4';
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div
+                  style={{
+                    width: 38,
+                    height: 38,
+                    borderRadius: 10,
+                    background: '#FFFEF9',
+                    border: '1.5px solid #B8CECF',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#4F7C7A',
+                    flexShrink: 0,
+                  }}
+                >
+                  <Trash2 size={18} />
+                </div>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: '#263B3B' }}>
+                    Crumple & Discard Form in 3D
+                  </div>
+                  <div style={{ fontSize: 11, color: '#365F5D' }}>
+                    Grab and crumple this entire form, drag it into the delete trash icon to open a brand-new editing page
+                  </div>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onOpenCrumple();
+                }}
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: 8,
+                  border: 'none',
+                  background: '#4F7C7A',
+                  color: '#FFFEF9',
+                  fontSize: 12,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  flexShrink: 0,
+                  boxShadow: '0 2px 6px rgba(79, 124, 122, 0.25)',
+                }}
+              >
+                <Trash2 size={13} /> Crumple Form
+              </button>
+            </div>
           )}
         </div>
       </div>

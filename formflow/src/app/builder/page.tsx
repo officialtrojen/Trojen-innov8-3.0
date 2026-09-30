@@ -34,6 +34,7 @@ import PropertiesPanel from '@/components/builder/PropertiesPanel';
 import LogicPanel from '@/components/builder/LogicPanel';
 import ThemePanel from '@/components/builder/ThemePanel';
 import FormRenderer from '@/components/form/FormRenderer';
+import FormCrumpleExperience from '@/components/builder/FormCrumpleExperience';
 import { getBackgroundStyle, POSTER_PRESETS } from '@/lib/theme-presets';
 import { createClient } from '@/lib/supabase/client';
 import {
@@ -49,6 +50,7 @@ import {
   Image as ImageIcon,
   Sliders,
   GitBranch,
+  Trash2,
 } from 'lucide-react';
 
 const INITIAL_DEMO_SCHEMA: FormSchema = {
@@ -109,6 +111,43 @@ export default function StandaloneBuilderPage() {
   const [copied, setCopied] = useState(false);
   const [saving, setSaving] = useState(false);
   const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
+  const [showCrumpleExperience, setShowCrumpleExperience] = useState(false);
+
+  // Reset to brand-new clean form
+  const handleNewForm = useCallback(() => {
+    const freshSchema: FormSchema = {
+      title: 'Untitled Form',
+      description: 'Start designing your questions here.',
+      fields: [
+        {
+          id: generateId('q'),
+          type: 'short_text',
+          label: 'What is your full name?',
+          required: true,
+          placeholder: 'Type your answer here...',
+        },
+      ],
+      logic: [],
+      theme: {
+        ...DEFAULT_THEME,
+        backgroundType: 'solid',
+        background: '#EAF4F4',
+        posterUrl: undefined,
+        bannerUrl: undefined,
+        posterTitle: undefined,
+        posterSubtitle: undefined,
+      },
+      settings: DEFAULT_SETTINGS,
+    };
+    setSchema(freshSchema);
+    setSelectedFieldId(freshSchema.fields[0].id);
+    setActivePanel('properties');
+    try {
+      localStorage.setItem('formflow_builder_draft', JSON.stringify(freshSchema));
+    } catch {
+      // Ignore quota
+    }
+  }, []);
 
   // Load from local storage or check auth
   useEffect(() => {
@@ -502,6 +541,40 @@ export default function StandaloneBuilderPage() {
               </button>
             </div>
 
+            {/* 3D Paper Crumple Discard / Reset */}
+            <button
+              type="button"
+              onClick={() => setShowCrumpleExperience(true)}
+              style={{
+                fontSize: 12,
+                fontWeight: 700,
+                borderRadius: 8,
+                padding: '7px 13px',
+                background: '#EAF4F4',
+                color: '#365F5D',
+                border: '1.5px solid #B8CECF',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                transition: 'all 0.15s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = '#4F7C7A';
+                e.currentTarget.style.color = '#263B3B';
+                e.currentTarget.style.background = '#CFE5E3';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = '#B8CECF';
+                e.currentTarget.style.color = '#365F5D';
+                e.currentTarget.style.background = '#EAF4F4';
+              }}
+              title="Crumple form in 3D and drop to trash to start fresh"
+            >
+              <Trash2 size={14} color="#4F7C7A" />
+              <span>Crumple & Discard</span>
+            </button>
+
             <button
               type="button"
               onClick={handleSaveToAccount}
@@ -573,6 +646,7 @@ export default function StandaloneBuilderPage() {
                 title={schema.title}
                 description={schema.description}
                 onOpenThemePanel={() => setActivePanel('theme')}
+                onOpenCrumple={() => setShowCrumpleExperience(true)}
               />
             </div>
 
@@ -658,6 +732,14 @@ export default function StandaloneBuilderPage() {
           </div>
         )}
       </DragOverlay>
+
+      {/* 3D WebGL Paper Crumple Experience */}
+      <FormCrumpleExperience
+        isOpen={showCrumpleExperience}
+        onClose={() => setShowCrumpleExperience(false)}
+        onNewForm={handleNewForm}
+        schema={schema}
+      />
 
       <style>{`
         @media (max-width: 900px) {
