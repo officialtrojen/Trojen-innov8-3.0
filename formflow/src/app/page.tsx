@@ -18,6 +18,7 @@ import {
   X,
 } from 'lucide-react';
 import Scroll3DCard from '@/components/Scroll3DCard';
+import BookQuillCanvas from '@/components/BookQuillCanvas';
 
 /* ── Navigation ── */
 function Navbar() {
@@ -802,9 +803,10 @@ function Footer() {
 /* ── Page ── */
 export default function LandingPage() {
   return (
-    <>
+    <div style={{ background: '#FAF8F5', color: '#1F1A17', minHeight: '100vh', position: 'relative' }}>
+      <BookQuillCanvas />
       <Navbar />
-      <main>
+      <main style={{ position: 'relative', zIndex: 1 }}>
         <Hero />
         <BuilderShowcaseSection />
         <Features />
@@ -814,6 +816,6 @@ export default function LandingPage() {
         <CTA />
       </main>
       <Footer />
-    </>
+    </div>
   );
 }
