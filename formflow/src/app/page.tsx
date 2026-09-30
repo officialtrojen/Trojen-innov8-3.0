@@ -17,8 +17,9 @@ import {
   Menu,
   X,
 } from 'lucide-react';
-import Scroll3DCard from '@/components/Scroll3DCard';
 import LiveBackground from '@/components/LiveBackground';
+import Unified3DCanvas from '@/components/Unified3DCanvas';
+import Scroll3DCard from '@/components/Scroll3DCard';
 
 /* ── Navigation ── */
 function Navbar() {
@@ -693,6 +694,38 @@ function LogicDemo() {
   );
 }
 
+/* ── Analytics Demo ── */
+function AnalyticsDemo() {
+  return (
+    <section style={{ padding: '80px 24px', maxWidth: 1000, margin: '0 auto', position: 'relative', zIndex: 1 }}>
+      <div style={{ textAlign: 'center', marginBottom: 48 }}>
+        <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', fontWeight: 700, color: '#F3F4F6', marginBottom: 12 }}>
+          Real-Time Analytics & Insights
+        </h2>
+        <p style={{ color: '#9CA3AF', maxWidth: 500, margin: '0 auto', fontSize: 16 }}>
+          Watch responses come in live. Understand your data at a glance.
+        </p>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 20, maxWidth: 800, margin: '0 auto' }}>
+        {[
+          { label: 'Total Responses', value: '1,247', change: '+12%' },
+          { label: 'Completion Rate', value: '89%', change: '+3%' },
+          { label: 'Avg. Rating', value: '4.6 ★', change: '+0.2' },
+          { label: 'Today', value: '34', change: '+8' },
+        ].map((s, i) => (
+          <Scroll3DCard key={i}>
+            <div className="card" style={{ padding: 24, textAlign: 'center', background: 'rgba(15, 23, 42, 0.85)' }}>
+              <div style={{ fontSize: 28, fontWeight: 700, color: '#F3F4F6', marginBottom: 4 }}>{s.value}</div>
+              <div style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 6 }}>{s.label}</div>
+              <span style={{ fontSize: 12, color: '#34D399', fontWeight: 600 }}>{s.change}</span>
+            </div>
+          </Scroll3DCard>
+        ))}
+      </div>
+    </section>
+  );
+}
 
 /* ── Integrations ── */
 function Integrations() {
@@ -805,13 +838,15 @@ export default function LandingPage() {
   return (
     <>
       <LiveBackground />
+      <Unified3DCanvas />
       <Navbar />
-      <main style={{ position: 'relative', zIndex: 1 }}>
+      <main>
         <Hero />
         <BuilderShowcaseSection />
         <Features />
         <HowItWorks />
         <LogicDemo />
+        <AnalyticsDemo />
         <Integrations />
         <CTA />
       </main>

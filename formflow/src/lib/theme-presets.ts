@@ -109,11 +109,11 @@ export const GRADIENT_PRESETS: GradientPreset[] = [
     primary: '#7C3AED',
   },
   {
-    id: 'dense-red-parchment',
-    name: 'Dense Red & Parchment',
-    gradient: 'linear-gradient(135deg, #FAF8F5 0%, #F5F0E6 50%, #EFE8D8 100%)',
-    text: '#2D0A0A',
-    primary: '#7A1010',
+    id: 'midnight-slate',
+    name: 'Dark Obsidian',
+    gradient: 'linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #334155 100%)',
+    text: '#F8FAFC',
+    primary: '#38BDF8',
   },
 ];
 

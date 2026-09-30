@@ -27,17 +27,20 @@ create policy "Users can update their own profile" on public.profiles
 create policy "Service role can insert profiles" on public.profiles
   for insert with check (true);
 
--- 2. Automatic Profile Creation Trigger on User Sign Up
+-- 2. Automatic Profile Creation Trigger on User Sign Up (Email & Google OAuth)
 create or replace function public.handle_new_user()
 returns trigger as $$
 begin
-  insert into public.profiles (id, email, name)
+  insert into public.profiles (id, email, name, avatar_url)
   values (
     new.id,
     new.email,
-    coalesce(new.raw_user_meta_data->>'name', new.raw_user_meta_data->>'full_name', split_part(new.email, '@', 1))
+    coalesce(new.raw_user_meta_data->>'name', new.raw_user_meta_data->>'full_name', split_part(new.email, '@', 1)),
+    new.raw_user_meta_data->>'avatar_url'
   )
-  on conflict (id) do nothing;
+  on conflict (id) do update set
+    name = excluded.name,
+    avatar_url = excluded.avatar_url;
   return new;
 end;
 $$ language plpgsql security definer;

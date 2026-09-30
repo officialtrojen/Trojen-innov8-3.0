@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
@@ -27,16 +27,13 @@ import {
   DEFAULT_THEME,
   DEFAULT_SETTINGS,
 } from '@/lib/types';
-import { generateId, generateSlug, formSchemaToCSV, downloadFile, downloadExcel } from '@/lib/utils';
+import { generateId, generateSlug } from '@/lib/utils';
 import FieldPalette from '@/components/builder/FieldPalette';
 import FormCanvas from '@/components/builder/FormCanvas';
 import PropertiesPanel from '@/components/builder/PropertiesPanel';
 import LogicPanel from '@/components/builder/LogicPanel';
 import ThemePanel from '@/components/builder/ThemePanel';
 import FormRenderer from '@/components/form/FormRenderer';
-import FormCrumpleExperience from '@/components/builder/FormCrumpleExperience';
-import FormDeleteTrashBin from '@/components/builder/FormDeleteTrashBin';
-import FormCrunchAnimationOverlay from '@/components/builder/FormCrunchAnimationOverlay';
 import { getBackgroundStyle, POSTER_PRESETS } from '@/lib/theme-presets';
 import { createClient } from '@/lib/supabase/client';
 import {
@@ -52,7 +49,6 @@ import {
   Image as ImageIcon,
   Sliders,
   GitBranch,
-  Trash2,
 } from 'lucide-react';
 
 const INITIAL_DEMO_SCHEMA: FormSchema = {
@@ -113,96 +109,6 @@ export default function StandaloneBuilderPage() {
   const [copied, setCopied] = useState(false);
   const [saving, setSaving] = useState(false);
   const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
-  const [showCrumpleExperience, setShowCrumpleExperience] = useState(false);
-  const [isFormArmed, setIsFormArmed] = useState(false);
-  const [isDraggingArmedForm, setIsDraggingArmedForm] = useState(false);
-  const [dragPointer, setDragPointer] = useState<{ x: number; y: number } | null>(null);
-  const [isOverTrash, setIsOverTrash] = useState(false);
-  const [isCrumpling, setIsCrumpling] = useState(false);
-  const trashBinRef = useRef<HTMLDivElement | null>(null);
-
-  // Global pointer tracking when dragging armed form
-  useEffect(() => {
-    if (!isDraggingArmedForm) return;
-
-    const handlePointerMove = (e: PointerEvent) => {
-      setDragPointer({ x: e.clientX, y: e.clientY });
-
-      if (trashBinRef.current) {
-        const rect = trashBinRef.current.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
-        const dist = Math.hypot(e.clientX - centerX, e.clientY - centerY);
-        setIsOverTrash(dist < 80);
-      }
-    };
-
-    const handlePointerUp = (e: PointerEvent) => {
-      setIsDraggingArmedForm(false);
-      setDragPointer(null);
-
-      if (trashBinRef.current) {
-        const rect = trashBinRef.current.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
-        const dist = Math.hypot(e.clientX - centerX, e.clientY - centerY);
-        if (dist < 80) {
-          setIsCrumpling(true);
-          return;
-        }
-      }
-      setIsOverTrash(false);
-    };
-
-    window.addEventListener('pointermove', handlePointerMove);
-    window.addEventListener('pointerup', handlePointerUp);
-    return () => {
-      window.removeEventListener('pointermove', handlePointerMove);
-      window.removeEventListener('pointerup', handlePointerUp);
-    };
-  }, [isDraggingArmedForm]);
-
-  const handleStartDragForm = useCallback((e: React.PointerEvent) => {
-    e.preventDefault();
-    setIsDraggingArmedForm(true);
-    setDragPointer({ x: e.clientX, y: e.clientY });
-  }, []);
-
-  // Reset to brand-new clean form
-  const handleNewForm = useCallback(() => {
-    const freshSchema: FormSchema = {
-      title: 'Untitled Form',
-      description: 'Start designing your questions here.',
-      fields: [
-        {
-          id: generateId('q'),
-          type: 'short_text',
-          label: 'What is your full name?',
-          required: true,
-          placeholder: 'Type your answer here...',
-        },
-      ],
-      logic: [],
-      theme: {
-        ...DEFAULT_THEME,
-        backgroundType: 'solid',
-        background: '#EAF4F4',
-        posterUrl: undefined,
-        bannerUrl: undefined,
-        posterTitle: undefined,
-        posterSubtitle: undefined,
-      },
-      settings: DEFAULT_SETTINGS,
-    };
-    setSchema(freshSchema);
-    setSelectedFieldId(freshSchema.fields[0].id);
-    setActivePanel('properties');
-    try {
-      localStorage.setItem('formflow_builder_draft', JSON.stringify(freshSchema));
-    } catch {
-      // Ignore quota
-    }
-  }, []);
 
   // Load from local storage or check auth
   useEffect(() => {
@@ -344,22 +250,12 @@ export default function StandaloneBuilderPage() {
     }
   };
 
-  // --- Export CSV & JSON ---
-  const handleExportCsv = () => {
-    const csv = formSchemaToCSV(schema);
-    const filename = `${schema.title.toLowerCase().replace(/[^a-z0-9]+/g, '_')}_fields.csv`;
-    downloadFile(csv, filename, 'text/csv;charset=utf-8;');
-  };
-
-  const handleExportExcel = () => {
-    downloadExcel(schema);
-  };
-
+  // --- Export JSON ---
   const handleExportJson = () => {
     const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(schema, null, 2));
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute('href', dataStr);
-    downloadAnchor.setAttribute('download', `${schema.title.toLowerCase().replace(/[^a-z0-9]+/g, '_')}_schema.json`);
+    downloadAnchor.setAttribute('download', `${schema.title.toLowerCase().replace(/\s+/g, '_')}_schema.json`);
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
@@ -416,8 +312,8 @@ export default function StandaloneBuilderPage() {
         <header
           style={{
             height: 60,
-            background: '#FFFEF9',
-            borderBottom: '1px solid #B8CECF',
+            background: 'white',
+            borderBottom: '1px solid rgba(184,206,207,0.4)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -430,22 +326,13 @@ export default function StandaloneBuilderPage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             <Link
               href="/"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-                padding: '6px 12px',
-                fontSize: 13,
-                fontWeight: 600,
-                color: '#365F5D',
-                borderRadius: 8,
-                textDecoration: 'none',
-              }}
+              className="btn btn-ghost btn-sm"
+              style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px', fontSize: 13 }}
             >
               <ArrowLeft size={16} /> Home
             </Link>
 
-            <div style={{ width: 1, height: 24, background: '#B8CECF' }} />
+            <div style={{ width: 1, height: 24, background: 'rgba(184,206,207,0.5)' }} />
 
             <input
               value={schema.title}
@@ -454,21 +341,17 @@ export default function StandaloneBuilderPage() {
                 fontSize: 16,
                 fontWeight: 700,
                 color: '#263B3B',
-                border: '1px solid transparent',
-                borderRadius: 6,
+                border: 'none',
                 background: 'transparent',
                 outline: 'none',
                 width: 280,
-                padding: '4px 6px',
               }}
-              onFocus={(e) => { e.currentTarget.style.borderColor = '#B8CECF'; e.currentTarget.style.background = '#EAF4F4'; }}
-              onBlur={(e) => { e.currentTarget.style.borderColor = 'transparent'; e.currentTarget.style.background = 'transparent'; }}
               placeholder="Form Title"
             />
           </div>
 
           {/* Mode Switcher: Edit vs Live Preview */}
-          <div style={{ display: 'flex', background: '#EAF4F4', border: '1px solid #B8CECF', borderRadius: 10, padding: 3, gap: 2 }}>
+          <div style={{ display: 'flex', background: 'rgba(207,229,227,0.4)', borderRadius: 10, padding: 3, gap: 2 }}>
             <button
               type="button"
               onClick={() => setMode('edit')}
@@ -476,15 +359,15 @@ export default function StandaloneBuilderPage() {
                 padding: '6px 14px',
                 borderRadius: 8,
                 fontSize: 12,
-                fontWeight: 700,
+                fontWeight: 600,
                 border: 'none',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 6,
-                background: mode === 'edit' ? '#4F7C7A' : 'transparent',
-                color: mode === 'edit' ? '#FFFEF9' : '#365F5D',
-                boxShadow: mode === 'edit' ? '0 2px 4px rgba(38, 59, 59, 0.2)' : 'none',
+                background: mode === 'edit' ? 'white' : 'transparent',
+                color: mode === 'edit' ? '#263B3B' : '#52796F',
+                boxShadow: mode === 'edit' ? '0 2px 4px rgba(0,0,0,0.06)' : 'none',
               }}
             >
               <Edit3 size={14} /> Builder View
@@ -497,15 +380,15 @@ export default function StandaloneBuilderPage() {
                 padding: '6px 14px',
                 borderRadius: 8,
                 fontSize: 12,
-                fontWeight: 700,
+                fontWeight: 600,
                 border: 'none',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 6,
-                background: mode === 'preview' ? '#4F7C7A' : 'transparent',
-                color: mode === 'preview' ? '#FFFEF9' : '#365F5D',
-                boxShadow: mode === 'preview' ? '0 2px 4px rgba(38, 59, 59, 0.2)' : 'none',
+                background: mode === 'preview' ? 'white' : 'transparent',
+                color: mode === 'preview' ? '#263B3B' : '#52796F',
+                boxShadow: mode === 'preview' ? '0 2px 4px rgba(0,0,0,0.06)' : 'none',
               }}
             >
               <Eye size={14} /> Live Preview
@@ -514,7 +397,7 @@ export default function StandaloneBuilderPage() {
 
           {/* Center Tabs: Fields / Logic / Theme & Poster */}
           {mode === 'edit' && (
-            <div style={{ display: 'flex', gap: 4, background: '#EAF4F4', border: '1px solid #B8CECF', borderRadius: 8, padding: 3 }} className="hidden-mobile">
+            <div style={{ display: 'flex', gap: 4, background: 'rgba(207,229,227,0.3)', borderRadius: 8, padding: 3 }} className="hidden-mobile">
               {[
                 { id: 'properties', label: 'Questions', icon: Sliders },
                 { id: 'theme', label: '🎨 Background & Poster', icon: ImageIcon },
@@ -530,15 +413,15 @@ export default function StandaloneBuilderPage() {
                       padding: '5px 12px',
                       borderRadius: 6,
                       fontSize: 12,
-                      fontWeight: 700,
+                      fontWeight: 600,
                       border: 'none',
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
                       gap: 6,
-                      background: isSelected ? '#4F7C7A' : 'transparent',
-                      color: isSelected ? '#FFFEF9' : '#365F5D',
-                      boxShadow: isSelected ? '0 1px 3px rgba(38, 59, 59, 0.2)' : 'none',
+                      background: isSelected ? 'white' : 'transparent',
+                      color: isSelected ? 'var(--primary)' : '#52796F',
+                      boxShadow: isSelected ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
                     }}
                   >
                     <tab.icon size={13} />
@@ -551,124 +434,22 @@ export default function StandaloneBuilderPage() {
 
           {/* Right Action Buttons */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            {/* Export CSV & JSON */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                background: '#EAF4F4',
-                border: '1.5px solid #B8CECF',
-                borderRadius: 8,
-                overflow: 'hidden',
-              }}
-            >
-              <button
-                type="button"
-                onClick={handleExportCsv}
-                style={{
-                  fontSize: 12,
-                  fontWeight: 700,
-                  color: '#263B3B',
-                  background: 'transparent',
-                  border: 'none',
-                  padding: '6px 12px',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 6,
-                }}
-                title="Download Form Questions & Structure as CSV"
-              >
-                <Download size={14} /> Export CSV
-              </button>
-              <div style={{ width: 1, height: 18, background: '#B8CECF' }} />
-              <button
-                type="button"
-                onClick={handleExportExcel}
-                style={{
-                  fontSize: 11,
-                  fontWeight: 600,
-                  color: '#365F5D',
-                  background: 'transparent',
-                  border: 'none',
-                  padding: '6px 9px',
-                  cursor: 'pointer',
-                }}
-                title="Download as Excel"
-              >
-                Excel
-              </button>
-              <div style={{ width: 1, height: 18, background: '#B8CECF' }} />
-              <button
-                type="button"
-                onClick={handleExportJson}
-                style={{
-                  fontSize: 11,
-                  fontWeight: 600,
-                  color: '#365F5D',
-                  background: 'transparent',
-                  border: 'none',
-                  padding: '6px 9px',
-                  cursor: 'pointer',
-                }}
-                title="Download as JSON"
-              >
-                JSON
-              </button>
-            </div>
-
-            {/* 3D Paper Crumple Discard / Reset */}
             <button
               type="button"
-              onClick={() => setShowCrumpleExperience(true)}
-              style={{
-                fontSize: 12,
-                fontWeight: 700,
-                borderRadius: 8,
-                padding: '7px 13px',
-                background: '#EAF4F4',
-                color: '#365F5D',
-                border: '1.5px solid #B8CECF',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-                transition: 'all 0.15s ease',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = '#4F7C7A';
-                e.currentTarget.style.color = '#263B3B';
-                e.currentTarget.style.background = '#CFE5E3';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = '#B8CECF';
-                e.currentTarget.style.color = '#365F5D';
-                e.currentTarget.style.background = '#EAF4F4';
-              }}
-              title="Crumple form in 3D and drop to trash to start fresh"
+              onClick={handleExportJson}
+              className="btn btn-ghost btn-sm"
+              title="Download Schema JSON"
+              style={{ fontSize: 12 }}
             >
-              <Trash2 size={14} color="#4F7C7A" />
-              <span>Crumple & Discard</span>
+              <Download size={14} /> Export JSON
             </button>
 
             <button
               type="button"
               onClick={handleSaveToAccount}
+              className="btn btn-primary btn-sm"
               disabled={saving}
-              style={{
-                fontSize: 12,
-                fontWeight: 700,
-                borderRadius: 8,
-                padding: '7px 16px',
-                background: '#4F7C7A',
-                color: '#FFFEF9',
-                border: 'none',
-                cursor: saving ? 'not-allowed' : 'pointer',
-                boxShadow: '0 2px 6px rgba(79, 124, 122, 0.3)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-              }}
+              style={{ fontSize: 12, borderRadius: 8 }}
             >
               {saving ? <span className="spinner" /> : <Save size={14} />}
               {user ? 'Save to Dashboard' : 'Save & Publish'}
@@ -687,8 +468,8 @@ export default function StandaloneBuilderPage() {
             <div
               style={{
                 width: 220,
-                borderRight: '1px solid #B8CECF',
-                background: '#FFFEF9',
+                borderRight: '1px solid rgba(184,206,207,0.3)',
+                background: 'var(--card-bg)',
                 overflowY: 'auto',
                 padding: 16,
                 flexShrink: 0,
@@ -702,58 +483,26 @@ export default function StandaloneBuilderPage() {
             <div
               style={{
                 flex: 1,
-                position: 'relative',
-                display: 'flex',
-                flexDirection: 'column',
-                overflow: 'hidden',
+                overflowY: 'auto',
+                padding: '28px 24px',
+                transition: 'background 0.3s ease',
                 ...getBackgroundStyle(schema.theme),
               }}
-              className="builder-canvas-wrapper"
+              className="builder-canvas"
             >
-              <div
-                style={{
-                  flex: 1,
-                  overflowY: 'auto',
-                  padding: '28px 24px',
+              <FormCanvas
+                fields={schema.fields}
+                selectedFieldId={selectedFieldId}
+                onSelectField={(id) => {
+                  setSelectedFieldId(id);
+                  if (id) setActivePanel('properties');
                 }}
-                className="builder-canvas"
-              >
-                <FormCanvas
-                  fields={schema.fields}
-                  selectedFieldId={selectedFieldId}
-                  onSelectField={(id) => {
-                    setSelectedFieldId(id);
-                    if (id) setActivePanel('properties');
-                  }}
-                  onDeleteField={deleteField}
-                  onDuplicateField={duplicateField}
-                  theme={schema.theme}
-                  title={schema.title}
-                  description={schema.description}
-                  onOpenThemePanel={() => setActivePanel('theme')}
-                  onOpenCrumple={() => setShowCrumpleExperience(true)}
-                  isFormArmed={isFormArmed}
-                  onArmForm={setIsFormArmed}
-                  onStartDragForm={handleStartDragForm}
-                />
-              </div>
-
-              {/* Bottom-right Delete Trash Bin Icon */}
-              <FormDeleteTrashBin
-                isFormArmed={isFormArmed}
-                onArmToggle={setIsFormArmed}
-                onCrumpleDelete={() => setIsCrumpling(true)}
-                schema={schema}
-                trashBinRef={trashBinRef}
-                isOverTrash={isOverTrash}
-                isCrumpling={isCrumpling}
-                onTrashClick={() => {
-                  if (isFormArmed) {
-                    setIsCrumpling(true);
-                  } else {
-                    setIsFormArmed(true);
-                  }
-                }}
+                onDeleteField={deleteField}
+                onDuplicateField={duplicateField}
+                theme={schema.theme}
+                title={schema.title}
+                description={schema.description}
+                onOpenThemePanel={() => setActivePanel('theme')}
               />
             </div>
 
@@ -761,8 +510,8 @@ export default function StandaloneBuilderPage() {
             <div
               style={{
                 width: 330,
-                borderLeft: '1px solid #B8CECF',
-                background: '#FFFEF9',
+                borderLeft: '1px solid rgba(184,206,207,0.3)',
+                background: 'var(--card-bg)',
                 overflowY: 'auto',
                 flexShrink: 0,
               }}
@@ -776,21 +525,13 @@ export default function StandaloneBuilderPage() {
               )}
 
               {activePanel === 'properties' && !selectedField && (
-                <div style={{ padding: 32, textAlign: 'center', color: '#365F5D', fontSize: 13, marginTop: 40 }}>
-                  <p style={{ lineHeight: 1.5, marginBottom: 16 }}>Click on any form question to inspect and edit its title, options, and validations.</p>
+                <div style={{ padding: 32, textAlign: 'center', color: '#52796F', fontSize: 13, marginTop: 40 }}>
+                  <p>Click on any form question to inspect and edit its title, options, and validations.</p>
                   <button
                     type="button"
                     onClick={() => setActivePanel('theme')}
-                    style={{
-                      padding: '8px 14px',
-                      borderRadius: 8,
-                      border: '1.5px solid #4F7C7A',
-                      background: '#EAF4F4',
-                      color: '#4F7C7A',
-                      fontWeight: 700,
-                      fontSize: 12,
-                      cursor: 'pointer',
-                    }}
+                    className="btn btn-secondary btn-sm"
+                    style={{ marginTop: 12 }}
                   >
                     Open Background & Poster
                   </button>
@@ -839,96 +580,6 @@ export default function StandaloneBuilderPage() {
           </div>
         )}
       </DragOverlay>
-
-      {/* Floating Drag Ghost when armed form is dragged */}
-      {isDraggingArmedForm && dragPointer && (
-        <div
-          style={{
-            position: 'fixed',
-            left: dragPointer.x,
-            top: dragPointer.y,
-            transform: `translate(-50%, -50%) rotate(${isOverTrash ? 18 : -6}deg) scale(${isOverTrash ? 0.35 : 0.75})`,
-            width: 280,
-            height: 340,
-            borderRadius: 14,
-            background: '#FFFEF9',
-            border: `2.5px dashed ${isOverTrash ? '#E74C3C' : '#4F7C7A'}`,
-            boxShadow: '0 20px 50px rgba(38, 59, 59, 0.35)',
-            pointerEvents: 'none',
-            zIndex: 9990,
-            overflow: 'hidden',
-            transition: 'transform 0.15s ease, border-color 0.15s ease',
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-        >
-          <div
-            style={{
-              height: 48,
-              background: '#4F7C7A',
-              padding: '10px 14px',
-              color: '#FFFEF9',
-              fontWeight: 800,
-              fontSize: 13,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}
-          >
-            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 160 }}>
-              {schema.title || 'Untitled Form'}
-            </span>
-            <span
-              style={{
-                fontSize: 10,
-                background: 'rgba(255,254,249,0.25)',
-                padding: '2px 6px',
-                borderRadius: 4,
-              }}
-            >
-              📄 Form Sheet
-            </span>
-          </div>
-          <div style={{ padding: 14, flex: 1, background: '#F8FBFA', display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <div style={{ height: 10, width: '60%', background: '#CFE5E3', borderRadius: 5 }} />
-            <div style={{ height: 10, width: '85%', background: '#EAF4F4', borderRadius: 5 }} />
-            <div style={{ height: 32, background: '#FFFEF9', border: '1px solid #B8CECF', borderRadius: 8, marginTop: 10 }} />
-            <div style={{ height: 32, background: '#FFFEF9', border: '1px solid #B8CECF', borderRadius: 8 }} />
-          </div>
-          <div
-            style={{
-              padding: '10px 12px',
-              background: isOverTrash ? '#FDEDEC' : '#EAF4F4',
-              textAlign: 'center',
-              fontSize: 12,
-              fontWeight: 800,
-              color: isOverTrash ? '#E74C3C' : '#365F5D',
-            }}
-          >
-            {isOverTrash ? '🔥 Release to Crumple & Delete!' : 'Dragging to Delete Icon ↘️'}
-          </div>
-        </div>
-      )}
-
-      {/* 3D Paper Crumple Crunch Animation Overlay */}
-      <FormCrunchAnimationOverlay
-        isOpen={isCrumpling}
-        schema={schema}
-        onComplete={() => {
-          setIsCrumpling(false);
-          setIsFormArmed(false);
-          setIsOverTrash(false);
-          handleNewForm();
-        }}
-      />
-
-      {/* 3D WebGL Paper Crumple Experience */}
-      <FormCrumpleExperience
-        isOpen={showCrumpleExperience}
-        onClose={() => setShowCrumpleExperience(false)}
-        onNewForm={handleNewForm}
-        schema={schema}
-      />
 
       <style>{`
         @media (max-width: 900px) {

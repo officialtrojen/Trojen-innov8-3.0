@@ -5,8 +5,8 @@ import { useParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/components/AuthProvider';
 import { DBForm, DBResponse } from '@/lib/types';
-import { formatDateTime, responsesToCSV, downloadFile, responsesToExcel } from '@/lib/utils';
-import { Download, Trash2, Eye, Search, X, FileSpreadsheet } from 'lucide-react';
+import { formatDateTime, responsesToCSV, downloadFile } from '@/lib/utils';
+import { Download, Trash2, Eye, Search, X } from 'lucide-react';
 
 export default function ResponsesPage() {
   const params = useParams();
@@ -66,12 +66,6 @@ export default function ResponsesPage() {
     downloadFile(csv, `${form.title.replace(/\s+/g, '_')}_responses.csv`, 'text/csv;charset=utf-8;');
   };
 
-  const handleExportExcel = () => {
-    if (!form || responses.length === 0) return;
-    const fields = form.schema.fields.map((f) => ({ id: f.id, label: f.label, type: f.type }));
-    responsesToExcel(form.title, fields, responses);
-  };
-
   const handleDelete = async (responseId: string) => {
     if (!confirm('Delete this response?')) return;
     await supabase.from('responses').delete().eq('id', responseId);
@@ -101,14 +95,9 @@ export default function ResponsesPage() {
           <h1 style={{ fontSize: 24, fontWeight: 700, color: '#263B3B', marginBottom: 4 }}>Responses</h1>
           <p style={{ color: '#52796F', fontSize: 14 }}>{form.title} — {responses.length} response{responses.length !== 1 ? 's' : ''}</p>
         </div>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button onClick={handleExportExcel} className="btn btn-primary btn-sm" disabled={responses.length === 0} style={{ background: 'linear-gradient(135deg, #10B981, #059669)' }}>
-            <FileSpreadsheet size={16} /> Export Excel
-          </button>
-          <button onClick={handleExport} className="btn btn-secondary btn-sm" disabled={responses.length === 0}>
-            <Download size={16} /> Export CSV
-          </button>
-        </div>
+        <button onClick={handleExport} className="btn btn-primary btn-sm" disabled={responses.length === 0}>
+          <Download size={16} /> Export CSV
+        </button>
       </div>
 
       {/* Search */}

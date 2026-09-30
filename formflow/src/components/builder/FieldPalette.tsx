@@ -36,15 +36,15 @@ function PaletteItem({ type, label, icon, onAdd }: { type: string; label: string
     display: 'flex',
     alignItems: 'center',
     gap: 10,
-    padding: '9px 12px',
+    padding: '10px 12px',
     borderRadius: 8,
     cursor: 'grab',
-    background: isDragging ? '#CFE5E3' : 'transparent',
-    border: '1.5px solid transparent',
+    background: isDragging ? 'var(--accent)' : 'transparent',
+    border: '1px solid transparent',
     transition: 'all 0.15s ease',
     fontSize: 13,
     color: '#263B3B',
-    fontWeight: 600,
+    fontWeight: 500,
     transform: transform
       ? `translate(${transform.x}px, ${transform.y}px)`
       : undefined,
@@ -59,8 +59,8 @@ function PaletteItem({ type, label, icon, onAdd }: { type: string; label: string
       {...attributes}
       onClick={onAdd}
       onMouseEnter={(e) => {
-        (e.currentTarget as HTMLElement).style.background = '#EAF4F4';
-        (e.currentTarget as HTMLElement).style.borderColor = '#B8CECF';
+        (e.currentTarget as HTMLElement).style.background = 'var(--accent)';
+        (e.currentTarget as HTMLElement).style.borderColor = 'rgba(184,206,207,0.5)';
       }}
       onMouseLeave={(e) => {
         if (!isDragging) {
@@ -71,18 +71,18 @@ function PaletteItem({ type, label, icon, onAdd }: { type: string; label: string
     >
       <div
         style={{
-          width: 30,
-          height: 30,
+          width: 32,
+          height: 32,
           borderRadius: 8,
-          background: '#CFE5E3',
+          background: 'var(--accent)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#4F7C7A',
+          color: 'var(--primary)',
           flexShrink: 0,
         }}
       >
-        <Icon size={15} />
+        <Icon size={16} />
       </div>
       <span>{label}</span>
     </div>
@@ -95,23 +95,21 @@ interface FieldPaletteProps {
 
 export default function FieldPalette({ onAddField }: FieldPaletteProps) {
   return (
-    <div style={{ color: '#263B3B' }}>
+    <div>
       <div
         style={{
           fontSize: 11,
-          fontWeight: 700,
-          color: '#4F7C7A',
+          fontWeight: 600,
+          color: '#52796F',
           textTransform: 'uppercase',
-          letterSpacing: 1.2,
+          letterSpacing: 1,
           marginBottom: 12,
           padding: '0 4px',
-          borderBottom: '1px solid #B8CECF',
-          paddingBottom: 8,
         }}
       >
-        Question Blocks
+        Field Types
       </div>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         {FIELD_PALETTE.map((item) => (
           <PaletteItem
             key={item.type}
@@ -125,17 +123,16 @@ export default function FieldPalette({ onAddField }: FieldPaletteProps) {
 
       <div
         style={{
-          marginTop: 20,
-          padding: '12px 14px',
-          borderRadius: 10,
-          background: '#EAF4F4',
-          border: '1px solid #B8CECF',
+          marginTop: 24,
+          padding: 12,
+          borderRadius: 8,
+          background: 'rgba(207,229,227,0.3)',
           fontSize: 12,
-          color: '#365F5D',
+          color: '#52796F',
           lineHeight: 1.5,
         }}
       >
-        💡 <strong style={{ color: '#263B3B' }}>Tip:</strong> Click or drag any block onto the canvas to add it.
+        💡 <strong>Tip:</strong> Click or drag fields onto the canvas to add them.
       </div>
     </div>
   );

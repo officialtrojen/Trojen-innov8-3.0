@@ -210,8 +210,8 @@ export default function FormBuilder({
           <div
             style={{
               width: 220,
-              borderRight: '1px solid #B8CECF',
-              background: '#FFFEF9',
+              borderRight: '1px solid rgba(184,206,207,0.3)',
+              background: 'var(--card-bg)',
               overflowY: 'auto',
               padding: 16,
               flexShrink: 0,
@@ -249,8 +249,8 @@ export default function FormBuilder({
           <div
             style={{
               width: 320,
-              borderLeft: '1px solid #B8CECF',
-              background: '#FFFEF9',
+              borderLeft: '1px solid rgba(184,206,207,0.3)',
+              background: 'var(--card-bg)',
               overflowY: 'auto',
               flexShrink: 0,
             }}
@@ -263,7 +263,7 @@ export default function FormBuilder({
               />
             )}
             {activePanel === 'properties' && !selectedField && (
-              <div style={{ padding: 24, textAlign: 'center', color: '#365F5D', fontSize: 14, marginTop: 60 }}>
+              <div style={{ padding: 24, textAlign: 'center', color: '#52796F', fontSize: 14, marginTop: 60 }}>
                 Select a field to edit its properties
               </div>
             )}

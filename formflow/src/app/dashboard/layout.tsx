@@ -78,9 +78,47 @@ function Sidebar() {
 
       {/* User */}
       <div style={{ padding: '16px 24px', borderTop: '1px solid rgba(184,206,207,0.3)' }}>
-        <div style={{ fontSize: 13, color: '#52796F', marginBottom: 8, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          {user?.email}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+          {user?.user_metadata?.avatar_url ? (
+            <img
+              src={user.user_metadata.avatar_url}
+              alt="Avatar"
+              style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover' }}
+            />
+          ) : (
+            <div
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, #4285F4, #34A853)',
+                color: 'white',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 14,
+                fontWeight: 600,
+              }}
+            >
+              {(user?.user_metadata?.name || user?.email || 'U')[0].toUpperCase()}
+            </div>
+          )}
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: '#263B3B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {user?.user_metadata?.name || user?.user_metadata?.full_name || 'Creator'}
+            </div>
+            <div style={{ fontSize: 11, color: '#52796F', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {user?.email || 'Google User'}
+            </div>
+          </div>
         </div>
+
+        {user?.app_metadata?.provider === 'google' && (
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: '#EFF6FF', color: '#1D4ED8', fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 9999, marginBottom: 10 }}>
+            <span>✓ Google Verified</span>
+          </div>
+        )}
+
         <button
           onClick={signOut}
           className="btn btn-ghost btn-sm"

@@ -40,13 +40,14 @@ export async function updateSession(request: NextRequest) {
     // Auth check fallback when using placeholder/mock credentials
   }
 
-  // Redirect unauthenticated users away from protected routes
+  // Redirect unauthenticated users away from protected routes (unless in local placeholder mode)
+  const isPlaceholder = !supabaseUrl || supabaseUrl.includes('placeholder');
   const protectedPaths = ['/dashboard', '/forms', '/integrations', '/settings'];
   const isProtected = protectedPaths.some((path) =>
     request.nextUrl.pathname.startsWith(path)
   );
 
-  if (!user && isProtected) {
+  if (!user && isProtected && !isPlaceholder) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     return NextResponse.redirect(url);
