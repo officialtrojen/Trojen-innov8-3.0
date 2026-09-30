@@ -1,0 +1,128 @@
+'use client';
+
+import React from 'react';
+import Link from 'next/link';
+import { Save, Globe, Eye, GitBranch, Palette, Link as LinkIcon, Check } from 'lucide-react';
+
+interface BuilderToolbarProps {
+  title: string;
+  onTitleChange: (title: string) => void;
+  onSave: () => void;
+  onPublish: () => void;
+  saving: boolean;
+  formStatus: string;
+  publicSlug: string;
+  formId: string;
+  activePanel: 'properties' | 'logic' | 'theme';
+  onPanelChange: (panel: 'properties' | 'logic' | 'theme') => void;
+}
+
+export default function BuilderToolbar({
+  title,
+  onTitleChange,
+  onSave,
+  onPublish,
+  saving,
+  formStatus,
+  publicSlug,
+  formId,
+  activePanel,
+  onPanelChange,
+}: BuilderToolbarProps) {
+  const [copied, setCopied] = React.useState(false);
+
+  const handleCopyLink = () => {
+    const url = `${window.location.origin}/f/${publicSlug}`;
+    navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '10px 20px',
+        background: 'var(--card-bg)',
+        borderBottom: '1px solid rgba(184,206,207,0.3)',
+        gap: 12,
+        flexWrap: 'wrap',
+      }}
+    >
+      {/* Left: Title */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, minWidth: 200 }}>
+        <input
+          value={title}
+          onChange={(e) => onTitleChange(e.target.value)}
+          style={{
+            border: 'none',
+            background: 'transparent',
+            fontSize: 16,
+            fontWeight: 600,
+            color: '#263B3B',
+            width: '100%',
+            maxWidth: 300,
+            padding: '4px 0',
+            outline: 'none',
+          }}
+          placeholder="Form Title"
+        />
+        <span className={`badge badge-${formStatus}`} style={{ flexShrink: 0 }}>
+          {formStatus.charAt(0).toUpperCase() + formStatus.slice(1)}
+        </span>
+      </div>
+
+      {/* Center: Panel toggles */}
+      <div style={{ display: 'flex', gap: 4, background: 'var(--accent)', borderRadius: 8, padding: 3 }}>
+        {([
+          { key: 'properties', label: 'Properties', icon: null },
+          { key: 'logic', label: 'Logic', icon: GitBranch },
+          { key: 'theme', label: 'Theme', icon: Palette },
+        ] as const).map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => onPanelChange(tab.key)}
+            className="btn btn-sm"
+            style={{
+              background: activePanel === tab.key ? 'white' : 'transparent',
+              color: activePanel === tab.key ? 'var(--primary)' : '#52796F',
+              boxShadow: activePanel === tab.key ? 'var(--shadow-sm)' : 'none',
+              borderRadius: 6,
+              fontSize: 12,
+              fontWeight: 500,
+              border: 'none',
+            }}
+          >
+            {tab.icon && <tab.icon size={13} />}
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Right: Actions */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        {formStatus === 'published' && (
+          <button onClick={handleCopyLink} className="btn btn-ghost btn-sm" title="Copy public link">
+            {copied ? <Check size={15} style={{ color: '#28a745' }} /> : <LinkIcon size={15} />}
+            {copied ? 'Copied!' : 'Share'}
+          </button>
+        )}
+
+        <Link href={`/dashboard/forms/${formId}/preview`} className="btn btn-ghost btn-sm">
+          <Eye size={15} /> Preview
+        </Link>
+
+        <button onClick={onSave} className="btn btn-secondary btn-sm" disabled={saving}>
+          {saving ? <span className="spinner" /> : <Save size={15} />}
+          Save
+        </button>
+
+        <button onClick={onPublish} className="btn btn-primary btn-sm">
+          <Globe size={15} /> Publish
+        </button>
+      </div>
+    </div>
+  );
+}
