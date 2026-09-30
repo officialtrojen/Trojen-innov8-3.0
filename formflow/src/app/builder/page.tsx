@@ -444,9 +444,23 @@ export default function StandaloneBuilderPage() {
             <Link
               href="/"
               className="btn btn-ghost btn-sm"
-              style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px', fontSize: 13 }}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '6px 14px',
+                fontSize: 12,
+                fontWeight: 600,
+                color: '#334155',
+                background: '#F8FAFC',
+                border: '1px solid #CBD5E1',
+                borderRadius: 8,
+                boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
+                textDecoration: 'none',
+                transition: 'all 0.15s ease',
+              }}
             >
-              <ArrowLeft size={16} /> Home
+              <ArrowLeft size={15} style={{ color: '#475569' }} /> Home
             </Link>
 
             <div style={{ width: 1, height: 24, background: 'rgba(184,206,207,0.5)' }} />
@@ -623,11 +637,38 @@ export default function StandaloneBuilderPage() {
             <button
               type="button"
               onClick={handleSaveToAccount}
-              className="btn btn-primary btn-sm"
+              className="btn btn-sm"
               disabled={saving}
-              style={{ fontSize: 12, borderRadius: 8 }}
+              style={{
+                fontSize: 12,
+                fontWeight: 600,
+                borderRadius: 8,
+                padding: '7px 16px',
+                background: '#1E293B',
+                color: '#FFFFFF',
+                border: '1px solid #0F172A',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.06)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 7,
+                cursor: saving ? 'not-allowed' : 'pointer',
+                opacity: saving ? 0.75 : 1,
+                transition: 'all 0.15s ease',
+              }}
+              onMouseEnter={(e) => {
+                if (!saving) {
+                  e.currentTarget.style.background = '#0F172A';
+                  e.currentTarget.style.boxShadow = '0 3px 10px rgba(15, 23, 42, 0.2)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!saving) {
+                  e.currentTarget.style.background = '#1E293B';
+                  e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.06)';
+                }
+              }}
             >
-              {saving ? <span className="spinner" /> : <Save size={14} />}
+              {saving ? <span className="spinner" /> : <Save size={14} style={{ color: '#FFFFFF' }} />}
               {user ? 'Save to Dashboard' : 'Save & Publish'}
             </button>
           </div>
