@@ -45,6 +45,43 @@ function SortableFieldCard({
 }) {
   const [hoveredStar, setHoveredStar] = React.useState<number | null>(null);
   const [selectedStar, setSelectedStar] = React.useState<number>(3);
+  const lastActionRef = React.useRef<number>(0);
+
+  const handleUpAction = (e: React.SyntheticEvent) => {
+    e.stopPropagation();
+    const now = Date.now();
+    if (now - lastActionRef.current < 200) return;
+    lastActionRef.current = now;
+    if (!isFirst && onMoveUp) {
+      onMoveUp();
+    }
+  };
+
+  const handleDownAction = (e: React.SyntheticEvent) => {
+    e.stopPropagation();
+    const now = Date.now();
+    if (now - lastActionRef.current < 200) return;
+    lastActionRef.current = now;
+    if (!isLast && onMoveDown) {
+      onMoveDown();
+    }
+  };
+
+  const handleDuplicateAction = (e: React.SyntheticEvent) => {
+    e.stopPropagation();
+    const now = Date.now();
+    if (now - lastActionRef.current < 200) return;
+    lastActionRef.current = now;
+    onDuplicate();
+  };
+
+  const handleDeleteAction = (e: React.SyntheticEvent) => {
+    e.stopPropagation();
+    const now = Date.now();
+    if (now - lastActionRef.current < 200) return;
+    lastActionRef.current = now;
+    onDelete();
+  };
 
   const {
     attributes,
@@ -240,13 +277,9 @@ function SortableFieldCard({
           <button
             type="button"
             disabled={isFirst}
-            onPointerDown={(e) => e.stopPropagation()}
-            onMouseDown={(e) => e.stopPropagation()}
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-              if (!isFirst) onMoveUp?.();
-            }}
+            onPointerDown={handleUpAction}
+            onMouseDown={handleUpAction}
+            onClick={handleUpAction}
             className="btn btn-ghost btn-sm"
             style={{ padding: 6, opacity: isFirst ? 0.35 : 1, cursor: isFirst ? 'not-allowed' : 'pointer' }}
             title={isFirst ? "First question (cannot move higher)" : "Move question up"}
@@ -257,13 +290,9 @@ function SortableFieldCard({
           <button
             type="button"
             disabled={isLast}
-            onPointerDown={(e) => e.stopPropagation()}
-            onMouseDown={(e) => e.stopPropagation()}
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-              if (!isLast) onMoveDown?.();
-            }}
+            onPointerDown={handleDownAction}
+            onMouseDown={handleDownAction}
+            onClick={handleDownAction}
             className="btn btn-ghost btn-sm"
             style={{ padding: 6, opacity: isLast ? 0.35 : 1, cursor: isLast ? 'not-allowed' : 'pointer' }}
             title={isLast ? "Last question (cannot move lower)" : "Move question down"}
@@ -275,13 +304,9 @@ function SortableFieldCard({
 
           <button
             type="button"
-            onPointerDown={(e) => e.stopPropagation()}
-            onMouseDown={(e) => e.stopPropagation()}
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-              onDuplicate();
-            }}
+            onPointerDown={handleDuplicateAction}
+            onMouseDown={handleDuplicateAction}
+            onClick={handleDuplicateAction}
             className="btn btn-ghost btn-sm"
             style={{ padding: 6 }}
             title="Duplicate question"
@@ -290,13 +315,9 @@ function SortableFieldCard({
           </button>
           <button
             type="button"
-            onPointerDown={(e) => e.stopPropagation()}
-            onMouseDown={(e) => e.stopPropagation()}
-            onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-              onDelete();
-            }}
+            onPointerDown={handleDeleteAction}
+            onMouseDown={handleDeleteAction}
+            onClick={handleDeleteAction}
             className="btn btn-ghost btn-sm"
             style={{ padding: 6, color: '#F87171' }}
             title="Delete question"
