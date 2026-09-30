@@ -434,15 +434,54 @@ export default function StandaloneBuilderPage() {
 
           {/* Right Action Buttons */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <button
-              type="button"
-              onClick={handleExportJson}
-              className="btn btn-ghost btn-sm"
-              title="Download Schema JSON"
-              style={{ fontSize: 12 }}
+            {/* Export CSV & JSON */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                background: '#EAF4F4',
+                border: '1.5px solid #B8CECF',
+                borderRadius: 8,
+                overflow: 'hidden',
+              }}
             >
-              <Download size={14} /> Export JSON
-            </button>
+              <button
+                type="button"
+                onClick={handleExportCsv}
+                style={{
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: '#263B3B',
+                  background: 'transparent',
+                  border: 'none',
+                  padding: '6px 12px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                }}
+                title="Download Form Questions & Structure as CSV"
+              >
+                <Download size={14} /> Export CSV
+              </button>
+              <div style={{ width: 1, height: 18, background: '#B8CECF' }} />
+              <button
+                type="button"
+                onClick={handleExportJson}
+                style={{
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: '#365F5D',
+                  background: 'transparent',
+                  border: 'none',
+                  padding: '6px 9px',
+                  cursor: 'pointer',
+                }}
+                title="Download as JSON"
+              >
+                JSON
+              </button>
+            </div>
 
             <button
               type="button"

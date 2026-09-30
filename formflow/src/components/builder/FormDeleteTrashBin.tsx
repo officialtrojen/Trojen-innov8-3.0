@@ -92,25 +92,25 @@ export default function FormDeleteTrashBin({
         onMouseEnter={() => setShowTooltip(true)}
         onMouseLeave={() => !isFormArmed && setShowTooltip(false)}
         style={{
-          width: 58,
-          height: 58,
+          width: 60,
+          height: 60,
           borderRadius: '50%',
-          background: isOverTrash ? '#FDEDEC' : isFormArmed ? '#CFE5E3' : '#FFFEF9',
-          border: `2.5px solid ${isOverTrash ? '#E74C3C' : isFormArmed ? '#4F7C7A' : '#B8CECF'}`,
+          background: isOverTrash ? '#FDEDEC' : isFormArmed ? '#FFEEEE' : '#FFFEF9',
+          border: `2.5px solid ${isOverTrash ? '#C0392B' : '#E74C3C'}`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           cursor: 'pointer',
           boxShadow: isOverTrash
-            ? '0 0 24px rgba(231, 76, 60, 0.5), 0 8px 24px rgba(231, 76, 60, 0.3)'
+            ? '0 0 26px rgba(231, 76, 60, 0.6), 0 8px 24px rgba(231, 76, 60, 0.35)'
             : isFormArmed
-            ? '0 0 20px rgba(79, 124, 122, 0.4), 0 6px 20px rgba(38, 59, 59, 0.2)'
-            : '0 4px 14px rgba(38, 59, 59, 0.12)',
-          transform: isOverTrash ? 'scale(1.18)' : isFormArmed ? 'scale(1.08)' : 'scale(1)',
+            ? '0 0 22px rgba(231, 76, 60, 0.45), 0 6px 20px rgba(38, 59, 59, 0.2)'
+            : '0 4px 16px rgba(231, 76, 60, 0.25), 0 2px 8px rgba(38, 59, 59, 0.1)',
+          transform: isOverTrash ? 'scale(1.2)' : isFormArmed ? 'scale(1.1)' : 'scale(1)',
           transition: 'all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
           position: 'relative',
         }}
-        title="Delete Icon: Double-click form and drag here to crumple & create a new form"
+        title="Delete Icon: Double-click form and drag here to crumple & delete"
       >
         {/* Animated Ripple Beacon Ring when armed */}
         {isFormArmed && (
@@ -119,7 +119,7 @@ export default function FormDeleteTrashBin({
               position: 'absolute',
               inset: -8,
               borderRadius: '50%',
-              border: '2px solid #4F7C7A',
+              border: '2px solid #E74C3C',
               animation: 'ripple 1.5s infinite',
               pointerEvents: 'none',
             }}
@@ -128,12 +128,12 @@ export default function FormDeleteTrashBin({
 
         {/* Animated Trash Can SVG with moving lid */}
         <svg
-          width="28"
-          height="28"
+          width="30"
+          height="30"
           viewBox="0 0 24 24"
           fill="none"
-          stroke={isOverTrash ? '#E74C3C' : isFormArmed ? '#263B3B' : '#4F7C7A'}
-          strokeWidth="2"
+          stroke="#E74C3C"
+          strokeWidth="2.2"
           strokeLinecap="round"
           strokeLinejoin="round"
           style={{
@@ -144,7 +144,7 @@ export default function FormDeleteTrashBin({
           <g
             style={{
               transformOrigin: '4px 7px',
-              transform: isOverTrash ? 'rotate(-32deg) translateY(-3px)' : 'none',
+              transform: isOverTrash ? 'rotate(-35deg) translateY(-4px)' : 'none',
               transition: 'transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
             }}
           >
@@ -162,16 +162,16 @@ export default function FormDeleteTrashBin({
         <span
           style={{
             position: 'absolute',
-            bottom: -6,
-            padding: '2px 6px',
+            bottom: -7,
+            padding: '2px 7px',
             borderRadius: 6,
-            background: isOverTrash ? '#E74C3C' : '#4F7C7A',
+            background: '#E74C3C',
             color: '#FFFEF9',
-            fontSize: 9,
+            fontSize: 9.5,
             fontWeight: 800,
             letterSpacing: '0.04em',
             textTransform: 'uppercase',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
+            boxShadow: '0 2px 6px rgba(231, 76, 60, 0.4)',
           }}
         >
           Delete
