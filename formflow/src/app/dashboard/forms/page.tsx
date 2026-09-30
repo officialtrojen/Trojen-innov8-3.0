@@ -59,14 +59,8 @@ export default function MyFormsPage() {
         </div>
         
         <div style={{ display: 'flex', gap: 12 }}>
-          <Link href="/dashboard/forms/new">
-            <button style={{ 
-              background: '#8B5CF6', color: 'white', border: 'none', padding: '10px 24px', borderRadius: '8px',
-              fontSize: 14, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer',
-              boxShadow: '0 4px 14px rgba(139, 92, 246, 0.4)'
-            }}>
-              <Plus size={16} /> Create Form
-            </button>
+          <Link href="/dashboard/forms/new" className="btn btn-primary" style={{ padding: '10px 20px', borderRadius: 8 }}>
+            <Plus size={16} /> Create Form
           </Link>
         </div>
       </motion.div>
@@ -76,17 +70,15 @@ export default function MyFormsPage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
+            className="card"
             style={{
-              background: '#1e293b',
-              border: '1px solid rgba(255, 255, 255, 0.05)',
-              borderRadius: '16px',
               padding: '48px 32px',
-              width: '90%', maxWidth: 500,
-              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)',
+              width: '90%',
+              maxWidth: 500,
               textAlign: 'center',
             }}
           >
-            <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
+            <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px', border: '1px solid rgba(255,255,255,0.08)' }}>
               <FileText size={32} color="#94A3B8" />
             </div>
             <h2 style={{ fontSize: 22, fontWeight: 700, color: '#F8FAFC', marginBottom: 12 }}>No Forms Yet</h2>
