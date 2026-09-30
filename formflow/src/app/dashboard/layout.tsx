@@ -31,6 +31,12 @@ function Sidebar() {
   const pathname = usePathname();
   const { user, signOut } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
+
+  const handleSignOut = () => {
+    setSigningOut(true);
+    signOut();
+  };
 
   const sidebarContent = (
     <>
@@ -119,11 +125,12 @@ function Sidebar() {
         )}
 
         <button
-          onClick={signOut}
+          onClick={handleSignOut}
+          disabled={signingOut}
           className="btn btn-ghost btn-sm"
-          style={{ width: '100%', justifyContent: 'flex-start', color: '#f87171' }}
+          style={{ width: '100%', justifyContent: 'flex-start', color: '#f87171', opacity: signingOut ? 0.7 : 1 }}
         >
-          <LogOut size={16} /> Sign Out
+          <LogOut size={16} /> {signingOut ? 'Signing out...' : 'Sign Out'}
         </button>
 
         <div style={{ marginTop: 14, textAlign: 'center', fontSize: 10, color: '#88A7A5' }}>
@@ -228,16 +235,6 @@ function Sidebar() {
 }
 
 function DashboardShell({ children }: { children: React.ReactNode }) {
-  const { loading } = useAuth();
-
-  if (loading) {
-    return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div className="spinner" style={{ width: 32, height: 32 }} />
-      </div>
-    );
-  }
-
   return (
     <>
       <LiveBackground />

@@ -36,14 +36,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const supabase = createClient();
 
   useEffect(() => {
-    // Get initial session from Supabase
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    // Listen for auth changes
+    // onAuthStateChange fires immediately from local storage cache — no network wait
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -52,8 +45,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
-  }, [supabase.auth]);
+    // Fallback: ensure loading is cleared even if no auth event fires
+    const timeout = setTimeout(() => setLoading(false), 500);
+
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(timeout);
+    };
+  }, []);
 
   const signUp = async (email: string, password: string, name: string) => {
     const { data, error } = await supabase.auth.signUp({
@@ -232,10 +231,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    // Clear local state immediately for instant UI feedback
     setUser(null);
     setSession(null);
+    // Navigate away at once, sign out in background
     window.location.href = '/';
+    supabase.auth.signOut().catch(() => {});
   };
 
   return (
