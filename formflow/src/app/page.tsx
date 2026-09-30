@@ -18,6 +18,7 @@ import {
   X,
 } from 'lucide-react';
 import LiveBackground from '@/components/LiveBackground';
+import Hero3DCanvas from '@/components/Hero3DCanvas';
 
 /* ── Navigation ── */
 function Navbar() {
@@ -172,7 +173,7 @@ function Hero() {
         Create powerful forms, surveys and conditional workflows visually — without writing code.
       </p>
 
-      <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 40 }}>
         <Link href="/signup" className="btn btn-primary btn-lg" style={{ fontSize: 16, borderRadius: 12 }}>
           Create Your First Form <ArrowRight size={18} />
         </Link>
@@ -180,6 +181,9 @@ function Hero() {
           Explore Demo
         </Link>
       </div>
+
+      {/* 3D Interactive Hero Canvas */}
+      <Hero3DCanvas />
 
       {/* Product Preview */}
       <div
