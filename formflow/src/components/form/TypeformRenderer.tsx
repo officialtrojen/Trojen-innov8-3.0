@@ -8,6 +8,7 @@ import {
   DEFAULT_THEME,
   DEFAULT_SETTINGS,
 } from '@/lib/types';
+import { getVisibleFields } from '@/lib/logic-engine';
 import {
   Check,
   ChevronDown,
@@ -92,16 +93,19 @@ export default function TypeformRenderer({
   fields: propFields,
   onSubmit,
 }: TypeformRendererProps) {
-  const activeFields = propFields || schema.fields || HARDCODED_TYPEFORM_QUESTIONS;
+  const [answers, setAnswers] = useState<Record<string, unknown>>({});
+  const rawFields = propFields || schema.fields || HARDCODED_TYPEFORM_QUESTIONS;
+  const visibleFields = getVisibleFields(rawFields, schema.logic || [], answers as Record<string, any>);
+  const activeFields = visibleFields.length > 0 ? visibleFields : rawFields;
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState<'forward' | 'backward'>('forward');
-  const [answers, setAnswers] = useState<Record<string, unknown>>({});
   const [error, setError] = useState<string | null>(null);
   const [isCompleted, setIsCompleted] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const currentField = activeFields[currentIndex];
-  const isLastQuestion = currentIndex === activeFields.length - 1;
+  const safeIndex = Math.min(currentIndex, activeFields.length - 1);
+  const currentField = activeFields[safeIndex >= 0 ? safeIndex : 0];
+  const isLastQuestion = (safeIndex >= 0 ? safeIndex : 0) === activeFields.length - 1;
 
   // Auto focus input on slide change
   useEffect(() => {

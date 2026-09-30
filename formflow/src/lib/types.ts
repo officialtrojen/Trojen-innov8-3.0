@@ -68,6 +68,7 @@ export interface LogicRule {
   id: string;
   condition: LogicCondition;
   action: LogicAction;
+  elseAction?: LogicAction;
 }
 
 // ---------- Form Theme ----------
