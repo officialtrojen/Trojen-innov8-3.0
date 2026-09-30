@@ -14,69 +14,147 @@ export async function POST(req: Request) {
 
     // Check if Gemini API Key exists for live Gemini AI completion
     const apiKey = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+    const { chatHistory, userMemory } = await req.json().catch(() => ({ chatHistory: [], userMemory: null }));
 
     if (apiKey) {
-      try {
-        const geminiRes = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: [
-                {
-                  parts: [
-                    {
-                      text: `You are an AI Form Builder Expert. Analyze this user prompt and generate or modify a JSON form schema for FormFlow.
-User Prompt: "${prompt}"
+      const modelsToTry = [
+        'gemini-2.0-flash',
+        'gemini-1.5-flash',
+        'gemini-1.5-pro',
+        'gemini-2.0-flash-lite'
+      ];
 
-Current Schema (if any): ${currentSchema ? JSON.stringify(currentSchema) : 'None'}
+      // Format previous conversation turn history for multi-turn learning
+      const formattedContents: any[] = [];
 
-Return ONLY a valid JSON object with the following structure:
+      if (Array.isArray(chatHistory) && chatHistory.length > 0) {
+        chatHistory.slice(-8).forEach((msg: any) => {
+          if (msg.sender === 'user') {
+            formattedContents.push({
+              role: 'user',
+              parts: [{ text: msg.text }],
+            });
+          } else if (msg.sender === 'ai') {
+            formattedContents.push({
+              role: 'model',
+              parts: [{ text: msg.text }],
+            });
+          }
+        });
+      }
+
+      // Context instructions for Web Search & User Memory Learning
+      const systemInstruction = `You are an expert AI Form Builder & Web Researcher for FormFlow.
+You create, extend, and modify interactive web form schemas based on natural language user requests.
+
+WEB SEARCH GROUNDING & KNOWLEDGE:
+Use online industry standards, real-world best practices, and search knowledge to generate highly accurate questions, logical field groupings, standard select options, and placeholders for any domain (e.g. Medical Intakes, Job Applications, ISO Compliance, Event Registrations, Customer NPS, University Registrations).
+
+LEARNED USER MEMORY & PREFERENCES:
+${userMemory ? JSON.stringify(userMemory, null, 2) : 'No prior user memory recorded yet.'}
+(Incorporate the user's preferred styles, colors, question patterns, and past preferences into the generated schema).
+
+CURRENT FORM SCHEMA ON CANVAS:
+${currentSchema ? JSON.stringify(currentSchema, null, 2) : 'None (Blank Canvas)'}
+
+AVAILABLE FIELD TYPES:
+- "short_text": Single-line text input
+- "paragraph": Multi-line text input
+- "multiple_choice": Dropdown/radio selection with "options" array
+- "yes_no": Binary Yes/No switch
+- "rating": Star rating (1-5)
+- "file_upload": File/document attachment
+- "date_picker": Date selector
+- "welcome_screen": Header poster screen
+
+RULES FOR OUTPUT:
+1. Return ONLY a valid JSON object without markdown formatting.
+2. If the user asks to modify an existing question (e.g. "change name to...", "rename question label...", "change label of question 1..."), find that question in 'currentSchema.fields' and update its 'label' or 'placeholder' or 'options'!
+3. If the user asks to change text/label/question color (e.g. "change name color to purple", "make text color yellow", "change label color"), set 'theme.text' AND/OR set 'textColor' property on the questions to the requested color!
+4. If modifying or adding to currentSchema, preserve existing question IDs ('id') when updating them, and generate new 'q_...' IDs for new questions.
+5. Provide a helpful, friendly summary in 'replyMessage' explaining what was created or modified.
+
+JSON Structure required:
 {
-  "replyMessage": "A friendly summary of what was generated/modified",
+  "replyMessage": "Detailed friendly message explaining what was added/updated",
   "actionType": "create" | "add_fields" | "theme" | "modify",
+  "learnedMemory": {
+    "preferredTheme": "string description",
+    "favoriteFieldTypes": ["list"],
+    "commonTopics": ["list"]
+  },
   "schema": {
-    "title": "String title",
-    "description": "String description",
+    "title": "Form Title",
+    "description": "Form Description",
     "fields": [
       {
-        "id": "q_unique",
-        "type": "short_text" | "paragraph" | "multiple_choice" | "yes_no" | "rating" | "file_upload" | "date_picker" | "welcome_screen",
-        "label": "Question Label",
-        "required": boolean,
-        "placeholder": "Optional placeholder",
-        "options": ["Option 1", "Option 2"] // only for multiple_choice
+        "id": "q_123",
+        "type": "short_text",
+        "label": "Field Label",
+        "textColor": "#8B5CF6",
+        "required": true,
+        "placeholder": "Sample placeholder",
+        "options": ["Option 1", "Option 2"]
       }
     ],
     "theme": {
       "primary": "#8B5CF6",
+      "text": "#8B5CF6",
       "background": "#05070D",
-      "backgroundType": "solid"
+      "backgroundType": "solid",
+      "posterTitle": "Title",
+      "posterSubtitle": "Subtitle"
     }
   }
-}
-Return strict JSON only without markdown formatting.`,
-                    },
-                  ],
-                },
-              ],
-            }),
-          }
-        );
+}`;
 
-        const geminiData = await geminiRes.json();
-        const responseText = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text;
+      // Append current turn
+      formattedContents.push({
+        role: 'user',
+        parts: [{ text: `${systemInstruction}\n\nUser Request: "${prompt}"` }],
+      });
 
-        if (responseText) {
-          const cleanedText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
-          const parsed = JSON.parse(cleanedText);
-          if (parsed.schema && parsed.schema.fields) {
-            return NextResponse.json(parsed);
+      for (const model of modelsToTry) {
+        try {
+          const geminiRes = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contents: formattedContents,
+                tools: [{ googleSearch: {} }],
+              }),
+            }
+          );
+
+          if (geminiRes.ok) {
+            const geminiData = await geminiRes.json();
+            const responseText = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+            if (responseText) {
+              const cleanedText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
+              const parsed = JSON.parse(cleanedText);
+              if (parsed.schema && parsed.schema.fields) {
+                // Ensure schema theme merges with existing theme properties
+                const mergedTheme: FormTheme = {
+                  ...DEFAULT_THEME,
+                  ...(currentSchema?.theme || {}),
+                  ...(parsed.schema.theme || {}),
+                };
+
+                if (parsed.schema.theme?.primary && !mergedTheme.bannerColor) {
+                  mergedTheme.bannerColor = `linear-gradient(135deg, ${parsed.schema.theme.primary} 0%, #0F172A 100%)`;
+                }
+
+                parsed.schema.theme = mergedTheme;
+                return NextResponse.json(parsed);
+              }
+            }
           }
+        } catch (geminiError) {
+          console.warn(`Gemini API model ${model} attempt error:`, geminiError);
         }
-      } catch (geminiError) {
-        console.warn('Gemini API call fallback to local AI engine:', geminiError);
       }
     }
 
@@ -89,36 +167,100 @@ Return strict JSON only without markdown formatting.`,
     let description = currentSchema?.description || 'Form generated with AI Assistant.';
 
     // Intent 1: Theme & Visual Updates
-    if (lowerPrompt.includes('theme') || lowerPrompt.includes('color') || lowerPrompt.includes('poster') || lowerPrompt.includes('dark') || lowerPrompt.includes('cyberpunk')) {
+    if (
+      lowerPrompt.includes('theme') ||
+      lowerPrompt.includes('color') ||
+      lowerPrompt.includes('poster') ||
+      lowerPrompt.includes('banner') ||
+      lowerPrompt.includes('dark') ||
+      lowerPrompt.includes('cyberpunk') ||
+      lowerPrompt.includes('purple') ||
+      lowerPrompt.includes('blue') ||
+      lowerPrompt.includes('yellow') ||
+      lowerPrompt.includes('red') ||
+      lowerPrompt.includes('green') ||
+      lowerPrompt.includes('amber')
+    ) {
       actionType = 'theme';
-      if (lowerPrompt.includes('cyberpunk') || lowerPrompt.includes('dark') || lowerPrompt.includes('purple')) {
+      if (lowerPrompt.includes('purple') || lowerPrompt.includes('cyberpunk') || lowerPrompt.includes('violet')) {
         updatedTheme = {
           ...updatedTheme,
           primary: '#8B5CF6',
-          background: '#05070D',
+          background: '#0F172A',
+          cardBackground: '#1E293B',
           backgroundType: 'solid',
-          posterTitle: 'Cyberpunk Portal',
-          posterSubtitle: 'Interactive AI Form Experience',
+          bannerColor: 'linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%)',
+          posterTitle: updatedTheme.posterTitle || 'Electric Purple Theme',
+          posterSubtitle: updatedTheme.posterSubtitle || 'Custom AI Form Styling',
         };
-        replyMessage = '✨ Applied Cyberpunk Midnight Obsidian & Electric Purple theme!';
-      } else if (lowerPrompt.includes('ocean') || lowerPrompt.includes('blue')) {
+        replyMessage = '✨ Applied Electric Purple Banner & Background Theme!';
+      } else if (lowerPrompt.includes('ocean') || lowerPrompt.includes('blue') || lowerPrompt.includes('cyan')) {
         updatedTheme = {
           ...updatedTheme,
           primary: '#38BDF8',
           background: '#0F172A',
+          cardBackground: '#1E293B',
           backgroundType: 'solid',
-          posterTitle: 'Oceanic Wave',
-          posterSubtitle: 'Clean & Modern Survey',
+          bannerColor: 'linear-gradient(135deg, #0284C7 0%, #0369A1 100%)',
+          posterTitle: updatedTheme.posterTitle || 'Oceanic Blue Theme',
+          posterSubtitle: updatedTheme.posterSubtitle || 'Clean & Modern Survey',
         };
-        replyMessage = '✨ Applied Deep Ocean Blue Theme!';
-      } else {
+        replyMessage = '✨ Applied Deep Ocean Blue Banner Theme!';
+      } else if (lowerPrompt.includes('emerald') || lowerPrompt.includes('green')) {
         updatedTheme = {
           ...updatedTheme,
-          primary: '#A855F7',
-          background: '#0F172A',
+          primary: '#10B981',
+          background: '#064E3B',
+          cardBackground: '#065F46',
           backgroundType: 'solid',
+          bannerColor: 'linear-gradient(135deg, #10B981 0%, #047857 100%)',
+          posterTitle: updatedTheme.posterTitle || 'Emerald Green Theme',
+          posterSubtitle: updatedTheme.posterSubtitle || 'Fresh Organic Theme',
         };
-        replyMessage = '✨ Updated form styling and theme colors!';
+        replyMessage = '✨ Applied Emerald Green Banner Theme!';
+      } else if (lowerPrompt.includes('amber') || lowerPrompt.includes('yellow') || lowerPrompt.includes('gold')) {
+        updatedTheme = {
+          ...updatedTheme,
+          primary: '#F59E0B',
+          background: '#451A03',
+          cardBackground: '#78350F',
+          backgroundType: 'solid',
+          bannerColor: 'linear-gradient(135deg, #F59E0B 0%, #D97706 100%)',
+          posterTitle: updatedTheme.posterTitle || 'Warm Gold Amber Theme',
+          posterSubtitle: updatedTheme.posterSubtitle || 'Vibrant Warm Styling',
+        };
+        replyMessage = '✨ Applied Warm Amber Gold Banner Theme!';
+      } else {
+        const hexMatch = lowerPrompt.match(/#(?:[0-9a-fA-F]{3}){1,2}/);
+        const hex = hexMatch ? hexMatch[0] : '#8B5CF6';
+        updatedTheme = {
+          ...updatedTheme,
+          primary: hex,
+          text: lowerPrompt.includes('text') || lowerPrompt.includes('name') ? hex : updatedTheme.text,
+          bannerColor: `linear-gradient(135deg, ${hex} 0%, #0F172A 100%)`,
+          posterTitle: updatedTheme.posterTitle || 'Custom Theme Color',
+        };
+        replyMessage = `✨ Updated theme color and banner to ${hex}!`;
+      }
+
+      // Apply text color update to fields if requested
+      if (lowerPrompt.includes('text') || lowerPrompt.includes('name color') || lowerPrompt.includes('label color')) {
+        const targetColor = updatedTheme.primary || '#8B5CF6';
+        updatedTheme.text = targetColor;
+        const fields = (currentSchema?.fields || []).map((f) => ({ ...f, textColor: targetColor }));
+        
+        return NextResponse.json({
+          replyMessage: `✨ Updated question name & text colors to ${targetColor}!`,
+          actionType: 'theme',
+          schema: {
+            title,
+            description,
+            fields,
+            logic: currentSchema?.logic || [],
+            theme: updatedTheme,
+            settings: currentSchema?.settings || DEFAULT_SETTINGS,
+          },
+        });
       }
 
       const mergedSchema: FormSchema = {

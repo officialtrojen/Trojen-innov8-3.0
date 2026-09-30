@@ -425,32 +425,36 @@ export default function FormRenderer({ schema, onSubmit, readOnly = false }: For
             ...cardStyle,
           }}
         >
-          {/* POSTER DISPLAY */}
-          {currentPoster && (
+          {/* POSTER / BANNER DISPLAY */}
+          {(currentPoster || schema.theme.bannerColor || schema.theme.posterColor || schema.theme.posterTitle) && (
             <div
               style={{
                 position: 'relative',
                 width: '100%',
                 height: posterHeight,
                 overflow: 'hidden',
-                background: '#0F172A',
+                background: schema.theme.bannerColor || schema.theme.posterColor || `linear-gradient(135deg, ${schema.theme.primary || '#8B5CF6'} 0%, #0F172A 100%)`,
               }}
             >
-              <img
-                src={currentPoster}
-                alt="Form poster"
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  display: 'block',
-                }}
-              />
+              {currentPoster && (
+                <img
+                  src={currentPoster}
+                  alt="Form poster"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    display: 'block',
+                  }}
+                />
+              )}
               <div
                 style={{
                   position: 'absolute',
                   inset: 0,
-                  background: `linear-gradient(to top, rgba(0,0,0, ${Math.max(0.4, overlayOpacity + 0.2)}), rgba(0,0,0, ${overlayOpacity}))`,
+                  background: currentPoster
+                    ? `linear-gradient(to top, rgba(0,0,0, ${Math.max(0.4, overlayOpacity + 0.2)}), rgba(0,0,0, ${overlayOpacity}))`
+                    : 'transparent',
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'flex-end',

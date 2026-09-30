@@ -36,6 +36,8 @@ export interface FormField {
   maxStars?: number;
   buttonText?: string;
   validation?: FieldValidation;
+  fontFamily?: string;
+  textColor?: string;
 }
 
 // ---------- Conditional Logic ----------

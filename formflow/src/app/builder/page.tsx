@@ -931,6 +931,8 @@ export default function StandaloneBuilderPage() {
         }}
         isOpen={isAiOpen}
         onClose={() => setIsAiOpen(false)}
+        onOpen={() => setIsAiOpen(true)}
+        onToggle={() => setIsAiOpen((prev) => !prev)}
       />
 
       <style>{`

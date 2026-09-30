@@ -20,6 +20,7 @@ function SortableFieldCard({
   onDelete,
   onDuplicate,
   primaryColor,
+  themeText,
   isDarkCard = false,
 }: {
   field: FormField;
@@ -28,6 +29,7 @@ function SortableFieldCard({
   onDelete: () => void;
   onDuplicate: () => void;
   primaryColor?: string;
+  themeText?: string;
   isDarkCard?: boolean;
 }) {
   const [hoveredStar, setHoveredStar] = React.useState<number | null>(null);
@@ -61,6 +63,7 @@ function SortableFieldCard({
   };
 
   const accentColor = primaryColor || '#4F7C7A';
+  const labelColor = field.textColor || themeText || (isDarkCard ? '#F8FAFC' : '#263B3B');
 
   return (
     <div
@@ -107,13 +110,28 @@ function SortableFieldCard({
         </div>
 
         {/* Field content */}
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-            <span style={{ fontWeight: 600, fontSize: 14, color: isDarkCard ? '#F8FAFC' : '#263B3B' }}>
+        <div style={{ flex: 1, minWidth: 0, fontFamily: field.fontFamily || undefined }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
+            <span style={{ fontWeight: 600, fontSize: 14, color: labelColor, fontFamily: field.fontFamily || undefined }}>
               {field.label}
             </span>
             {field.required && (
               <span style={{ color: '#ef4444', fontSize: 13, fontWeight: 700 }}>*</span>
+            )}
+            {field.fontFamily && (
+              <span
+                style={{
+                  fontSize: 10,
+                  padding: '1px 6px',
+                  borderRadius: 4,
+                  background: isDarkCard ? 'rgba(255,255,255,0.1)' : '#E2E8F0',
+                  color: isDarkCard ? '#CBD5E1' : '#475569',
+                  fontWeight: 500,
+                  fontFamily: field.fontFamily,
+                }}
+              >
+                🔤 {field.fontFamily}
+              </span>
             )}
           </div>
 
@@ -302,33 +320,37 @@ export default function FormCanvas({
                 : cardStyle.border,
             }}
           >
-            {/* POSTER DISPLAY IN FORM HEADER */}
-            {currentPoster && (
+            {/* POSTER / BANNER DISPLAY IN FORM HEADER */}
+            {(currentPoster || theme?.bannerColor || theme?.posterColor || theme?.posterTitle) && (
               <div
                 style={{
                   position: 'relative',
                   width: '100%',
                   height: posterHeight,
                   overflow: 'hidden',
-                  background: '#0F172A',
+                  background: theme?.bannerColor || theme?.posterColor || `linear-gradient(135deg, ${theme?.primary || '#8B5CF6'} 0%, #0F172A 100%)`,
                 }}
               >
-                <img
-                  src={currentPoster}
-                  alt="Form poster"
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    display: 'block',
-                  }}
-                />
+                {currentPoster && (
+                  <img
+                    src={currentPoster}
+                    alt="Form poster"
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      display: 'block',
+                    }}
+                  />
+                )}
                 {/* Dark/color tint overlay */}
                 <div
                   style={{
                     position: 'absolute',
                     inset: 0,
-                    background: `linear-gradient(to top, rgba(0,0,0, ${Math.max(0.4, overlayOpacity + 0.2)}), rgba(0,0,0, ${overlayOpacity}))`,
+                    background: currentPoster 
+                      ? `linear-gradient(to top, rgba(0,0,0, ${Math.max(0.4, overlayOpacity + 0.2)}), rgba(0,0,0, ${overlayOpacity}))`
+                      : 'transparent',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'flex-end',
@@ -336,8 +358,8 @@ export default function FormCanvas({
                     color: 'white',
                   }}
                 >
-                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(6px)', padding: '4px 10px', borderRadius: 999, fontSize: 11, fontWeight: 600, width: 'fit-content', marginBottom: 8 }}>
-                    <ImageIcon size={12} /> Poster Active
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.25)', backdropFilter: 'blur(8px)', padding: '4px 12px', borderRadius: 999, fontSize: 11, fontWeight: 700, width: 'fit-content', marginBottom: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.2)' }}>
+                    <ImageIcon size={12} /> {currentPoster ? 'Poster Image' : 'Banner Color Active'}
                   </div>
                   {theme?.posterTitle && (
                     <h2 style={{ fontSize: 22, fontWeight: 800, margin: '0 0 4px 0', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
@@ -466,6 +488,7 @@ export default function FormCanvas({
                       onDelete={() => onDeleteField(field.id)}
                       onDuplicate={() => onDuplicateField(field.id)}
                       primaryColor={theme?.primary}
+                      themeText={theme?.text}
                       isDarkCard={isDarkCard}
                     />
                   ))}

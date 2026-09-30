@@ -524,6 +524,8 @@ export default function FormBuilder({
         onApplySchema={setSchema}
         isOpen={isAiOpen}
         onClose={() => setIsAiOpen(false)}
+        onOpen={() => setIsAiOpen(true)}
+        onToggle={() => setIsAiOpen((prev) => !prev)}
       />
 
       <style>{`
