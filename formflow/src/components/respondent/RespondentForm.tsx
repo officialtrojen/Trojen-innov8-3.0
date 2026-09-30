@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { FormSchema, FormField } from '@/types/form';
 import { evaluateFormLogic } from '@/lib/logicEngine';
+// @ts-ignore
 import confetti from 'canvas-confetti';
 import { 
   ArrowRight, 

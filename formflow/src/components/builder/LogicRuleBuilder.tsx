@@ -113,7 +113,7 @@ export const LogicRuleBuilder: React.FC<LogicRuleBuilderProps> = ({
             {logicRules.map((rule, idx) => {
               const srcF = fields.find((f) => f.id === rule.sourceFieldId);
               const tgtF = fields.find((f) => f.id === rule.action.targetFieldId);
-              const elseF = rule.elseAction ? fields.find((f) => f.id === rule.elseAction.targetFieldId) : null;
+              const elseF = rule.elseAction?.targetFieldId ? fields.find((f) => f.id === rule.elseAction?.targetFieldId) : null;
 
               return (
                 <div

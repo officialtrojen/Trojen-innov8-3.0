@@ -16,6 +16,7 @@ import {
   AlertCircle,
   Code
 } from 'lucide-react';
+// @ts-ignore
 import QRCode from 'qrcode';
 
 interface ShareAndWebhooksProps {
@@ -42,8 +43,8 @@ export const ShareAndWebhooks: React.FC<ShareAndWebhooksProps> = ({
 
   useEffect(() => {
     QRCode.toDataURL(publicUrl, { width: 220, margin: 2 })
-      .then((url) => setQrCodeUrl(url))
-      .catch((err) => console.error('QR code generation error:', err));
+      .then((url: string) => setQrCodeUrl(url))
+      .catch((err: any) => console.error('QR code generation error:', err));
   }, [publicUrl]);
 
   const handleCopyLink = () => {
