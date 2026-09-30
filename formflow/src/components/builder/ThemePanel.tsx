@@ -473,7 +473,7 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
                   style={{
                     border: 'none',
                     background: 'transparent',
-                    color: '#e74c3c',
+                    color: '#f87171',
                     fontSize: 11,
                     fontWeight: 600,
                     cursor: 'pointer',

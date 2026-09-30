@@ -211,7 +211,7 @@ function SortableFieldCard({
             type="button"
             onClick={(e) => { e.stopPropagation(); onDelete(); }}
             className="btn btn-ghost btn-sm"
-            style={{ padding: 6, color: '#ef4444' }}
+            style={{ padding: 6, color: '#f87171' }}
             title="Delete question"
           >
             <Trash2 size={15} />
@@ -313,10 +313,10 @@ export default function FormCanvas({
           overflow: 'hidden',
           background: 'white',
           boxShadow: isFormArmed
-            ? '0 0 0 3px #E74C3C, 0 16px 45px rgba(231, 76, 60, 0.25)'
+            ? '0 0 0 3px #FCA5A5, 0 16px 45px rgba(248, 113, 113, 0.2)'
             : '0 24px 64px rgba(38, 59, 59, 0.14), 0 8px 24px rgba(38, 59, 59, 0.07), 0 1px 3px rgba(38, 59, 59, 0.05)',
           border: isFormArmed
-            ? '2.5px solid #E74C3C'
+            ? '2px solid #F87171'
             : isOver
             ? '2px dashed var(--primary)'
             : '1px solid rgba(184,206,207,0.5)',
@@ -334,8 +334,8 @@ export default function FormCanvas({
               onStartDragForm?.(e);
             }}
             style={{
-              background: 'linear-gradient(135deg, #FDEDEC 0%, #FADBD8 100%)',
-              borderBottom: '2px solid #E74C3C',
+              background: 'linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%)',
+              borderBottom: '2px solid #FCA5A5',
               padding: '10px 18px',
               display: 'flex',
               alignItems: 'center',
@@ -344,9 +344,9 @@ export default function FormCanvas({
               userSelect: 'none',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#C0392B', fontWeight: 700, fontSize: 13 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#DC2626', fontWeight: 700, fontSize: 13 }}>
               <span style={{ fontSize: 18, animation: 'bounce 1s infinite' }}>🖐️</span>
-              <span>Form Armed! Click & drag this sheet to the red Delete Trash Icon ↘️</span>
+              <span>Form Armed! Click & drag this sheet to the Delete Trash Icon ↘️</span>
             </div>
             <button
               type="button"
@@ -355,13 +355,13 @@ export default function FormCanvas({
                 onArmForm?.(false);
               }}
               style={{
-                background: 'rgba(231, 76, 60, 0.15)',
+                background: 'rgba(239, 68, 68, 0.1)',
                 border: 'none',
                 borderRadius: 6,
                 padding: '4px 10px',
                 fontSize: 11,
                 fontWeight: 700,
-                color: '#C0392B',
+                color: '#DC2626',
                 cursor: 'pointer',
               }}
             >

@@ -208,7 +208,7 @@ export default function PropertiesPanel({ field, onUpdate }: PropertiesPanelProp
                       onUpdate({ options: newOpts });
                     }}
                     className="btn btn-ghost btn-sm"
-                    style={{ padding: 4, color: '#e74c3c' }}
+                    style={{ padding: 4, color: '#f87171' }}
                     disabled={(field.options || []).length <= 1}
                   >
                     <Trash2 size={13} />

@@ -263,7 +263,7 @@ function RuleEditor({
 
       {/* Delete */}
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
-        <button onClick={onDelete} className="btn btn-ghost btn-sm" style={{ color: '#e74c3c', padding: 4 }}>
+        <button onClick={onDelete} className="btn btn-ghost btn-sm" style={{ color: '#f87171', padding: 4 }}>
           <Trash2 size={13} /> Remove
         </button>
       </div>

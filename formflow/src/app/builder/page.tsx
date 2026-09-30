@@ -763,7 +763,7 @@ export default function StandaloneBuilderPage() {
             height: 340,
             borderRadius: 14,
             background: '#FFFEF9',
-            border: `2.5px dashed ${isOverTrash ? '#E74C3C' : '#4F7C7A'}`,
+            border: `2.5px dashed ${isOverTrash ? '#F87171' : '#4F7C7A'}`,
             boxShadow: '0 20px 50px rgba(38, 59, 59, 0.35)',
             pointerEvents: 'none',
             zIndex: 9990,
@@ -809,11 +809,11 @@ export default function StandaloneBuilderPage() {
           <div
             style={{
               padding: '10px 12px',
-              background: isOverTrash ? '#FDEDEC' : '#EAF4F4',
+              background: isOverTrash ? '#FEF2F2' : '#EAF4F4',
               textAlign: 'center',
               fontSize: 12,
               fontWeight: 800,
-              color: isOverTrash ? '#E74C3C' : '#365F5D',
+              color: isOverTrash ? '#DC2626' : '#365F5D',
             }}
           >
             {isOverTrash ? '🔥 Release to Crumple & Delete!' : 'Dragging to Delete Icon ↘️'}

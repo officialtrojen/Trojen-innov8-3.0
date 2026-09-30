@@ -338,11 +338,11 @@ export default function FormCrumpleExperience({
               gap: 12,
               padding: '12px 18px',
               borderRadius: 12,
-              border: `2px dashed ${trashHovered ? '#e74c3c' : '#4F7C7A'}`,
-              background: trashHovered ? '#FDEDEC' : '#EAF4F4',
+              border: `2px dashed ${trashHovered ? '#F87171' : '#4F7C7A'}`,
+              background: trashHovered ? '#FEF2F2' : '#EAF4F4',
               cursor: 'pointer',
               transition: 'all 0.2s ease',
-              boxShadow: trashHovered ? '0 0 16px rgba(231, 76, 60, 0.35)' : 'none',
+              boxShadow: trashHovered ? '0 0 16px rgba(248, 113, 113, 0.25)' : 'none',
               transform: trashHovered ? 'scale(1.02)' : 'scale(1)',
             }}
           >
@@ -351,11 +351,11 @@ export default function FormCrumpleExperience({
                 width: 40,
                 height: 40,
                 borderRadius: 10,
-                background: trashHovered ? '#FADBD8' : '#CFE5E3',
+                background: trashHovered ? '#FEE2E2' : '#CFE5E3',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: trashHovered ? '#e74c3c' : '#4F7C7A',
+                color: trashHovered ? '#F87171' : '#4F7C7A',
                 flexShrink: 0,
                 transition: 'all 0.2s ease',
               }}
@@ -363,7 +363,7 @@ export default function FormCrumpleExperience({
               <Trash2 size={20} />
             </div>
             <div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: trashHovered ? '#C0392B' : '#263B3B' }}>
+              <div style={{ fontSize: 13, fontWeight: 700, color: trashHovered ? '#DC2626' : '#263B3B' }}>
                 Delete Icon Drop Zone
               </div>
               <div style={{ fontSize: 11, color: '#365F5D' }}>

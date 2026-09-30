@@ -62,12 +62,12 @@ export default function FormDeleteTrashBin({
             marginBottom: 10,
             padding: '7px 14px',
             borderRadius: 10,
-            background: isOverTrash ? '#FDEDEC' : '#263B3B',
-            color: isOverTrash ? '#C0392B' : '#FFFEF9',
+            background: isOverTrash ? '#FEF2F2' : '#263B3B',
+            color: isOverTrash ? '#DC2626' : '#FFFEF9',
             fontSize: 12,
             fontWeight: 700,
             boxShadow: '0 4px 16px rgba(38, 59, 59, 0.25)',
-            border: isOverTrash ? '1.5px solid #E74C3C' : '1.5px solid #4F7C7A',
+            border: isOverTrash ? '1.5px solid #FCA5A5' : '1.5px solid #4F7C7A',
             whiteSpace: 'nowrap',
             animation: 'fadeIn 0.2s ease, bounce 1.5s infinite',
             display: 'flex',
@@ -95,17 +95,17 @@ export default function FormDeleteTrashBin({
           width: 60,
           height: 60,
           borderRadius: '50%',
-          background: isOverTrash ? '#FDEDEC' : isFormArmed ? '#FFEEEE' : '#FFFEF9',
-          border: `2.5px solid ${isOverTrash ? '#C0392B' : '#E74C3C'}`,
+          background: isOverTrash ? '#FEF2F2' : isFormArmed ? '#FFF5F5' : '#FFFEF9',
+          border: `2.5px solid ${isOverTrash ? '#EF4444' : '#F87171'}`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           cursor: 'pointer',
           boxShadow: isOverTrash
-            ? '0 0 26px rgba(231, 76, 60, 0.6), 0 8px 24px rgba(231, 76, 60, 0.35)'
+            ? '0 0 24px rgba(248, 113, 113, 0.4), 0 8px 20px rgba(248, 113, 113, 0.25)'
             : isFormArmed
-            ? '0 0 22px rgba(231, 76, 60, 0.45), 0 6px 20px rgba(38, 59, 59, 0.2)'
-            : '0 4px 16px rgba(231, 76, 60, 0.25), 0 2px 8px rgba(38, 59, 59, 0.1)',
+            ? '0 0 18px rgba(248, 113, 113, 0.3), 0 6px 20px rgba(38, 59, 59, 0.2)'
+            : '0 4px 14px rgba(248, 113, 113, 0.2), 0 2px 8px rgba(38, 59, 59, 0.1)',
           transform: isOverTrash ? 'scale(1.2)' : isFormArmed ? 'scale(1.1)' : 'scale(1)',
           transition: 'all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
           position: 'relative',
@@ -119,7 +119,7 @@ export default function FormDeleteTrashBin({
               position: 'absolute',
               inset: -8,
               borderRadius: '50%',
-              border: '2px solid #E74C3C',
+              border: '2px solid #FCA5A5',
               animation: 'ripple 1.5s infinite',
               pointerEvents: 'none',
             }}
@@ -132,7 +132,7 @@ export default function FormDeleteTrashBin({
           height="30"
           viewBox="0 0 24 24"
           fill="none"
-          stroke="#E74C3C"
+          stroke="#F87171"
           strokeWidth="2.2"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -165,13 +165,13 @@ export default function FormDeleteTrashBin({
             bottom: -7,
             padding: '2px 7px',
             borderRadius: 6,
-            background: '#E74C3C',
+            background: '#F87171',
             color: '#FFFEF9',
             fontSize: 9.5,
             fontWeight: 800,
             letterSpacing: '0.04em',
             textTransform: 'uppercase',
-            boxShadow: '0 2px 6px rgba(231, 76, 60, 0.4)',
+            boxShadow: '0 2px 6px rgba(248, 113, 113, 0.35)',
           }}
         >
           Delete
