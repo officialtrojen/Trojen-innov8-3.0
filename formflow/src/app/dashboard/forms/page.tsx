@@ -174,7 +174,7 @@ export default function MyFormsPage() {
               </p>
               
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: 16 }}>
-                <Link href={`/dashboard/forms/${form.id}/edit`} style={{ flex: 1, textDecoration: 'none' }}>
+                <Link href={`/builder?id=${form.id}`} style={{ flex: 1, textDecoration: 'none' }}>
                   <button style={{ width: '100%', background: 'rgba(255,255,255,0.05)', color: '#F8FAFC', border: 'none', padding: '8px 0', borderRadius: 8, fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, cursor: 'pointer' }}>
                     <Edit2 size={14} /> Edit
                   </button>

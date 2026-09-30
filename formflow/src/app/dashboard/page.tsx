@@ -222,7 +222,7 @@ export default function DashboardPage() {
                     <td style={{ padding: '14px 16px', color: '#94A3B8' }}>{formatDate(form.updated_at)}</td>
                     <td style={{ padding: '14px 16px' }}>
                       <div style={{ display: 'flex', gap: 4, justifyContent: 'flex-end' }}>
-                        <Link href={`/dashboard/forms/${form.id}/edit`} className="btn btn-ghost btn-sm" title="Edit">
+                        <Link href={`/builder?id=${form.id}`} className="btn btn-ghost btn-sm" title="Edit in Studio">
                           <Edit3 size={15} />
                         </Link>
                         <Link href={`/dashboard/forms/${form.id}/preview`} className="btn btn-ghost btn-sm" title="Preview">
