@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import LiveBackground from '@/components/LiveBackground';
 import Unified3DCanvas from '@/components/Unified3DCanvas';
-import WebGLArtCanvas from '@/components/WebGLArtCanvas';
+import BlackHoleCanvas from '@/components/BlackHoleCanvas';
 import Scroll3DCard from '@/components/Scroll3DCard';
 
 /* ── Navigation ── */
@@ -839,7 +839,7 @@ export default function LandingPage() {
   return (
     <>
       <LiveBackground />
-      <WebGLArtCanvas />
+      <BlackHoleCanvas />
       <Unified3DCanvas />
       <Navbar />
       <main>
