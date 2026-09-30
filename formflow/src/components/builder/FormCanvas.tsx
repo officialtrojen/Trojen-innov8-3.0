@@ -20,6 +20,7 @@ function SortableFieldCard({
   onDelete,
   onDuplicate,
   primaryColor,
+  themeText,
   isDarkCard = false,
 }: {
   field: FormField;
@@ -28,6 +29,7 @@ function SortableFieldCard({
   onDelete: () => void;
   onDuplicate: () => void;
   primaryColor?: string;
+  themeText?: string;
   isDarkCard?: boolean;
 }) {
   const [hoveredStar, setHoveredStar] = React.useState<number | null>(null);
@@ -61,6 +63,7 @@ function SortableFieldCard({
   };
 
   const accentColor = primaryColor || '#4F7C7A';
+  const labelColor = field.textColor || themeText || (isDarkCard ? '#F8FAFC' : '#263B3B');
 
   return (
     <div
@@ -109,7 +112,7 @@ function SortableFieldCard({
         {/* Field content */}
         <div style={{ flex: 1, minWidth: 0, fontFamily: field.fontFamily || undefined }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
-            <span style={{ fontWeight: 600, fontSize: 14, color: isDarkCard ? '#F8FAFC' : '#263B3B', fontFamily: field.fontFamily || undefined }}>
+            <span style={{ fontWeight: 600, fontSize: 14, color: labelColor, fontFamily: field.fontFamily || undefined }}>
               {field.label}
             </span>
             {field.required && (
@@ -485,6 +488,7 @@ export default function FormCanvas({
                       onDelete={() => onDeleteField(field.id)}
                       onDuplicate={() => onDuplicateField(field.id)}
                       primaryColor={theme?.primary}
+                      themeText={theme?.text}
                       isDarkCard={isDarkCard}
                     />
                   ))}

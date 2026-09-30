@@ -69,8 +69,10 @@ AVAILABLE FIELD TYPES:
 
 RULES FOR OUTPUT:
 1. Return ONLY a valid JSON object without markdown formatting.
-2. If modifying or adding to currentSchema, preserve existing question IDs ('id') when updating them, and generate new 'q_...' IDs for new questions.
-3. Provide a helpful, friendly summary in 'replyMessage' explaining what was created or modified and what web standards/learnings were used.
+2. If the user asks to modify an existing question (e.g. "change name to...", "rename question label...", "change label of question 1..."), find that question in 'currentSchema.fields' and update its 'label' or 'placeholder' or 'options'!
+3. If the user asks to change text/label/question color (e.g. "change name color to purple", "make text color yellow", "change label color"), set 'theme.text' AND/OR set 'textColor' property on the questions to the requested color!
+4. If modifying or adding to currentSchema, preserve existing question IDs ('id') when updating them, and generate new 'q_...' IDs for new questions.
+5. Provide a helpful, friendly summary in 'replyMessage' explaining what was created or modified.
 
 JSON Structure required:
 {
@@ -89,6 +91,7 @@ JSON Structure required:
         "id": "q_123",
         "type": "short_text",
         "label": "Field Label",
+        "textColor": "#8B5CF6",
         "required": true,
         "placeholder": "Sample placeholder",
         "options": ["Option 1", "Option 2"]
@@ -96,6 +99,7 @@ JSON Structure required:
     ],
     "theme": {
       "primary": "#8B5CF6",
+      "text": "#8B5CF6",
       "background": "#05070D",
       "backgroundType": "solid",
       "posterTitle": "Title",
@@ -232,10 +236,31 @@ JSON Structure required:
         updatedTheme = {
           ...updatedTheme,
           primary: hex,
+          text: lowerPrompt.includes('text') || lowerPrompt.includes('name') ? hex : updatedTheme.text,
           bannerColor: `linear-gradient(135deg, ${hex} 0%, #0F172A 100%)`,
           posterTitle: updatedTheme.posterTitle || 'Custom Theme Color',
         };
         replyMessage = `✨ Updated theme color and banner to ${hex}!`;
+      }
+
+      // Apply text color update to fields if requested
+      if (lowerPrompt.includes('text') || lowerPrompt.includes('name color') || lowerPrompt.includes('label color')) {
+        const targetColor = updatedTheme.primary || '#8B5CF6';
+        updatedTheme.text = targetColor;
+        const fields = (currentSchema?.fields || []).map((f) => ({ ...f, textColor: targetColor }));
+        
+        return NextResponse.json({
+          replyMessage: `✨ Updated question name & text colors to ${targetColor}!`,
+          actionType: 'theme',
+          schema: {
+            title,
+            description,
+            fields,
+            logic: currentSchema?.logic || [],
+            theme: updatedTheme,
+            settings: currentSchema?.settings || DEFAULT_SETTINGS,
+          },
+        });
       }
 
       const mergedSchema: FormSchema = {

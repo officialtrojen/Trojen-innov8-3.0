@@ -37,6 +37,7 @@ export interface FormField {
   buttonText?: string;
   validation?: FieldValidation;
   fontFamily?: string;
+  textColor?: string;
 }
 
 // ---------- Conditional Logic ----------
