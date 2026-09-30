@@ -6,6 +6,7 @@
     "dev": "next dev",
     "server": "node server.js",
     "start:node": "node server.js",
+    "connect:backend": "node scripts/connect-backend.js",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
