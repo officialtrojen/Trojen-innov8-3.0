@@ -118,7 +118,8 @@ function Sidebar() {
           </div>
         </div>
 
-        {user?.app_metadata?.provider === 'google' && (
+        {(user?.app_metadata?.provider === 'google' ||
+          (user?.app_metadata?.providers as string[] | undefined)?.includes('google')) && (
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: 'rgba(56, 189, 248, 0.12)', color: '#38BDF8', fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 9999, marginBottom: 10 }}>
             <span>✓ Google Verified</span>
           </div>

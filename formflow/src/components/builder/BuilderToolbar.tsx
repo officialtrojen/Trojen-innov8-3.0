@@ -191,8 +191,7 @@ export default function BuilderToolbar({
             Save
           </button>
 
-      {/* Right: Actions */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+
         {onToggleAi && (
           <button
             type="button"
@@ -223,8 +222,9 @@ export default function BuilderToolbar({
             {copied ? <Check size={15} style={{ color: '#28a745' }} /> : <LinkIcon size={15} />}
             {copied ? 'Copied!' : 'Share'}
           </button>
-        </div>
+        )}
       </div>
+    </div>
 
       {/* Share Modal Dialog */}
       <ShareModal

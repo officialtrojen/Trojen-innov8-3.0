@@ -78,7 +78,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signInWithGoogle = async () => {
     try {
       const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: `${origin}/auth/callback`,
@@ -89,7 +89,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         },
       });
 
-      return { error: error?.message ?? null };
+      if (error) {
+        return { error: error.message };
+      }
+
+      if (data?.url && typeof window !== 'undefined') {
+        window.location.assign(data.url);
+      }
+
+      return { error: null };
     } catch (e: any) {
       return { error: e.message || 'Google OAuth failed to initialize' };
     }

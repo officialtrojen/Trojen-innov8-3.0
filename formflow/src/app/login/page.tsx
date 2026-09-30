@@ -35,6 +35,24 @@ export default function LoginPage() {
     return () => clearInterval(interval);
   }, [resendTimer]);
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const urlError = params.get('error');
+      if (urlError) {
+        if (urlError === 'oauth_failed') {
+          setError('Google sign-in could not be completed. Please try again.');
+        } else {
+          setError(decodeURIComponent(urlError));
+        }
+      }
+
+      const handlePageShow = () => setGoogleLoading(false);
+      window.addEventListener('pageshow', handlePageShow);
+      return () => window.removeEventListener('pageshow', handlePageShow);
+    }
+  }, []);
+
   // Handle password login
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -103,9 +121,8 @@ export default function LoginPage() {
     if (err) {
       setError(err);
       setGoogleLoading(false);
-    } else {
-      window.location.href = '/dashboard';
     }
+    // Note: Do not navigate manually. signInWithGoogle initiates redirect to Google consent screen.
   };
 
   return (
