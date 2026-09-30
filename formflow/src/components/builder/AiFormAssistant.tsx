@@ -21,6 +21,8 @@ interface AiFormAssistantProps {
   onApplySchema: (newSchema: FormSchema) => void;
   isOpen: boolean;
   onClose: () => void;
+  onOpen?: () => void;
+  onToggle?: () => void;
 }
 
 interface ChatMessage {
@@ -36,6 +38,8 @@ export default function AiFormAssistant({
   onApplySchema,
   isOpen,
   onClose,
+  onOpen,
+  onToggle,
 }: AiFormAssistantProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
@@ -69,7 +73,11 @@ export default function AiFormAssistant({
     return (
       <button
         type="button"
-        onClick={onClose}
+        onClick={() => {
+          if (onOpen) onOpen();
+          else if (onToggle) onToggle();
+          else onClose();
+        }}
         style={{
           position: 'fixed',
           bottom: 24,
