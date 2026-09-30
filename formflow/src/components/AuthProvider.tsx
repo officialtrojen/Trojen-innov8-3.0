@@ -11,6 +11,8 @@ interface AuthContextType {
   signUp: (email: string, password: string, name: string) => Promise<{ error: string | null }>;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
   signInWithGoogle: () => Promise<{ error: string | null }>;
+  sendOtp: (email: string) => Promise<{ error: string | null }>;
+  verifyOtp: (email: string, token: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -86,6 +88,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const sendOtp = async (email: string) => {
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email: email.trim(),
+        options: {
+          shouldCreateUser: true,
+        },
+      });
+      return { error: error?.message ?? null };
+    } catch (e: any) {
+      return { error: e.message || 'Failed to send OTP' };
+    }
+  };
+
+  const verifyOtp = async (email: string, token: string) => {
+    try {
+      const { data, error } = await supabase.auth.verifyOtp({
+        email: email.trim(),
+        token: token.trim(),
+        type: 'email',
+      });
+      if (!error && data.session) {
+        setSession(data.session);
+        setUser(data.user);
+      }
+      return { error: error?.message ?? null };
+    } catch (e: any) {
+      return { error: e.message || 'Failed to verify OTP' };
+    }
+  };
+
   const signOut = async () => {
     await supabase.auth.signOut();
     setUser(null);
@@ -95,7 +128,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, session, loading, signUp, signIn, signInWithGoogle, signOut }}
+      value={{
+        user,
+        session,
+        loading,
+        signUp,
+        signIn,
+        signInWithGoogle,
+        sendOtp,
+        verifyOtp,
+        signOut,
+      }}
     >
       {children}
     </AuthContext.Provider>
