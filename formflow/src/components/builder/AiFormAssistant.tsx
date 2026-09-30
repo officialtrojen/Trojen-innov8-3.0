@@ -56,7 +56,36 @@ export default function AiFormAssistant({
     }
   }, [messages, isOpen, isMinimized]);
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    return (
+      <button
+        type="button"
+        onClick={onClose}
+        style={{
+          position: 'fixed',
+          bottom: 24,
+          right: 24,
+          zIndex: 1000,
+          padding: '12px 22px',
+          borderRadius: 99,
+          background: 'linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%)',
+          color: '#FFFFFF',
+          fontWeight: 800,
+          fontSize: 14,
+          border: '1.5px solid rgba(255, 255, 255, 0.25)',
+          boxShadow: '0 12px 35px rgba(139, 92, 246, 0.6), 0 0 24px rgba(139, 92, 246, 0.4)',
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 10,
+          transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
+        }}
+      >
+        <Sparkles size={18} color="#FDE047" />
+        <span>✨ Open AI Form Assistant</span>
+      </button>
+    );
+  }
 
   const handleSendPrompt = async (promptText?: string) => {
     const textToSend = promptText || inputPrompt.trim();

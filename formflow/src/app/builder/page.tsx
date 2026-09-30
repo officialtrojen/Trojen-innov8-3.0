@@ -121,7 +121,7 @@ export default function StandaloneBuilderPage() {
   const [dragPointer, setDragPointer] = useState<{ x: number; y: number } | null>(null);
   const [isOverTrash, setIsOverTrash] = useState(false);
   const [isCrumpling, setIsCrumpling] = useState(false);
-  const [isAiOpen, setIsAiOpen] = useState(false);
+  const [isAiOpen, setIsAiOpen] = useState(true);
   const [publishedFormInfo, setPublishedFormInfo] = useState<{
     isOpen: boolean;
     formId: string;
