@@ -485,7 +485,7 @@ export const RespondentForm: React.FC<RespondentFormProps> = ({ form }) => {
         {/* Footer */}
         <div className="w-full max-w-2xl mx-auto flex items-center justify-between text-[11px] text-zinc-500 pt-4">
           <span>{form.title}</span>
-          <span>Powered by FlowForm No-Code Engine</span>
+          <span>© 2026 FormFlow. Built with ❤️ by team trojen</span>
         </div>
       </div>
     );
@@ -572,6 +572,12 @@ export const RespondentForm: React.FC<RespondentFormProps> = ({ form }) => {
           >
             {submitting ? 'Submitting...' : 'Complete & Submit Form ✓'}
           </button>
+        </div>
+
+        {/* Footer */}
+        <div className="w-full max-w-2xl mx-auto flex items-center justify-between text-[11px] text-zinc-500 pt-6 border-t border-zinc-200/20">
+          <span>{form.title}</span>
+          <span>© 2026 FormFlow. Built with ❤️ by team trojen</span>
         </div>
       </div>
     </div>

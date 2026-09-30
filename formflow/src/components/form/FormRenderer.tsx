@@ -534,6 +534,11 @@ export default function FormRenderer({ schema, onSubmit, readOnly = false }: For
             )}
           </div>
         </div>
+
+        {/* Footer Branding */}
+        <div style={{ marginTop: 20, textAlign: 'center', fontSize: 11, color: '#6A8E8C', opacity: 0.85, fontWeight: 500 }}>
+          © 2026 FormFlow. Built with ❤️ by team trojen
+        </div>
       </form>
     </div>
   );

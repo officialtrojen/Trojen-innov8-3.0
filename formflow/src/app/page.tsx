@@ -697,7 +697,7 @@ function Footer() {
         <span style={{ fontWeight: 700, fontSize: 16, color: '#FFFFFF' }}>FormFlow</span>
       </div>
       <p style={{ color: '#F8FAFC', fontSize: 13 }}>
-        © {new Date().getFullYear()} FormFlow. Built with ❤️ for hackathons.
+        © 2026 FormFlow. Built with ❤️ by team trojen
       </p>
     </footer>
   );
