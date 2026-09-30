@@ -388,6 +388,7 @@ export default function FormRenderer({ schema, onSubmit, readOnly = false }: For
   return (
     <div
       style={{
+        position: 'relative',
         minHeight: '100vh',
         fontFamily: schema.theme.fontFamily,
         padding: '40px 24px',

@@ -220,22 +220,34 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
             <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#263B3B', marginBottom: 8 }}>
               Background Type
             </label>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 4 }}>
               {[
                 { id: 'solid', label: 'Solid' },
                 { id: 'gradient', label: 'Gradient' },
                 { id: 'pattern', label: 'Pattern' },
                 { id: 'image', label: 'Image' },
+                { id: 'blackhole', label: '🕳️ Black Hole' },
               ].map((t) => {
                 const isSelected = (theme.backgroundType || 'solid') === t.id;
                 return (
                   <button
                     key={t.id}
                     type="button"
-                    onClick={() => onUpdate({ backgroundType: t.id as FormTheme['backgroundType'] })}
+                    onClick={() => {
+                      if (t.id === 'blackhole') {
+                        onUpdate({
+                          backgroundType: 'blackhole',
+                          background: '#090D16',
+                          text: '#F8FAFC',
+                          primary: '#818CF8',
+                        });
+                      } else {
+                        onUpdate({ backgroundType: t.id as FormTheme['backgroundType'] });
+                      }
+                    }}
                     style={{
-                      padding: '8px 4px',
-                      fontSize: 11,
+                      padding: '8px 2px',
+                      fontSize: 10,
                       fontWeight: 700,
                       borderRadius: 8,
                       border: `1.5px solid ${isSelected ? '#4F7C7A' : '#B8CECF'}`,
@@ -243,6 +255,9 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
                       color: isSelected ? '#263B3B' : '#365F5D',
                       cursor: 'pointer',
                       transition: 'all 0.15s ease',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
                     }}
                   >
                     {t.label}
@@ -494,6 +509,26 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
                   </button>
                 </div>
               )}
+            </div>
+          )}
+
+          {theme.backgroundType === 'blackhole' && (
+            <div
+              style={{
+                padding: '14px 16px',
+                borderRadius: 10,
+                background: 'linear-gradient(135deg, #0F172A, #1E1B4B)',
+                color: '#F3F4F6',
+                border: '1px solid rgba(99, 102, 241, 0.4)',
+                boxShadow: '0 4px 14px rgba(99, 102, 241, 0.25)',
+              }}
+            >
+              <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 6, display: 'flex', alignItems: 'center', gap: 6, color: '#C084FC' }}>
+                <Sparkles size={15} /> Quantum Raymarching Black Hole
+              </div>
+              <p style={{ fontSize: 12, color: '#9CA3AF', lineHeight: 1.5, margin: 0 }}>
+                Interactive GLSL gravitational lensing & plasma accretion disk shader. Reacts dynamically to cursor movement.
+              </p>
             </div>
           )}
         </div>

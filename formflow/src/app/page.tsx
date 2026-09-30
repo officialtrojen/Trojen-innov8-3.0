@@ -17,9 +17,6 @@ import {
   Menu,
   X,
 } from 'lucide-react';
-import LiveBackground from '@/components/LiveBackground';
-import Unified3DCanvas from '@/components/Unified3DCanvas';
-import BlackHoleCanvas from '@/components/BlackHoleCanvas';
 import Scroll3DCard from '@/components/Scroll3DCard';
 
 /* ── Navigation ── */
@@ -806,9 +803,6 @@ function Footer() {
 export default function LandingPage() {
   return (
     <>
-      <LiveBackground />
-      <BlackHoleCanvas />
-      <Unified3DCanvas />
       <Navbar />
       <main>
         <Hero />

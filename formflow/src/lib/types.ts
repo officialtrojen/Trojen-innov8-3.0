@@ -80,7 +80,7 @@ export interface FormTheme {
   logoUrl?: string;
   bannerUrl?: string;
   // Background customization options
-  backgroundType?: 'solid' | 'gradient' | 'pattern' | 'image';
+  backgroundType?: 'solid' | 'gradient' | 'pattern' | 'image' | 'blackhole';
   backgroundGradient?: string;
   backgroundPattern?: 'dots' | 'grid' | 'mesh' | 'stripes' | 'none';
   backgroundImage?: string;
