@@ -147,6 +147,8 @@ export default function StandaloneBuilderPage() {
     publicSlug: '',
     title: '',
   });
+  const [existingFormId, setExistingFormId] = useState<string | null>(null);
+  const [existingPublicSlug, setExistingPublicSlug] = useState<string | null>(null);
   const trashBinRef = useRef<HTMLDivElement | null>(null);
 
   // Global pointer tracking when dragging armed form
@@ -238,11 +240,44 @@ export default function StandaloneBuilderPage() {
 
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
+      const urlId = params.get('id');
       const urlTitle = params.get('title');
       const urlDesc = params.get('description');
       const isNew = params.get('new') === 'true';
 
-      if (urlTitle || isNew) {
+      if (urlId) {
+        setExistingFormId(urlId);
+        const supabase = createClient();
+        supabase
+          .from('forms')
+          .select('*')
+          .eq('id', urlId)
+          .single()
+          .then(({ data, error }) => {
+            if (data && !error) {
+              let parsedSchema = data.schema;
+              if (typeof parsedSchema === 'string') {
+                try {
+                  parsedSchema = JSON.parse(parsedSchema);
+                } catch {}
+              }
+              const loadedSchema: FormSchema = {
+                title: data.title || parsedSchema?.title || 'Untitled Form',
+                description: data.description || parsedSchema?.description || '',
+                fields: Array.isArray(parsedSchema?.fields) ? parsedSchema.fields : [],
+                logic: Array.isArray(parsedSchema?.logic) ? parsedSchema.logic : [],
+                theme: parsedSchema?.theme || data.theme || DEFAULT_THEME,
+                settings: parsedSchema?.settings || DEFAULT_SETTINGS,
+              };
+              setSchema(loadedSchema);
+              setExistingPublicSlug(data.public_slug);
+              if (loadedSchema.fields.length > 0) {
+                setSelectedFieldId(loadedSchema.fields[0].id);
+              }
+            }
+          });
+        initialized = true;
+      } else if (urlTitle || isNew) {
         const freshSchema: FormSchema = {
           title: urlTitle ? decodeURIComponent(urlTitle) : 'Untitled Form',
           description: urlDesc ? decodeURIComponent(urlDesc) : '',
@@ -486,29 +521,57 @@ export default function StandaloneBuilderPage() {
     }
 
     try {
-      const { data, error } = await supabase
-        .from('forms')
-        .insert({
-          owner_id: user.id,
-          title: schema.title,
-          description: schema.description || null,
-          schema,
-          theme: schema.theme,
-          status: 'published',
-          public_slug: generateSlug(),
-        })
-        .select('id, public_slug')
-        .single();
+      if (existingFormId) {
+        const { error } = await supabase
+          .from('forms')
+          .update({
+            title: schema.title,
+            description: schema.description || null,
+            schema,
+            theme: schema.theme,
+            status: 'published',
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', existingFormId);
 
-      if (error) {
-        alert('Could not save form: ' + error.message);
-      } else if (data) {
-        setPublishedFormInfo({
-          isOpen: true,
-          publicSlug: data.public_slug,
-          formId: data.id,
-          title: schema.title,
-        });
+        if (error) {
+          alert('Could not update form: ' + error.message);
+        } else {
+          setPublishedFormInfo({
+            isOpen: true,
+            publicSlug: existingPublicSlug || generateSlug(),
+            formId: existingFormId,
+            title: schema.title,
+          });
+        }
+      } else {
+        const slug = generateSlug();
+        const { data, error } = await supabase
+          .from('forms')
+          .insert({
+            owner_id: user.id,
+            title: schema.title,
+            description: schema.description || null,
+            schema,
+            theme: schema.theme,
+            status: 'published',
+            public_slug: slug,
+          })
+          .select('id, public_slug')
+          .single();
+
+        if (error) {
+          alert('Could not save form: ' + error.message);
+        } else if (data) {
+          setExistingFormId(data.id);
+          setExistingPublicSlug(data.public_slug);
+          setPublishedFormInfo({
+            isOpen: true,
+            publicSlug: data.public_slug,
+            formId: data.id,
+            title: schema.title,
+          });
+        }
       }
     } catch (err: unknown) {
       alert('Error saving form');
@@ -957,11 +1020,7 @@ export default function StandaloneBuilderPage() {
       <ShareModal
         isOpen={publishedFormInfo.isOpen}
         onClose={() => {
-          const formId = publishedFormInfo.formId;
           setPublishedFormInfo((prev) => ({ ...prev, isOpen: false }));
-          if (formId) {
-            router.push(`/dashboard/forms/${formId}/edit`);
-          }
         }}
         formTitle={publishedFormInfo.title}
         publicSlug={publishedFormInfo.publicSlug}

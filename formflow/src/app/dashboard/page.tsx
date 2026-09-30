@@ -70,6 +70,29 @@ export default function DashboardPage() {
     }
 
     load();
+
+    // Subscribe to realtime updates on forms and responses
+    const formsChannel = supabase
+      .channel('dashboard-forms-live')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'forms' },
+        () => {
+          load();
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'responses' },
+        () => {
+          load();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(formsChannel);
+    };
   }, [user, supabase]);
 
   const handleDuplicate = async (form: DBForm) => {

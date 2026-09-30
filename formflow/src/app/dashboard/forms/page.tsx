@@ -32,6 +32,22 @@ export default function MyFormsPage() {
       setLoading(false);
     }
     loadForms();
+
+    // Subscribe to realtime changes on forms table for live sync
+    const channel = supabase
+      .channel('my-forms-live')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'forms' },
+        () => {
+          loadForms();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [user, supabase]);
 
   if (loading) {
