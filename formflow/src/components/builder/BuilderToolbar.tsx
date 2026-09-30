@@ -45,8 +45,8 @@ export default function BuilderToolbar({
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '10px 20px',
-        background: 'var(--card-bg)',
-        borderBottom: '1px solid rgba(184,206,207,0.3)',
+        background: '#FFFEF9',
+        borderBottom: '1px solid #B8CECF',
         gap: 12,
         flexWrap: 'wrap',
       }}
@@ -57,70 +57,176 @@ export default function BuilderToolbar({
           value={title}
           onChange={(e) => onTitleChange(e.target.value)}
           style={{
-            border: 'none',
+            border: '1px solid transparent',
+            borderRadius: 6,
             background: 'transparent',
             fontSize: 16,
-            fontWeight: 600,
+            fontWeight: 700,
             color: '#263B3B',
             width: '100%',
-            maxWidth: 300,
-            padding: '4px 0',
+            maxWidth: 320,
+            padding: '4px 8px',
             outline: 'none',
+          }}
+          onFocus={(e) => {
+            e.currentTarget.style.borderColor = '#B8CECF';
+            e.currentTarget.style.background = '#EAF4F4';
+          }}
+          onBlur={(e) => {
+            e.currentTarget.style.borderColor = 'transparent';
+            e.currentTarget.style.background = 'transparent';
           }}
           placeholder="Form Title"
         />
-        <span className={`badge badge-${formStatus}`} style={{ flexShrink: 0 }}>
+        <span
+          style={{
+            padding: '3px 10px',
+            borderRadius: 999,
+            fontSize: 11,
+            fontWeight: 700,
+            background: '#CFE5E3',
+            color: '#263B3B',
+            border: '1px solid #B8CECF',
+            flexShrink: 0,
+          }}
+        >
           {formStatus.charAt(0).toUpperCase() + formStatus.slice(1)}
         </span>
       </div>
 
       {/* Center: Panel toggles */}
-      <div style={{ display: 'flex', gap: 4, background: 'var(--accent)', borderRadius: 8, padding: 3 }}>
+      <div
+        style={{
+          display: 'flex',
+          gap: 4,
+          background: '#EAF4F4',
+          borderRadius: 8,
+          padding: 3,
+          border: '1px solid #B8CECF',
+        }}
+      >
         {([
-          { key: 'properties', label: 'Fields', icon: null },
+          { key: 'properties', label: 'Questions', icon: null },
           { key: 'logic', label: 'Logic', icon: GitBranch },
-          { key: 'theme', label: 'Theme & Poster', icon: Palette },
-        ] as const).map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => onPanelChange(tab.key)}
-            className="btn btn-sm"
-            style={{
-              background: activePanel === tab.key ? 'white' : 'transparent',
-              color: activePanel === tab.key ? 'var(--primary)' : '#52796F',
-              boxShadow: activePanel === tab.key ? 'var(--shadow-sm)' : 'none',
-              borderRadius: 6,
-              fontSize: 12,
-              fontWeight: 500,
-              border: 'none',
-            }}
-          >
-            {tab.icon && <tab.icon size={13} />}
-            {tab.label}
-          </button>
-        ))}
+          { key: 'theme', label: 'Background & Poster', icon: Palette },
+        ] as const).map((tab) => {
+          const isSelected = activePanel === tab.key;
+          return (
+            <button
+              key={tab.key}
+              type="button"
+              onClick={() => onPanelChange(tab.key)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '6px 12px',
+                borderRadius: 6,
+                fontSize: 12,
+                fontWeight: 700,
+                border: 'none',
+                cursor: 'pointer',
+                background: isSelected ? '#4F7C7A' : 'transparent',
+                color: isSelected ? '#FFFEF9' : '#365F5D',
+                boxShadow: isSelected ? '0 1px 3px rgba(38, 59, 59, 0.2)' : 'none',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              {tab.icon && <tab.icon size={13} />}
+              {tab.label}
+            </button>
+          );
+        })}
       </div>
 
       {/* Right: Actions */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         {formStatus === 'published' && (
-          <button onClick={handleCopyLink} className="btn btn-ghost btn-sm" title="Copy public link">
-            {copied ? <Check size={15} style={{ color: '#28a745' }} /> : <LinkIcon size={15} />}
+          <button
+            onClick={handleCopyLink}
+            type="button"
+            title="Copy public link"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '7px 12px',
+              borderRadius: 6,
+              background: 'transparent',
+              color: '#365F5D',
+              border: '1px solid #B8CECF',
+              fontSize: 12,
+              fontWeight: 600,
+              cursor: 'pointer',
+            }}
+          >
+            {copied ? <Check size={14} style={{ color: '#4F7C7A' }} /> : <LinkIcon size={14} />}
             {copied ? 'Copied!' : 'Share'}
           </button>
         )}
 
-        <Link href={`/dashboard/forms/${formId}/preview`} className="btn btn-ghost btn-sm">
-          <Eye size={15} /> Preview
+        <Link
+          href={`/dashboard/forms/${formId}/preview`}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '7px 12px',
+            borderRadius: 6,
+            background: 'transparent',
+            color: '#365F5D',
+            border: 'none',
+            fontSize: 12,
+            fontWeight: 600,
+            cursor: 'pointer',
+            textDecoration: 'none',
+          }}
+        >
+          <Eye size={14} /> Preview
         </Link>
 
-        <button onClick={onSave} className="btn btn-secondary btn-sm" disabled={saving}>
-          {saving ? <span className="spinner" /> : <Save size={15} />}
+        <button
+          onClick={onSave}
+          disabled={saving}
+          type="button"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '7px 14px',
+            borderRadius: 6,
+            background: '#EAF4F4',
+            color: '#263B3B',
+            border: '1.5px solid #B8CECF',
+            fontSize: 12,
+            fontWeight: 700,
+            cursor: saving ? 'not-allowed' : 'pointer',
+            opacity: saving ? 0.7 : 1,
+          }}
+        >
+          {saving ? <span className="spinner" /> : <Save size={14} />}
           Save
         </button>
 
-        <button onClick={onPublish} className="btn btn-primary btn-sm">
-          <Globe size={15} /> Publish
+        <button
+          onClick={onPublish}
+          type="button"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '7px 16px',
+            borderRadius: 6,
+            background: '#4F7C7A',
+            color: '#FFFEF9',
+            border: 'none',
+            fontSize: 12,
+            fontWeight: 700,
+            cursor: 'pointer',
+            boxShadow: '0 2px 6px rgba(79, 124, 122, 0.3)',
+          }}
+        >
+          <Globe size={14} /> Publish
         </button>
       </div>
     </div>

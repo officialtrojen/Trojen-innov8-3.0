@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { FormField } from '@/lib/types';
-import { Plus, Trash2, GripVertical } from 'lucide-react';
+import { Plus, Trash2, GripVertical, Settings2 } from 'lucide-react';
 
 interface PropertiesPanelProps {
   field: FormField;
@@ -11,141 +11,246 @@ interface PropertiesPanelProps {
 
 export default function PropertiesPanel({ field, onUpdate }: PropertiesPanelProps) {
   return (
-    <div style={{ padding: 20 }}>
+    <div
+      style={{
+        padding: '20px 18px',
+        background: '#FFFEF9',
+        color: '#263B3B',
+        minHeight: '100%',
+      }}
+    >
+      {/* Header */}
       <div
         style={{
           fontSize: 11,
-          fontWeight: 600,
-          color: '#52796F',
+          fontWeight: 700,
+          color: '#4F7C7A',
           textTransform: 'uppercase',
-          letterSpacing: 1,
-          marginBottom: 20,
+          letterSpacing: 1.2,
+          marginBottom: 18,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          borderBottom: '1px solid #B8CECF',
+          paddingBottom: 10,
         }}
       >
-        Field Properties
+        <Settings2 size={14} color="#4F7C7A" />
+        Question Properties
       </div>
 
-      {/* Question Label */}
+      {/* Question Title */}
       <div style={{ marginBottom: 16 }}>
-        <label className="label">Question Title</label>
+        <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#263B3B', marginBottom: 6 }}>
+          Question Title
+        </label>
         <input
-          className="input"
           value={field.label}
           onChange={(e) => onUpdate({ label: e.target.value })}
+          style={{
+            width: '100%',
+            padding: '9px 12px',
+            borderRadius: 8,
+            border: '1.5px solid #B8CECF',
+            background: '#FFFEF9',
+            color: '#263B3B',
+            fontSize: 13,
+            outline: 'none',
+          }}
+          onFocus={(e) => { e.currentTarget.style.borderColor = '#4F7C7A'; }}
+          onBlur={(e) => { e.currentTarget.style.borderColor = '#B8CECF'; }}
         />
       </div>
 
       {/* Question Description / Helper Text */}
       <div style={{ marginBottom: 16 }}>
-        <label className="label">Description / Subtitle</label>
+        <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#263B3B', marginBottom: 6 }}>
+          Description / Subtitle
+        </label>
         <textarea
-          className="textarea"
           rows={2}
           value={field.description || ''}
           onChange={(e) => onUpdate({ description: e.target.value })}
-          placeholder="Optional helper text or instructions..."
+          placeholder="Optional instructions or helper text..."
+          style={{
+            width: '100%',
+            padding: '8px 12px',
+            borderRadius: 8,
+            border: '1.5px solid #B8CECF',
+            background: '#FFFEF9',
+            color: '#263B3B',
+            fontSize: 13,
+            outline: 'none',
+            resize: 'vertical',
+          }}
+          onFocus={(e) => { e.currentTarget.style.borderColor = '#4F7C7A'; }}
+          onBlur={(e) => { e.currentTarget.style.borderColor = '#B8CECF'; }}
         />
       </div>
 
-      {/* Welcome Screen Button Text */}
+      {/* Welcome Screen Start Button Text */}
       {field.type === 'welcome_screen' && (
         <div style={{ marginBottom: 16 }}>
-          <label className="label">Start Button Text</label>
+          <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#263B3B', marginBottom: 6 }}>
+            Start Button Text
+          </label>
           <input
-            className="input"
             value={field.buttonText || 'Start Quiz'}
             onChange={(e) => onUpdate({ buttonText: e.target.value })}
+            style={{
+              width: '100%',
+              padding: '9px 12px',
+              borderRadius: 8,
+              border: '1.5px solid #B8CECF',
+              background: '#FFFEF9',
+              color: '#263B3B',
+              fontSize: 13,
+              outline: 'none',
+            }}
+            onFocus={(e) => { e.currentTarget.style.borderColor = '#4F7C7A'; }}
+            onBlur={(e) => { e.currentTarget.style.borderColor = '#B8CECF'; }}
           />
         </div>
       )}
 
       {/* Required Toggle */}
-      <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <label className="label" style={{ marginBottom: 0 }}>Required</label>
-        <button
-          onClick={() => onUpdate({ required: !field.required })}
+      {field.type !== 'welcome_screen' && (
+        <div
           style={{
-            width: 44,
-            height: 24,
-            borderRadius: 12,
-            border: 'none',
-            background: field.required ? 'var(--primary)' : '#B8CECF',
-            cursor: 'pointer',
-            position: 'relative',
-            transition: 'background 0.2s ease',
+            marginBottom: 16,
+            padding: '10px 12px',
+            background: '#EAF4F4',
+            borderRadius: 10,
+            border: '1px solid #B8CECF',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
           }}
         >
-          <div
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#263B3B' }}>Required Question</div>
+            <div style={{ fontSize: 11, color: '#365F5D' }}>Respondent must answer to proceed</div>
+          </div>
+          <button
+            type="button"
+            onClick={() => onUpdate({ required: !field.required })}
             style={{
-              width: 18,
-              height: 18,
-              borderRadius: 9,
-              background: 'white',
-              position: 'absolute',
-              top: 3,
-              left: field.required ? 23 : 3,
-              transition: 'left 0.2s ease',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
+              width: 44,
+              height: 24,
+              borderRadius: 12,
+              border: '1px solid #B8CECF',
+              background: field.required ? '#4F7C7A' : '#CFE5E3',
+              cursor: 'pointer',
+              position: 'relative',
+              transition: 'background 0.2s ease',
             }}
-          />
-        </button>
-      </div>
+          >
+            <div
+              style={{
+                width: 18,
+                height: 18,
+                borderRadius: 9,
+                background: '#FFFEF9',
+                position: 'absolute',
+                top: 2,
+                left: field.required ? 22 : 2,
+                transition: 'left 0.2s ease',
+                boxShadow: '0 1px 3px rgba(38, 59, 59, 0.2)',
+              }}
+            />
+          </button>
+        </div>
+      )}
 
       {/* Placeholder (short_text, paragraph) */}
       {(field.type === 'short_text' || field.type === 'paragraph') && (
         <div style={{ marginBottom: 16 }}>
-          <label className="label">Placeholder</label>
+          <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#263B3B', marginBottom: 6 }}>
+            Input Placeholder
+          </label>
           <input
-            className="input"
             value={field.placeholder || ''}
             onChange={(e) => onUpdate({ placeholder: e.target.value })}
-            placeholder="Enter placeholder text..."
+            placeholder="Type your answer..."
+            style={{
+              width: '100%',
+              padding: '9px 12px',
+              borderRadius: 8,
+              border: '1.5px solid #B8CECF',
+              background: '#FFFEF9',
+              color: '#263B3B',
+              fontSize: 13,
+              outline: 'none',
+            }}
+            onFocus={(e) => { e.currentTarget.style.borderColor = '#4F7C7A'; }}
+            onBlur={(e) => { e.currentTarget.style.borderColor = '#B8CECF'; }}
           />
         </div>
       )}
 
-      {/* Validation: min/max length */}
+      {/* Validation: min/max length for short_text */}
       {field.type === 'short_text' && (
-        <>
-          <div style={{ marginBottom: 16, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
-            <div>
-              <label className="label">Min Length</label>
-              <input
-                className="input"
-                type="number"
-                min={0}
-                value={field.validation?.minLength || ''}
-                onChange={(e) =>
-                  onUpdate({
-                    validation: { ...field.validation, minLength: parseInt(e.target.value) || undefined },
-                  })
-                }
-              />
-            </div>
-            <div>
-              <label className="label">Max Length</label>
-              <input
-                className="input"
-                type="number"
-                min={0}
-                value={field.validation?.maxLength || ''}
-                onChange={(e) =>
-                  onUpdate({
-                    validation: { ...field.validation, maxLength: parseInt(e.target.value) || undefined },
-                  })
-                }
-              />
-            </div>
+        <div style={{ marginBottom: 16, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          <div>
+            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#365F5D', marginBottom: 4 }}>
+              Min Length
+            </label>
+            <input
+              type="number"
+              min={0}
+              value={field.validation?.minLength || ''}
+              onChange={(e) =>
+                onUpdate({
+                  validation: { ...field.validation, minLength: parseInt(e.target.value) || undefined },
+                })
+              }
+              style={{
+                width: '100%',
+                padding: '8px 10px',
+                borderRadius: 8,
+                border: '1.5px solid #B8CECF',
+                background: '#FFFEF9',
+                color: '#263B3B',
+                fontSize: 12,
+                outline: 'none',
+              }}
+            />
           </div>
-        </>
+          <div>
+            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#365F5D', marginBottom: 4 }}>
+              Max Length
+            </label>
+            <input
+              type="number"
+              min={0}
+              value={field.validation?.maxLength || ''}
+              onChange={(e) =>
+                onUpdate({
+                  validation: { ...field.validation, maxLength: parseInt(e.target.value) || undefined },
+                })
+              }
+              style={{
+                width: '100%',
+                padding: '8px 10px',
+                borderRadius: 8,
+                border: '1.5px solid #B8CECF',
+                background: '#FFFEF9',
+                color: '#263B3B',
+                fontSize: 12,
+                outline: 'none',
+              }}
+            />
+          </div>
+        </div>
       )}
 
-      {/* Paragraph char limit */}
+      {/* Paragraph character limit */}
       {field.type === 'paragraph' && (
         <div style={{ marginBottom: 16 }}>
-          <label className="label">Character Limit</label>
+          <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#263B3B', marginBottom: 6 }}>
+            Character Limit
+          </label>
           <input
-            className="input"
             type="number"
             min={0}
             value={field.validation?.charLimit || ''}
@@ -154,6 +259,16 @@ export default function PropertiesPanel({ field, onUpdate }: PropertiesPanelProp
                 validation: { ...field.validation, charLimit: parseInt(e.target.value) || undefined },
               })
             }
+            style={{
+              width: '100%',
+              padding: '9px 12px',
+              borderRadius: 8,
+              border: '1.5px solid #B8CECF',
+              background: '#FFFEF9',
+              color: '#263B3B',
+              fontSize: 13,
+              outline: 'none',
+            }}
           />
         </div>
       )}
@@ -162,63 +277,127 @@ export default function PropertiesPanel({ field, onUpdate }: PropertiesPanelProp
       {field.type === 'multiple_choice' && (
         <>
           <div style={{ marginBottom: 16 }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-              <label className="label" style={{ marginBottom: 0 }}>Selection Mode</label>
-            </div>
-            <div style={{ display: 'flex', gap: 8 }}>
-              {(['single', 'multiple'] as const).map((mode) => (
-                <button
-                  key={mode}
-                  onClick={() => onUpdate({ selectionMode: mode })}
-                  className="btn btn-sm"
-                  style={{
-                    background: field.selectionMode === mode ? 'var(--primary)' : 'transparent',
-                    color: field.selectionMode === mode ? 'white' : 'var(--text-main)',
-                    border: `1px solid ${field.selectionMode === mode ? 'var(--primary)' : 'var(--input-border)'}`,
-                    flex: 1,
-                  }}
-                >
-                  {mode === 'single' ? 'Single' : 'Multiple'}
-                </button>
-              ))}
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#263B3B', marginBottom: 6 }}>
+              Selection Mode
+            </label>
+            <div style={{ display: 'flex', gap: 6, background: '#EAF4F4', padding: 3, borderRadius: 8, border: '1px solid #B8CECF' }}>
+              {(['single', 'multiple'] as const).map((mode) => {
+                const isSelected = field.selectionMode === mode;
+                return (
+                  <button
+                    key={mode}
+                    type="button"
+                    onClick={() => onUpdate({ selectionMode: mode })}
+                    style={{
+                      flex: 1,
+                      padding: '6px 10px',
+                      borderRadius: 6,
+                      fontSize: 12,
+                      fontWeight: 600,
+                      border: 'none',
+                      cursor: 'pointer',
+                      background: isSelected ? '#4F7C7A' : 'transparent',
+                      color: isSelected ? '#FFFEF9' : '#263B3B',
+                      transition: 'all 0.15s ease',
+                    }}
+                  >
+                    {mode === 'single' ? 'Single Choice' : 'Multiple Select'}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
           <div style={{ marginBottom: 16 }}>
-            <label className="label">Options</label>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#263B3B', marginBottom: 8 }}>
+              Options (Press A, B, C...)
+            </label>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
               {(field.options || []).map((opt, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <div style={{ color: '#B8CECF', cursor: 'grab', padding: 2 }}>
-                    <GripVertical size={12} />
+                  <div
+                    style={{
+                      width: 22,
+                      height: 22,
+                      borderRadius: 4,
+                      background: '#CFE5E3',
+                      color: '#263B3B',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: 11,
+                      fontWeight: 700,
+                      flexShrink: 0,
+                    }}
+                  >
+                    {String.fromCharCode(65 + i)}
                   </div>
                   <input
-                    className="input"
                     value={opt}
                     onChange={(e) => {
                       const newOpts = [...(field.options || [])];
                       newOpts[i] = e.target.value;
                       onUpdate({ options: newOpts });
                     }}
-                    style={{ flex: 1 }}
+                    style={{
+                      flex: 1,
+                      padding: '8px 10px',
+                      borderRadius: 8,
+                      border: '1.5px solid #B8CECF',
+                      background: '#FFFEF9',
+                      color: '#263B3B',
+                      fontSize: 13,
+                      outline: 'none',
+                    }}
+                    onFocus={(e) => { e.currentTarget.style.borderColor = '#4F7C7A'; }}
+                    onBlur={(e) => { e.currentTarget.style.borderColor = '#B8CECF'; }}
                   />
                   <button
+                    type="button"
                     onClick={() => {
                       const newOpts = (field.options || []).filter((_, j) => j !== i);
                       onUpdate({ options: newOpts });
                     }}
-                    className="btn btn-ghost btn-sm"
-                    style={{ padding: 4, color: '#e74c3c' }}
+                    style={{
+                      padding: 6,
+                      background: 'transparent',
+                      border: 'none',
+                      color: '#e74c3c',
+                      cursor: 'pointer',
+                    }}
                     disabled={(field.options || []).length <= 1}
+                    title="Delete option"
                   >
-                    <Trash2 size={13} />
+                    <Trash2 size={14} />
                   </button>
                 </div>
               ))}
+
               <button
-                onClick={() => onUpdate({ options: [...(field.options || []), `Option ${(field.options?.length || 0) + 1}`] })}
-                className="btn btn-ghost btn-sm"
-                style={{ justifyContent: 'flex-start', color: 'var(--primary)' }}
+                type="button"
+                onClick={() =>
+                  onUpdate({
+                    options: [...(field.options || []), `Option ${(field.options?.length || 0) + 1}`],
+                  })
+                }
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '8px 12px',
+                  borderRadius: 8,
+                  border: '1.5px dashed #4F7C7A',
+                  background: '#EAF4F4',
+                  color: '#4F7C7A',
+                  fontSize: 12,
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  justifyContent: 'center',
+                  marginTop: 4,
+                  transition: 'background 0.15s ease',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = '#CFE5E3'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = '#EAF4F4'; }}
               >
                 <Plus size={14} /> Add Option
               </button>
@@ -227,29 +406,52 @@ export default function PropertiesPanel({ field, onUpdate }: PropertiesPanelProp
         </>
       )}
 
-      {/* Rating Stars */}
+      {/* Yes / No Information */}
+      {field.type === 'yes_no' && (
+        <div style={{ marginBottom: 16, padding: '12px 14px', background: '#EAF4F4', borderRadius: 10, border: '1px solid #B8CECF' }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: '#263B3B', marginBottom: 4 }}>Keyboard Hotkeys</div>
+          <div style={{ fontSize: 12, color: '#365F5D' }}>
+            Users can press <strong style={{ color: '#4F7C7A' }}>[Y]</strong> for Yes and <strong style={{ color: '#4F7C7A' }}>[N]</strong> for No.
+          </div>
+        </div>
+      )}
+
+      {/* Rating Stars Scale */}
       {field.type === 'rating' && (
         <div style={{ marginBottom: 16 }}>
-          <label className="label">Number of Stars</label>
+          <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#263B3B', marginBottom: 6 }}>
+            Rating Scale (Max Stars)
+          </label>
           <select
-            className="select"
             value={field.maxStars || 5}
             onChange={(e) => onUpdate({ maxStars: parseInt(e.target.value) })}
+            style={{
+              width: '100%',
+              padding: '9px 12px',
+              borderRadius: 8,
+              border: '1.5px solid #B8CECF',
+              background: '#FFFEF9',
+              color: '#263B3B',
+              fontSize: 13,
+              outline: 'none',
+              cursor: 'pointer',
+            }}
           >
             {[3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
-              <option key={n} value={n}>{n} stars</option>
+              <option key={n} value={n}>{n} Stars</option>
             ))}
           </select>
         </div>
       )}
 
-      {/* File Upload */}
+      {/* File Upload Configuration */}
       {field.type === 'file_upload' && (
         <>
           <div style={{ marginBottom: 16 }}>
-            <label className="label">Max File Size (MB)</label>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#263B3B', marginBottom: 6 }}>
+              Max File Size (MB)
+            </label>
             <input
-              className="input"
               type="number"
               min={1}
               max={100}
@@ -259,12 +461,24 @@ export default function PropertiesPanel({ field, onUpdate }: PropertiesPanelProp
                   validation: { ...field.validation, maxFileSize: parseInt(e.target.value) || 10 },
                 })
               }
+              style={{
+                width: '100%',
+                padding: '9px 12px',
+                borderRadius: 8,
+                border: '1.5px solid #B8CECF',
+                background: '#FFFEF9',
+                color: '#263B3B',
+                fontSize: 13,
+                outline: 'none',
+              }}
             />
           </div>
+
           <div style={{ marginBottom: 16 }}>
-            <label className="label">Allowed File Types</label>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#263B3B', marginBottom: 6 }}>
+              Allowed File Extensions
+            </label>
             <input
-              className="input"
               value={(field.validation?.allowedFileTypes || []).join(', ')}
               onChange={(e) =>
                 onUpdate({
@@ -274,19 +488,30 @@ export default function PropertiesPanel({ field, onUpdate }: PropertiesPanelProp
                   },
                 })
               }
-              placeholder="e.g. pdf, jpg, png (leave empty for all)"
+              placeholder="pdf, png, jpg, zip"
+              style={{
+                width: '100%',
+                padding: '9px 12px',
+                borderRadius: 8,
+                border: '1.5px solid #B8CECF',
+                background: '#FFFEF9',
+                color: '#263B3B',
+                fontSize: 13,
+                outline: 'none',
+              }}
             />
           </div>
         </>
       )}
 
-      {/* Date Picker */}
+      {/* Date Picker Range */}
       {field.type === 'date_picker' && (
         <div style={{ marginBottom: 16, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
           <div>
-            <label className="label">Min Date</label>
+            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#365F5D', marginBottom: 4 }}>
+              Min Date
+            </label>
             <input
-              className="input"
               type="date"
               value={field.validation?.minDate || ''}
               onChange={(e) =>
@@ -294,12 +519,23 @@ export default function PropertiesPanel({ field, onUpdate }: PropertiesPanelProp
                   validation: { ...field.validation, minDate: e.target.value || undefined },
                 })
               }
+              style={{
+                width: '100%',
+                padding: '8px 8px',
+                borderRadius: 8,
+                border: '1.5px solid #B8CECF',
+                background: '#FFFEF9',
+                color: '#263B3B',
+                fontSize: 12,
+                outline: 'none',
+              }}
             />
           </div>
           <div>
-            <label className="label">Max Date</label>
+            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#365F5D', marginBottom: 4 }}>
+              Max Date
+            </label>
             <input
-              className="input"
               type="date"
               value={field.validation?.maxDate || ''}
               onChange={(e) =>
@@ -307,6 +543,16 @@ export default function PropertiesPanel({ field, onUpdate }: PropertiesPanelProp
                   validation: { ...field.validation, maxDate: e.target.value || undefined },
                 })
               }
+              style={{
+                width: '100%',
+                padding: '8px 8px',
+                borderRadius: 8,
+                border: '1.5px solid #B8CECF',
+                background: '#FFFEF9',
+                color: '#263B3B',
+                fontSize: 12,
+                outline: 'none',
+              }}
             />
           </div>
         </div>

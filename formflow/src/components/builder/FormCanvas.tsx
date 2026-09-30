@@ -62,7 +62,7 @@ function SortableFieldCard({
       ref={setNodeRef}
       style={style}
       onClick={onSelect}
-      className="card group transition-all"
+      className="group transition-all"
       {...attributes}
     >
       <div
@@ -73,9 +73,12 @@ function SortableFieldCard({
           gap: 14,
           cursor: 'pointer',
           borderLeft: isSelected ? `4px solid ${accentColor}` : '4px solid transparent',
-          borderRadius: 'var(--radius)',
-          background: isSelected ? 'rgba(207,229,227,0.18)' : 'var(--card-bg)',
-          boxShadow: isSelected ? '0 4px 16px rgba(38, 59, 59, 0.08)' : undefined,
+          borderTop: `1px solid ${isSelected ? '#4F7C7A' : '#B8CECF'}`,
+          borderRight: `1px solid ${isSelected ? '#4F7C7A' : '#B8CECF'}`,
+          borderBottom: `1px solid ${isSelected ? '#4F7C7A' : '#B8CECF'}`,
+          borderRadius: 12,
+          background: isSelected ? '#EAF4F4' : '#FFFEF9',
+          boxShadow: isSelected ? '0 4px 16px rgba(38, 59, 59, 0.12)' : '0 1px 3px rgba(38, 59, 59, 0.05)',
           transition: 'all 0.15s ease',
         }}
       >
@@ -84,7 +87,7 @@ function SortableFieldCard({
           {...listeners}
           style={{
             cursor: 'grab',
-            color: '#94A3B8',
+            color: '#365F5D',
             display: 'flex',
             alignItems: 'center',
             padding: '6px 2px',
@@ -97,7 +100,7 @@ function SortableFieldCard({
         {/* Field content */}
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-            <span style={{ fontWeight: 600, fontSize: 14, color: '#263B3B' }}>
+            <span style={{ fontWeight: 700, fontSize: 14, color: '#263B3B' }}>
               {field.label}
             </span>
             {field.required && (
@@ -106,24 +109,24 @@ function SortableFieldCard({
           </div>
 
           {/* Field type and preview */}
-          <div style={{ fontSize: 11, fontWeight: 500, color: '#52796F', marginBottom: 8 }}>
+          <div style={{ fontSize: 11, fontWeight: 600, color: '#365F5D', marginBottom: 8 }}>
             {fieldTypeLabel[field.type] || field.type}
           </div>
 
           {/* Mini preview */}
           <div>
             {field.type === 'welcome_screen' && (
-              <div style={{ padding: '8px 12px', background: 'rgba(56, 189, 248, 0.1)', borderRadius: 8, fontSize: 12, color: '#0284C7', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 600 }}>
+              <div style={{ padding: '8px 12px', background: '#CFE5E3', borderRadius: 8, fontSize: 12, color: '#263B3B', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 700 }}>
                 ✨ {field.buttonText || 'Start Quiz'} Button
               </div>
             )}
             {field.type === 'short_text' && (
-              <div style={{ padding: '8px 12px', border: '1px solid var(--input-border)', borderRadius: 8, fontSize: 13, color: '#94A3B8', background: 'white' }}>
+              <div style={{ padding: '8px 12px', border: '1px solid #B8CECF', borderRadius: 8, fontSize: 13, color: '#365F5D', background: '#FFFEF9' }}>
                 {field.placeholder || 'Type your answer...'}
               </div>
             )}
             {field.type === 'paragraph' && (
-              <div style={{ padding: '8px 12px', border: '1px solid var(--input-border)', borderRadius: 8, fontSize: 13, color: '#94A3B8', background: 'white', minHeight: 46 }}>
+              <div style={{ padding: '8px 12px', border: '1px solid #B8CECF', borderRadius: 8, fontSize: 13, color: '#365F5D', background: '#FFFEF9', minHeight: 46 }}>
                 {field.placeholder || 'Type your detailed answer...'}
               </div>
             )}
@@ -131,21 +134,21 @@ function SortableFieldCard({
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {field.options.slice(0, 4).map((opt, i) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#263B3B' }}>
-                    <div style={{ width: 15, height: 15, borderRadius: field.selectionMode === 'multiple' ? 4 : 8, border: '1.5px solid var(--input-border)' }} />
+                    <div style={{ width: 15, height: 15, borderRadius: field.selectionMode === 'multiple' ? 4 : 8, border: '1.5px solid #4F7C7A', background: '#FFFEF9' }} />
                     <span>{opt}</span>
                   </div>
                 ))}
                 {field.options.length > 4 && (
-                  <span style={{ fontSize: 11, color: '#94A3B8' }}>+{field.options.length - 4} more options</span>
+                  <span style={{ fontSize: 11, color: '#365F5D' }}>+{field.options.length - 4} more options</span>
                 )}
               </div>
             )}
             {field.type === 'yes_no' && (
               <div style={{ display: 'flex', gap: 8 }}>
-                <span style={{ padding: '4px 12px', borderRadius: 6, border: '1px solid var(--input-border)', fontSize: 12, fontWeight: 600, color: '#263B3B', background: 'white' }}>
+                <span style={{ padding: '4px 12px', borderRadius: 6, border: '1px solid #B8CECF', fontSize: 12, fontWeight: 700, color: '#263B3B', background: '#FFFEF9' }}>
                   [Y] Yes
                 </span>
-                <span style={{ padding: '4px 12px', borderRadius: 6, border: '1px solid var(--input-border)', fontSize: 12, fontWeight: 600, color: '#263B3B', background: 'white' }}>
+                <span style={{ padding: '4px 12px', borderRadius: 6, border: '1px solid #B8CECF', fontSize: 12, fontWeight: 700, color: '#263B3B', background: '#FFFEF9' }}>
                   [N] No
                 </span>
               </div>
@@ -153,17 +156,17 @@ function SortableFieldCard({
             {field.type === 'rating' && (
               <div style={{ display: 'flex', gap: 4 }}>
                 {Array.from({ length: field.maxStars || 5 }).map((_, i) => (
-                  <Star key={i} size={18} style={{ color: '#CBD5E1', fill: '#CBD5E1' }} />
+                  <Star key={i} size={18} style={{ color: '#4F7C7A', fill: '#CFE5E3' }} />
                 ))}
               </div>
             )}
             {field.type === 'file_upload' && (
-              <div style={{ padding: '12px 14px', border: '1.5px dashed var(--input-border)', borderRadius: 8, fontSize: 12, color: '#64748B', textAlign: 'center', background: '#F8FAFC' }}>
+              <div style={{ padding: '12px 14px', border: '1.5px dashed #4F7C7A', borderRadius: 8, fontSize: 12, color: '#365F5D', textAlign: 'center', background: '#EAF4F4' }}>
                 📎 Drag and drop file or browse
               </div>
             )}
             {field.type === 'date_picker' && (
-              <div style={{ padding: '8px 12px', border: '1px solid var(--input-border)', borderRadius: 8, fontSize: 13, color: '#94A3B8', background: 'white' }}>
+              <div style={{ padding: '8px 12px', border: '1px solid #B8CECF', borderRadius: 8, fontSize: 13, color: '#365F5D', background: '#FFFEF9' }}>
                 {'📅 mm / dd / yyyy'}
               </div>
             )}
@@ -175,8 +178,7 @@ function SortableFieldCard({
           <button
             type="button"
             onClick={(e) => { e.stopPropagation(); onDuplicate(); }}
-            className="btn btn-ghost btn-sm"
-            style={{ padding: 6 }}
+            style={{ padding: 6, background: 'transparent', border: 'none', color: '#365F5D', cursor: 'pointer' }}
             title="Duplicate question"
           >
             <Copy size={15} />
@@ -184,8 +186,7 @@ function SortableFieldCard({
           <button
             type="button"
             onClick={(e) => { e.stopPropagation(); onDelete(); }}
-            className="btn btn-ghost btn-sm"
-            style={{ padding: 6, color: '#ef4444' }}
+            style={{ padding: 6, background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer' }}
             title="Delete question"
           >
             <Trash2 size={15} />
@@ -224,7 +225,7 @@ export default function FormCanvas({
 
   const currentPoster = theme?.posterUrl || theme?.bannerUrl;
   const posterHeight = theme?.posterHeight || 180;
-  const overlayOpacity = (theme?.posterOverlay ?? 20) / 100;
+  const overlayOpacity = (theme?.posterOverlay ?? 25) / 100;
 
   return (
     <div
@@ -244,9 +245,9 @@ export default function FormCanvas({
         style={{
           borderRadius: 16,
           overflow: 'hidden',
-          background: 'white',
-          boxShadow: '0 8px 30px rgba(38, 59, 59, 0.08)',
-          border: isOver ? '2px dashed var(--primary)' : '1px solid rgba(184,206,207,0.4)',
+          background: '#FFFEF9',
+          boxShadow: '0 8px 32px rgba(38, 59, 59, 0.1)',
+          border: isOver ? '2px dashed #4F7C7A' : '1px solid #B8CECF',
         }}
       >
         {/* POSTER DISPLAY IN FORM HEADER */}
@@ -257,7 +258,7 @@ export default function FormCanvas({
               width: '100%',
               height: posterHeight,
               overflow: 'hidden',
-              background: '#0F172A',
+              background: '#263B3B',
             }}
           >
             <img
@@ -275,15 +276,15 @@ export default function FormCanvas({
               style={{
                 position: 'absolute',
                 inset: 0,
-                background: `linear-gradient(to top, rgba(0,0,0, ${Math.max(0.4, overlayOpacity + 0.2)}), rgba(0,0,0, ${overlayOpacity}))`,
+                background: `linear-gradient(to top, rgba(38,59,59, ${Math.max(0.4, overlayOpacity + 0.2)}), rgba(38,59,59, ${overlayOpacity}))`,
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'flex-end',
                 padding: '24px 28px',
-                color: 'white',
+                color: '#FFFEF9',
               }}
             >
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(6px)', padding: '4px 10px', borderRadius: 999, fontSize: 11, fontWeight: 600, width: 'fit-content', marginBottom: 8 }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255,254,249,0.25)', backdropFilter: 'blur(6px)', padding: '4px 10px', borderRadius: 999, fontSize: 11, fontWeight: 700, width: 'fit-content', marginBottom: 8 }}>
                 <ImageIcon size={12} /> Poster Active
               </div>
               {theme?.posterTitle && (
@@ -301,18 +302,18 @@ export default function FormCanvas({
         )}
 
         {/* Form Title & Description Card */}
-        <div style={{ padding: '28px 32px 20px', borderBottom: '1px solid rgba(184,206,207,0.25)' }}>
+        <div style={{ padding: '28px 32px 20px', borderBottom: '1px solid #B8CECF' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
             <div>
               <h1 style={{ fontSize: 24, fontWeight: 800, color: theme?.text || '#263B3B', marginBottom: 8, letterSpacing: '-0.02em' }}>
                 {title || 'Untitled Form'}
               </h1>
               {description ? (
-                <p style={{ color: '#52796F', fontSize: 14, margin: 0, lineHeight: 1.6 }}>
+                <p style={{ color: '#365F5D', fontSize: 14, margin: 0, lineHeight: 1.6 }}>
                   {description}
                 </p>
               ) : (
-                <p style={{ color: '#94A3B8', fontSize: 13, margin: 0, fontStyle: 'italic' }}>
+                <p style={{ color: '#365F5D', fontSize: 13, margin: 0, fontStyle: 'italic', opacity: 0.8 }}>
                   No description provided. Add form details in settings.
                 </p>
               )}
@@ -323,8 +324,20 @@ export default function FormCanvas({
               <button
                 type="button"
                 onClick={onOpenThemePanel}
-                className="btn btn-ghost btn-sm"
-                style={{ fontSize: 12, display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0, color: '#52796F' }}
+                style={{
+                  fontSize: 12,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  flexShrink: 0,
+                  color: '#4F7C7A',
+                  background: '#EAF4F4',
+                  border: '1px solid #B8CECF',
+                  borderRadius: 6,
+                  padding: '6px 10px',
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                }}
                 title="Customize background & poster"
               >
                 <ImageIcon size={14} /> {currentPoster ? 'Edit Poster' : '+ Add Poster'}
@@ -338,27 +351,35 @@ export default function FormCanvas({
           {fields.length === 0 ? (
             <div
               style={{
-                border: '2px dashed rgba(184,206,207,0.6)',
+                border: '2px dashed #4F7C7A',
                 borderRadius: 12,
                 padding: '48px 24px',
                 textAlign: 'center',
-                color: '#52796F',
-                background: isOver ? 'rgba(207,229,227,0.2)' : '#FBFDFD',
+                color: '#365F5D',
+                background: isOver ? '#CFE5E3' : '#EAF4F4',
               }}
             >
               <div style={{ fontSize: 36, marginBottom: 12 }}>✨</div>
-              <h3 style={{ fontSize: 17, fontWeight: 700, color: '#263B3B', marginBottom: 6 }}>
+              <h3 style={{ fontSize: 17, fontWeight: 800, color: '#263B3B', marginBottom: 6 }}>
                 Drag and Drop Fields Here
               </h3>
-              <p style={{ fontSize: 13, color: '#64748B', maxWidth: 380, margin: '0 auto 16px', lineHeight: 1.5 }}>
+              <p style={{ fontSize: 13, color: '#365F5D', maxWidth: 380, margin: '0 auto 16px', lineHeight: 1.5 }}>
                 Drag question types from the left palette or click any field type to add it instantly to your form.
               </p>
               {onOpenThemePanel && (
                 <button
                   type="button"
                   onClick={onOpenThemePanel}
-                  className="btn btn-secondary btn-sm"
-                  style={{ fontSize: 12, borderRadius: 8 }}
+                  style={{
+                    fontSize: 12,
+                    borderRadius: 8,
+                    padding: '8px 16px',
+                    background: '#4F7C7A',
+                    color: '#FFFEF9',
+                    border: 'none',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                  }}
                 >
                   🎨 Customize Background & Poster
                 </button>

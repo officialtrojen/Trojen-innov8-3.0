@@ -312,8 +312,8 @@ export default function StandaloneBuilderPage() {
         <header
           style={{
             height: 60,
-            background: 'white',
-            borderBottom: '1px solid rgba(184,206,207,0.4)',
+            background: '#FFFEF9',
+            borderBottom: '1px solid #B8CECF',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -326,13 +326,22 @@ export default function StandaloneBuilderPage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             <Link
               href="/"
-              className="btn btn-ghost btn-sm"
-              style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px', fontSize: 13 }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '6px 12px',
+                fontSize: 13,
+                fontWeight: 600,
+                color: '#365F5D',
+                borderRadius: 8,
+                textDecoration: 'none',
+              }}
             >
               <ArrowLeft size={16} /> Home
             </Link>
 
-            <div style={{ width: 1, height: 24, background: 'rgba(184,206,207,0.5)' }} />
+            <div style={{ width: 1, height: 24, background: '#B8CECF' }} />
 
             <input
               value={schema.title}
@@ -341,17 +350,21 @@ export default function StandaloneBuilderPage() {
                 fontSize: 16,
                 fontWeight: 700,
                 color: '#263B3B',
-                border: 'none',
+                border: '1px solid transparent',
+                borderRadius: 6,
                 background: 'transparent',
                 outline: 'none',
                 width: 280,
+                padding: '4px 6px',
               }}
+              onFocus={(e) => { e.currentTarget.style.borderColor = '#B8CECF'; e.currentTarget.style.background = '#EAF4F4'; }}
+              onBlur={(e) => { e.currentTarget.style.borderColor = 'transparent'; e.currentTarget.style.background = 'transparent'; }}
               placeholder="Form Title"
             />
           </div>
 
           {/* Mode Switcher: Edit vs Live Preview */}
-          <div style={{ display: 'flex', background: 'rgba(207,229,227,0.4)', borderRadius: 10, padding: 3, gap: 2 }}>
+          <div style={{ display: 'flex', background: '#EAF4F4', border: '1px solid #B8CECF', borderRadius: 10, padding: 3, gap: 2 }}>
             <button
               type="button"
               onClick={() => setMode('edit')}
@@ -359,15 +372,15 @@ export default function StandaloneBuilderPage() {
                 padding: '6px 14px',
                 borderRadius: 8,
                 fontSize: 12,
-                fontWeight: 600,
+                fontWeight: 700,
                 border: 'none',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 6,
-                background: mode === 'edit' ? 'white' : 'transparent',
-                color: mode === 'edit' ? '#263B3B' : '#52796F',
-                boxShadow: mode === 'edit' ? '0 2px 4px rgba(0,0,0,0.06)' : 'none',
+                background: mode === 'edit' ? '#4F7C7A' : 'transparent',
+                color: mode === 'edit' ? '#FFFEF9' : '#365F5D',
+                boxShadow: mode === 'edit' ? '0 2px 4px rgba(38, 59, 59, 0.2)' : 'none',
               }}
             >
               <Edit3 size={14} /> Builder View
@@ -380,15 +393,15 @@ export default function StandaloneBuilderPage() {
                 padding: '6px 14px',
                 borderRadius: 8,
                 fontSize: 12,
-                fontWeight: 600,
+                fontWeight: 700,
                 border: 'none',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 6,
-                background: mode === 'preview' ? 'white' : 'transparent',
-                color: mode === 'preview' ? '#263B3B' : '#52796F',
-                boxShadow: mode === 'preview' ? '0 2px 4px rgba(0,0,0,0.06)' : 'none',
+                background: mode === 'preview' ? '#4F7C7A' : 'transparent',
+                color: mode === 'preview' ? '#FFFEF9' : '#365F5D',
+                boxShadow: mode === 'preview' ? '0 2px 4px rgba(38, 59, 59, 0.2)' : 'none',
               }}
             >
               <Eye size={14} /> Live Preview
@@ -397,7 +410,7 @@ export default function StandaloneBuilderPage() {
 
           {/* Center Tabs: Fields / Logic / Theme & Poster */}
           {mode === 'edit' && (
-            <div style={{ display: 'flex', gap: 4, background: 'rgba(207,229,227,0.3)', borderRadius: 8, padding: 3 }} className="hidden-mobile">
+            <div style={{ display: 'flex', gap: 4, background: '#EAF4F4', border: '1px solid #B8CECF', borderRadius: 8, padding: 3 }} className="hidden-mobile">
               {[
                 { id: 'properties', label: 'Questions', icon: Sliders },
                 { id: 'theme', label: '🎨 Background & Poster', icon: ImageIcon },
@@ -413,15 +426,15 @@ export default function StandaloneBuilderPage() {
                       padding: '5px 12px',
                       borderRadius: 6,
                       fontSize: 12,
-                      fontWeight: 600,
+                      fontWeight: 700,
                       border: 'none',
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
                       gap: 6,
-                      background: isSelected ? 'white' : 'transparent',
-                      color: isSelected ? 'var(--primary)' : '#52796F',
-                      boxShadow: isSelected ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+                      background: isSelected ? '#4F7C7A' : 'transparent',
+                      color: isSelected ? '#FFFEF9' : '#365F5D',
+                      boxShadow: isSelected ? '0 1px 3px rgba(38, 59, 59, 0.2)' : 'none',
                     }}
                   >
                     <tab.icon size={13} />
@@ -437,9 +450,20 @@ export default function StandaloneBuilderPage() {
             <button
               type="button"
               onClick={handleExportJson}
-              className="btn btn-ghost btn-sm"
+              style={{
+                fontSize: 12,
+                fontWeight: 600,
+                color: '#263B3B',
+                background: '#EAF4F4',
+                border: '1.5px solid #B8CECF',
+                borderRadius: 8,
+                padding: '6px 12px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+              }}
               title="Download Schema JSON"
-              style={{ fontSize: 12 }}
             >
               <Download size={14} /> Export JSON
             </button>
@@ -447,9 +471,21 @@ export default function StandaloneBuilderPage() {
             <button
               type="button"
               onClick={handleSaveToAccount}
-              className="btn btn-primary btn-sm"
               disabled={saving}
-              style={{ fontSize: 12, borderRadius: 8 }}
+              style={{
+                fontSize: 12,
+                fontWeight: 700,
+                borderRadius: 8,
+                padding: '7px 16px',
+                background: '#4F7C7A',
+                color: '#FFFEF9',
+                border: 'none',
+                cursor: saving ? 'not-allowed' : 'pointer',
+                boxShadow: '0 2px 6px rgba(79, 124, 122, 0.3)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+              }}
             >
               {saving ? <span className="spinner" /> : <Save size={14} />}
               {user ? 'Save to Dashboard' : 'Save & Publish'}
@@ -468,8 +504,8 @@ export default function StandaloneBuilderPage() {
             <div
               style={{
                 width: 220,
-                borderRight: '1px solid rgba(184,206,207,0.3)',
-                background: 'var(--card-bg)',
+                borderRight: '1px solid #B8CECF',
+                background: '#FFFEF9',
                 overflowY: 'auto',
                 padding: 16,
                 flexShrink: 0,
@@ -510,8 +546,8 @@ export default function StandaloneBuilderPage() {
             <div
               style={{
                 width: 330,
-                borderLeft: '1px solid rgba(184,206,207,0.3)',
-                background: 'var(--card-bg)',
+                borderLeft: '1px solid #B8CECF',
+                background: '#FFFEF9',
                 overflowY: 'auto',
                 flexShrink: 0,
               }}
@@ -525,13 +561,21 @@ export default function StandaloneBuilderPage() {
               )}
 
               {activePanel === 'properties' && !selectedField && (
-                <div style={{ padding: 32, textAlign: 'center', color: '#52796F', fontSize: 13, marginTop: 40 }}>
-                  <p>Click on any form question to inspect and edit its title, options, and validations.</p>
+                <div style={{ padding: 32, textAlign: 'center', color: '#365F5D', fontSize: 13, marginTop: 40 }}>
+                  <p style={{ lineHeight: 1.5, marginBottom: 16 }}>Click on any form question to inspect and edit its title, options, and validations.</p>
                   <button
                     type="button"
                     onClick={() => setActivePanel('theme')}
-                    className="btn btn-secondary btn-sm"
-                    style={{ marginTop: 12 }}
+                    style={{
+                      padding: '8px 14px',
+                      borderRadius: 8,
+                      border: '1.5px solid #4F7C7A',
+                      background: '#EAF4F4',
+                      color: '#4F7C7A',
+                      fontWeight: 700,
+                      fontSize: 12,
+                      cursor: 'pointer',
+                    }}
                   >
                     Open Background & Poster
                   </button>

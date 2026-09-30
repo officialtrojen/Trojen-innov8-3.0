@@ -51,27 +51,46 @@ export default function LogicPanel({
   };
 
   return (
-    <div style={{ padding: 20 }}>
+    <div
+      style={{
+        padding: '20px 18px',
+        background: '#FFFEF9',
+        color: '#263B3B',
+        minHeight: '100%',
+      }}
+    >
       <div
         style={{
           fontSize: 11,
-          fontWeight: 600,
-          color: '#52796F',
+          fontWeight: 700,
+          color: '#4F7C7A',
           textTransform: 'uppercase',
-          letterSpacing: 1,
+          letterSpacing: 1.2,
           marginBottom: 16,
           display: 'flex',
           alignItems: 'center',
           gap: 8,
+          borderBottom: '1px solid #B8CECF',
+          paddingBottom: 10,
         }}
       >
-        <GitBranch size={14} />
-        Conditional Logic
+        <GitBranch size={14} color="#4F7C7A" />
+        Conditional Branching
       </div>
 
       {fields.length < 2 && (
-        <div style={{ padding: 16, borderRadius: 8, background: 'rgba(207,229,227,0.3)', fontSize: 13, color: '#52796F', marginBottom: 16 }}>
-          Add at least 2 fields to create conditional logic.
+        <div
+          style={{
+            padding: 14,
+            borderRadius: 10,
+            background: '#EAF4F4',
+            border: '1px solid #B8CECF',
+            fontSize: 12,
+            color: '#365F5D',
+            marginBottom: 16,
+          }}
+        >
+          Add at least 2 questions to configure intelligent jump logic.
         </div>
       )}
 
@@ -89,18 +108,39 @@ export default function LogicPanel({
       </div>
 
       {rules.length === 0 && fields.length >= 2 && (
-        <div style={{ padding: 24, textAlign: 'center', color: '#52796F', fontSize: 13, marginBottom: 16 }}>
-          No logic rules yet. Add your first rule to create branching workflows.
+        <div style={{ padding: 24, textAlign: 'center', color: '#365F5D', fontSize: 13, marginBottom: 16 }}>
+          No logic rules created yet. Add a rule to show/hide or jump between questions.
         </div>
       )}
 
       <button
         onClick={handleAdd}
-        className="btn btn-secondary btn-sm"
-        style={{ width: '100%' }}
         disabled={fields.length < 2}
+        style={{
+          width: '100%',
+          padding: '10px 14px',
+          borderRadius: 8,
+          border: '1.5px solid #4F7C7A',
+          background: '#EAF4F4',
+          color: '#4F7C7A',
+          fontWeight: 700,
+          fontSize: 13,
+          cursor: fields.length < 2 ? 'not-allowed' : 'pointer',
+          opacity: fields.length < 2 ? 0.6 : 1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 6,
+          transition: 'all 0.15s ease',
+        }}
+        onMouseEnter={(e) => {
+          if (fields.length >= 2) e.currentTarget.style.background = '#CFE5E3';
+        }}
+        onMouseLeave={(e) => {
+          if (fields.length >= 2) e.currentTarget.style.background = '#EAF4F4';
+        }}
       >
-        <Plus size={14} /> Add Rule
+        <Plus size={15} /> Add Logic Rule
       </button>
     </div>
   );
@@ -121,13 +161,25 @@ function RuleEditor({
   const selectedOperator = LOGIC_OPERATORS.find((o) => o.value === rule.condition.operator);
   const sourceField = fields.find((f) => f.id === rule.condition.questionId);
 
+  const inputStyle: React.CSSProperties = {
+    width: '100%',
+    padding: '7px 10px',
+    borderRadius: 6,
+    border: '1.5px solid #B8CECF',
+    background: '#FFFEF9',
+    color: '#263B3B',
+    fontSize: 12,
+    outline: 'none',
+    marginBottom: 6,
+  };
+
   return (
     <div
       style={{
-        border: '1px solid rgba(184,206,207,0.5)',
+        border: '1.5px solid #B8CECF',
         borderRadius: 10,
         padding: 14,
-        background: 'rgba(255,254,249,0.5)',
+        background: '#EAF4F4',
       }}
     >
       {/* IF */}
@@ -135,26 +187,25 @@ function RuleEditor({
         <span
           style={{
             display: 'inline-block',
-            background: 'var(--primary)',
-            color: 'white',
+            background: '#4F7C7A',
+            color: '#FFFEF9',
             borderRadius: 4,
             padding: '2px 8px',
             fontSize: 11,
-            fontWeight: 600,
+            fontWeight: 700,
             marginBottom: 6,
           }}
         >
           IF
         </span>
         <select
-          className="select"
           value={rule.condition.questionId}
           onChange={(e) =>
             onUpdate({
               condition: { ...rule.condition, questionId: e.target.value },
             })
           }
-          style={{ fontSize: 13, marginBottom: 6 }}
+          style={inputStyle}
         >
           {fields.map((f) => (
             <option key={f.id} value={f.id}>{f.label}</option>
@@ -162,14 +213,13 @@ function RuleEditor({
         </select>
 
         <select
-          className="select"
           value={rule.condition.operator}
           onChange={(e) =>
             onUpdate({
               condition: { ...rule.condition, operator: e.target.value as LogicCondition['operator'] },
             })
           }
-          style={{ fontSize: 13, marginBottom: 6 }}
+          style={inputStyle}
         >
           {LOGIC_OPERATORS.map((op) => (
             <option key={op.value} value={op.value}>{op.label}</option>
@@ -180,23 +230,21 @@ function RuleEditor({
           <>
             {sourceField?.type === 'multiple_choice' && sourceField.options ? (
               <select
-                className="select"
                 value={String(rule.condition.value || '')}
                 onChange={(e) =>
                   onUpdate({
                     condition: { ...rule.condition, value: e.target.value },
                   })
                 }
-                style={{ fontSize: 13 }}
+                style={inputStyle}
               >
-                <option value="">Select value...</option>
+                <option value="">Select option value...</option>
                 {sourceField.options.map((opt) => (
                   <option key={opt} value={opt}>{opt}</option>
                 ))}
               </select>
             ) : (
               <input
-                className="input"
                 value={String(rule.condition.value || '')}
                 onChange={(e) =>
                   onUpdate({
@@ -204,7 +252,7 @@ function RuleEditor({
                   })
                 }
                 placeholder="Value..."
-                style={{ fontSize: 13 }}
+                style={inputStyle}
               />
             )}
           </>
@@ -216,26 +264,25 @@ function RuleEditor({
         <span
           style={{
             display: 'inline-block',
-            background: '#d4edda',
-            color: '#155724',
+            background: '#CFE5E3',
+            color: '#263B3B',
             borderRadius: 4,
             padding: '2px 8px',
             fontSize: 11,
-            fontWeight: 600,
+            fontWeight: 700,
             marginBottom: 6,
           }}
         >
           THEN
         </span>
         <select
-          className="select"
           value={rule.action.type}
           onChange={(e) =>
             onUpdate({
               action: { ...rule.action, type: e.target.value as LogicAction['type'] },
             })
           }
-          style={{ fontSize: 13, marginBottom: 6 }}
+          style={inputStyle}
         >
           {ACTION_TYPES.map((a) => (
             <option key={a.value} value={a.value}>{a.label}</option>
@@ -244,16 +291,15 @@ function RuleEditor({
 
         {rule.action.type !== 'end_form' && (
           <select
-            className="select"
             value={rule.action.targetQuestionId || ''}
             onChange={(e) =>
               onUpdate({
                 action: { ...rule.action, targetQuestionId: e.target.value },
               })
             }
-            style={{ fontSize: 13 }}
+            style={inputStyle}
           >
-            <option value="">Select question...</option>
+            <option value="">Select target question...</option>
             {fields.map((f) => (
               <option key={f.id} value={f.id}>{f.label}</option>
             ))}
@@ -263,7 +309,20 @@ function RuleEditor({
 
       {/* Delete */}
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
-        <button onClick={onDelete} className="btn btn-ghost btn-sm" style={{ color: '#e74c3c', padding: 4 }}>
+        <button
+          onClick={onDelete}
+          style={{
+            color: '#e74c3c',
+            background: 'transparent',
+            border: 'none',
+            fontSize: 12,
+            fontWeight: 600,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 4,
+          }}
+        >
           <Trash2 size={13} /> Remove
         </button>
       </div>

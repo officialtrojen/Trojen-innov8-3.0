@@ -84,22 +84,31 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
   const currentPoster = theme.posterUrl || theme.bannerUrl;
 
   return (
-    <div style={{ padding: '20px 16px' }}>
+    <div
+      style={{
+        padding: '20px 18px',
+        background: '#FFFEF9',
+        color: '#263B3B',
+        minHeight: '100%',
+      }}
+    >
       {/* Header */}
       <div
         style={{
           fontSize: 11,
           fontWeight: 700,
-          color: '#52796F',
+          color: '#4F7C7A',
           textTransform: 'uppercase',
           letterSpacing: 1.2,
-          marginBottom: 16,
+          marginBottom: 18,
           display: 'flex',
           alignItems: 'center',
           gap: 8,
+          borderBottom: '1px solid #B8CECF',
+          paddingBottom: 10,
         }}
       >
-        <Palette size={15} />
+        <Palette size={15} color="#4F7C7A" />
         Form Appearance & Styling
       </div>
 
@@ -107,7 +116,8 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
       <div
         style={{
           display: 'flex',
-          background: 'rgba(207,229,227,0.35)',
+          background: '#EAF4F4',
+          border: '1px solid #B8CECF',
           borderRadius: 10,
           padding: 3,
           marginBottom: 20,
@@ -129,9 +139,9 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
             alignItems: 'center',
             justifyContent: 'center',
             gap: 6,
-            background: activeTab === 'background' ? 'white' : 'transparent',
-            color: activeTab === 'background' ? '#263B3B' : '#52796F',
-            boxShadow: activeTab === 'background' ? '0 2px 5px rgba(0,0,0,0.06)' : 'none',
+            background: activeTab === 'background' ? '#4F7C7A' : 'transparent',
+            color: activeTab === 'background' ? '#FFFEF9' : '#365F5D',
+            boxShadow: activeTab === 'background' ? '0 2px 5px rgba(38, 59, 59, 0.2)' : 'none',
             transition: 'all 0.15s ease',
           }}
         >
@@ -154,9 +164,9 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
             alignItems: 'center',
             justifyContent: 'center',
             gap: 6,
-            background: activeTab === 'poster' ? 'white' : 'transparent',
-            color: activeTab === 'poster' ? '#263B3B' : '#52796F',
-            boxShadow: activeTab === 'poster' ? '0 2px 5px rgba(0,0,0,0.06)' : 'none',
+            background: activeTab === 'poster' ? '#4F7C7A' : 'transparent',
+            color: activeTab === 'poster' ? '#FFFEF9' : '#365F5D',
+            boxShadow: activeTab === 'poster' ? '0 2px 5px rgba(38, 59, 59, 0.2)' : 'none',
             transition: 'all 0.15s ease',
           }}
         >
@@ -168,7 +178,7 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
                 width: 6,
                 height: 6,
                 borderRadius: '50%',
-                background: '#4F7C7A',
+                background: activeTab === 'poster' ? '#CFE5E3' : '#4F7C7A',
               }}
             />
           )}
@@ -189,9 +199,9 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
             alignItems: 'center',
             justifyContent: 'center',
             gap: 6,
-            background: activeTab === 'colors' ? 'white' : 'transparent',
-            color: activeTab === 'colors' ? '#263B3B' : '#52796F',
-            boxShadow: activeTab === 'colors' ? '0 2px 5px rgba(0,0,0,0.06)' : 'none',
+            background: activeTab === 'colors' ? '#4F7C7A' : 'transparent',
+            color: activeTab === 'colors' ? '#FFFEF9' : '#365F5D',
+            boxShadow: activeTab === 'colors' ? '0 2px 5px rgba(38, 59, 59, 0.2)' : 'none',
             transition: 'all 0.15s ease',
           }}
         >
@@ -207,7 +217,7 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
           {/* Background Type Selector */}
           <div>
-            <label className="label" style={{ fontSize: 12, fontWeight: 600, marginBottom: 8 }}>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#263B3B', marginBottom: 8 }}>
               Background Type
             </label>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
@@ -224,13 +234,13 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
                     type="button"
                     onClick={() => onUpdate({ backgroundType: t.id as FormTheme['backgroundType'] })}
                     style={{
-                      padding: '7px 4px',
+                      padding: '8px 4px',
                       fontSize: 11,
-                      fontWeight: 600,
+                      fontWeight: 700,
                       borderRadius: 8,
-                      border: `1.5px solid ${isSelected ? 'var(--primary)' : 'rgba(184,206,207,0.6)'}`,
-                      background: isSelected ? 'var(--accent)' : 'transparent',
-                      color: isSelected ? 'var(--primary)' : '#263B3B',
+                      border: `1.5px solid ${isSelected ? '#4F7C7A' : '#B8CECF'}`,
+                      background: isSelected ? '#CFE5E3' : '#FFFEF9',
+                      color: isSelected ? '#263B3B' : '#365F5D',
                       cursor: 'pointer',
                       transition: 'all 0.15s ease',
                     }}
@@ -245,7 +255,7 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
           {/* Sub-options based on type */}
           {(theme.backgroundType === 'solid' || !theme.backgroundType) && (
             <div>
-              <label className="label" style={{ fontSize: 12, fontWeight: 600, marginBottom: 8 }}>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#263B3B', marginBottom: 8 }}>
                 Solid Color
               </label>
               <ColorPicker
@@ -254,23 +264,25 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
                 onChange={(v) => onUpdate({ background: v })}
               />
 
-              <div style={{ marginTop: 12 }}>
-                <span style={{ fontSize: 11, color: '#52796F', display: 'block', marginBottom: 6 }}>
-                  Quick Palette
+              <div style={{ marginTop: 14 }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: '#365F5D', display: 'block', marginBottom: 6 }}>
+                  Curated Brand Palette
                 </span>
-                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-                  {['#EAF4F4', '#F8FAFC', '#FEF3C7', '#EDE9FE', '#FCE7F3', '#DCFCE7', '#1E293B'].map((hex) => (
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                  {['#EAF4F4', '#FFFEF9', '#4F7C7A', '#B8CECF', '#263B3B', '#365F5D', '#CFE5E3'].map((hex) => (
                     <button
                       key={hex}
                       type="button"
                       onClick={() => onUpdate({ background: hex })}
                       style={{
-                        width: 24,
-                        height: 24,
-                        borderRadius: 6,
+                        width: 28,
+                        height: 28,
+                        borderRadius: 8,
                         background: hex,
-                        border: theme.background === hex ? '2px solid #4F7C7A' : '1px solid rgba(0,0,0,0.15)',
+                        border: theme.background === hex ? '2.5px solid #4F7C7A' : '1.5px solid #B8CECF',
                         cursor: 'pointer',
+                        boxShadow: '0 1px 3px rgba(38, 59, 59, 0.15)',
+                        transition: 'transform 0.1s ease',
                       }}
                       title={hex}
                     />
@@ -282,7 +294,7 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
 
           {theme.backgroundType === 'gradient' && (
             <div>
-              <label className="label" style={{ fontSize: 12, fontWeight: 600, marginBottom: 8 }}>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#263B3B', marginBottom: 8 }}>
                 Curated Gradients
               </label>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
@@ -301,8 +313,8 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
                       style={{
                         padding: '10px 8px',
                         borderRadius: 10,
-                        border: `1.5px solid ${isSelected ? 'var(--primary)' : 'rgba(184,206,207,0.5)'}`,
-                        background: 'white',
+                        border: `1.5px solid ${isSelected ? '#4F7C7A' : '#B8CECF'}`,
+                        background: isSelected ? '#CFE5E3' : '#FFFEF9',
                         cursor: 'pointer',
                         textAlign: 'left',
                         display: 'flex',
@@ -316,7 +328,7 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
                           height: 28,
                           borderRadius: 6,
                           background: g.gradient,
-                          border: '1px solid rgba(0,0,0,0.08)',
+                          border: '1px solid #B8CECF',
                         }}
                       />
                       <span style={{ fontSize: 11, fontWeight: 600, color: '#263B3B' }}>{g.name}</span>
@@ -327,13 +339,26 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
 
               {/* Custom gradient code */}
               <div style={{ marginTop: 14 }}>
-                <label className="label" style={{ fontSize: 11 }}>Custom CSS Gradient</label>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#365F5D', marginBottom: 4 }}>
+                  Custom CSS Gradient
+                </label>
                 <input
-                  className="input"
                   value={theme.backgroundGradient || ''}
                   onChange={(e) => onUpdate({ backgroundGradient: e.target.value })}
-                  placeholder="linear-gradient(135deg, #FFF, #EEE)"
-                  style={{ fontSize: 11, fontFamily: 'monospace' }}
+                  placeholder="linear-gradient(135deg, #EAF4F4, #CFE5E3)"
+                  style={{
+                    width: '100%',
+                    padding: '8px 10px',
+                    borderRadius: 8,
+                    border: '1.5px solid #B8CECF',
+                    background: '#FFFEF9',
+                    color: '#263B3B',
+                    fontSize: 11,
+                    fontFamily: 'monospace',
+                    outline: 'none',
+                  }}
+                  onFocus={(e) => { e.currentTarget.style.borderColor = '#4F7C7A'; }}
+                  onBlur={(e) => { e.currentTarget.style.borderColor = '#B8CECF'; }}
                 />
               </div>
             </div>
@@ -341,7 +366,7 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
 
           {theme.backgroundType === 'pattern' && (
             <div>
-              <label className="label" style={{ fontSize: 12, fontWeight: 600, marginBottom: 8 }}>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#263B3B', marginBottom: 8 }}>
                 Background Patterns
               </label>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 14 }}>
@@ -355,8 +380,8 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
                       style={{
                         padding: '12px 10px',
                         borderRadius: 10,
-                        border: `1.5px solid ${isSelected ? 'var(--primary)' : 'rgba(184,206,207,0.6)'}`,
-                        background: 'white',
+                        border: `1.5px solid ${isSelected ? '#4F7C7A' : '#B8CECF'}`,
+                        background: isSelected ? '#CFE5E3' : '#FFFEF9',
                         cursor: 'pointer',
                         textAlign: 'left',
                         display: 'flex',
@@ -364,7 +389,7 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
                         justifyContent: 'space-between',
                       }}
                     >
-                      <span style={{ fontSize: 12, fontWeight: 500, color: '#263B3B' }}>{p.name}</span>
+                      <span style={{ fontSize: 12, fontWeight: 600, color: '#263B3B' }}>{p.name}</span>
                       {isSelected && <Check size={14} color="#4F7C7A" />}
                     </button>
                   );
@@ -381,7 +406,7 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
 
           {theme.backgroundType === 'image' && (
             <div>
-              <label className="label" style={{ fontSize: 12, fontWeight: 600, marginBottom: 8 }}>
+              <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#263B3B', marginBottom: 8 }}>
                 Custom Background Image
               </label>
 
@@ -397,36 +422,54 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
               <button
                 type="button"
                 onClick={() => bgFileInputRef.current?.click()}
-                className="btn btn-secondary"
                 style={{
                   width: '100%',
+                  padding: '9px 14px',
+                  borderRadius: 8,
+                  border: '1.5px solid #4F7C7A',
+                  background: '#EAF4F4',
+                  color: '#4F7C7A',
+                  fontWeight: 700,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: 8,
                   marginBottom: 10,
                   fontSize: 12,
+                  cursor: 'pointer',
                 }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = '#CFE5E3'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = '#EAF4F4'; }}
               >
                 <Upload size={14} />
                 Upload Background Image
               </button>
 
               <div style={{ marginBottom: 10 }}>
-                <span style={{ fontSize: 11, color: '#52796F', display: 'block', marginBottom: 4 }}>
+                <span style={{ fontSize: 11, color: '#365F5D', display: 'block', marginBottom: 4, fontWeight: 600 }}>
                   Or paste image URL
                 </span>
                 <input
-                  className="input"
                   value={theme.backgroundImage || ''}
                   onChange={(e) => onUpdate({ backgroundImage: e.target.value })}
                   placeholder="https://images.unsplash.com/..."
-                  style={{ fontSize: 12 }}
+                  style={{
+                    width: '100%',
+                    padding: '8px 12px',
+                    borderRadius: 8,
+                    border: '1.5px solid #B8CECF',
+                    background: '#FFFEF9',
+                    color: '#263B3B',
+                    fontSize: 12,
+                    outline: 'none',
+                  }}
+                  onFocus={(e) => { e.currentTarget.style.borderColor = '#4F7C7A'; }}
+                  onBlur={(e) => { e.currentTarget.style.borderColor = '#B8CECF'; }}
                 />
               </div>
 
               {theme.backgroundImage && (
-                <div style={{ position: 'relative', marginTop: 10, borderRadius: 8, overflow: 'hidden' }}>
+                <div style={{ position: 'relative', marginTop: 10, borderRadius: 8, overflow: 'hidden', border: '1px solid #B8CECF' }}>
                   <img
                     src={theme.backgroundImage}
                     alt="Background preview"
@@ -439,8 +482,8 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
                       position: 'absolute',
                       top: 6,
                       right: 6,
-                      background: 'rgba(0,0,0,0.65)',
-                      color: 'white',
+                      background: 'rgba(38, 59, 59, 0.75)',
+                      color: '#FFFEF9',
                       border: 'none',
                       borderRadius: 6,
                       padding: 4,
@@ -463,7 +506,7 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-              <label className="label" style={{ fontSize: 12, fontWeight: 600, margin: 0 }}>
+              <label style={{ fontSize: 12, fontWeight: 700, color: '#263B3B', margin: 0 }}>
                 Form Poster / Banner
               </label>
               {currentPoster && (
@@ -475,7 +518,7 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
                     background: 'transparent',
                     color: '#e74c3c',
                     fontSize: 11,
-                    fontWeight: 600,
+                    fontWeight: 700,
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
@@ -500,7 +543,6 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
             <button
               type="button"
               onClick={() => posterFileInputRef.current?.click()}
-              className="btn btn-primary"
               style={{
                 width: '100%',
                 display: 'flex',
@@ -508,8 +550,18 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
                 justifyContent: 'center',
                 gap: 8,
                 fontSize: 13,
+                fontWeight: 700,
                 marginBottom: 12,
+                padding: '10px 14px',
+                borderRadius: 8,
+                background: '#4F7C7A',
+                color: '#FFFEF9',
+                border: 'none',
+                cursor: 'pointer',
+                boxShadow: '0 2px 6px rgba(79, 124, 122, 0.25)',
               }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = '#365F5D'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = '#4F7C7A'; }}
             >
               <Upload size={15} />
               Upload Poster Image
@@ -517,15 +569,25 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
 
             {/* Poster URL fallback */}
             <div style={{ marginBottom: 16 }}>
-              <span style={{ fontSize: 11, color: '#52796F', display: 'block', marginBottom: 4 }}>
+              <span style={{ fontSize: 11, color: '#365F5D', display: 'block', marginBottom: 4, fontWeight: 600 }}>
                 Or Image URL
               </span>
               <input
-                className="input"
                 value={currentPoster || ''}
                 onChange={(e) => onUpdate({ posterUrl: e.target.value, bannerUrl: e.target.value })}
                 placeholder="https://example.com/poster.jpg"
-                style={{ fontSize: 12 }}
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  borderRadius: 8,
+                  border: '1.5px solid #B8CECF',
+                  background: '#FFFEF9',
+                  color: '#263B3B',
+                  fontSize: 12,
+                  outline: 'none',
+                }}
+                onFocus={(e) => { e.currentTarget.style.borderColor = '#4F7C7A'; }}
+                onBlur={(e) => { e.currentTarget.style.borderColor = '#B8CECF'; }}
               />
             </div>
 
@@ -537,7 +599,7 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
                   borderRadius: 10,
                   overflow: 'hidden',
                   marginBottom: 16,
-                  border: '1px solid rgba(184,206,207,0.5)',
+                  border: '1.5px solid #B8CECF',
                 }}
               >
                 <img
@@ -553,12 +615,12 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
                   style={{
                     position: 'absolute',
                     inset: 0,
-                    background: `rgba(0,0,0, ${(theme.posterOverlay || 20) / 100})`,
+                    background: `rgba(38, 59, 59, ${(theme.posterOverlay || 25) / 100})`,
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'flex-end',
                     padding: 10,
-                    color: 'white',
+                    color: '#FFFEF9',
                   }}
                 >
                   {theme.posterTitle && (
@@ -578,7 +640,9 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
             {/* Poster Style Selector */}
             {currentPoster && (
               <div style={{ marginBottom: 14 }}>
-                <label className="label" style={{ fontSize: 11, fontWeight: 600 }}>Poster Position & Style</label>
+                <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#365F5D', marginBottom: 6 }}>
+                  Poster Position & Style
+                </label>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
                   {[
                     { id: 'card-top', label: 'Top of Card' },
@@ -593,13 +657,13 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
                         type="button"
                         onClick={() => onUpdate({ posterStyle: s.id as FormTheme['posterStyle'] })}
                         style={{
-                          padding: '6px 8px',
+                          padding: '7px 8px',
                           fontSize: 11,
-                          fontWeight: 500,
+                          fontWeight: 600,
                           borderRadius: 6,
-                          border: `1.5px solid ${isSelected ? 'var(--primary)' : 'rgba(184,206,207,0.6)'}`,
-                          background: isSelected ? 'var(--accent)' : 'transparent',
-                          color: isSelected ? 'var(--primary)' : '#263B3B',
+                          border: `1.5px solid ${isSelected ? '#4F7C7A' : '#B8CECF'}`,
+                          background: isSelected ? '#CFE5E3' : '#FFFEF9',
+                          color: isSelected ? '#263B3B' : '#365F5D',
                           cursor: 'pointer',
                         }}
                       >
@@ -614,7 +678,7 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
             {/* Poster Height Slider */}
             {currentPoster && (
               <div style={{ marginBottom: 14 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#52796F', marginBottom: 4 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11, color: '#365F5D', fontWeight: 600, marginBottom: 4 }}>
                   <span>Poster Height</span>
                   <span>{theme.posterHeight || 180}px</span>
                 </div>
@@ -634,23 +698,47 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
             {currentPoster && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 14 }}>
                 <div>
-                  <label className="label" style={{ fontSize: 11 }}>Poster Title Overlay (Optional)</label>
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#365F5D', marginBottom: 4 }}>
+                    Poster Title Overlay (Optional)
+                  </label>
                   <input
-                    className="input"
                     value={theme.posterTitle || ''}
                     onChange={(e) => onUpdate({ posterTitle: e.target.value })}
                     placeholder="e.g. Innov8 Hackathon"
-                    style={{ fontSize: 12 }}
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      borderRadius: 8,
+                      border: '1.5px solid #B8CECF',
+                      background: '#FFFEF9',
+                      color: '#263B3B',
+                      fontSize: 12,
+                      outline: 'none',
+                    }}
+                    onFocus={(e) => { e.currentTarget.style.borderColor = '#4F7C7A'; }}
+                    onBlur={(e) => { e.currentTarget.style.borderColor = '#B8CECF'; }}
                   />
                 </div>
                 <div>
-                  <label className="label" style={{ fontSize: 11 }}>Poster Subtitle / Tagline</label>
+                  <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#365F5D', marginBottom: 4 }}>
+                    Poster Subtitle / Tagline
+                  </label>
                   <input
-                    className="input"
                     value={theme.posterSubtitle || ''}
                     onChange={(e) => onUpdate({ posterSubtitle: e.target.value })}
                     placeholder="e.g. Official Registration"
-                    style={{ fontSize: 12 }}
+                    style={{
+                      width: '100%',
+                      padding: '8px 12px',
+                      borderRadius: 8,
+                      border: '1.5px solid #B8CECF',
+                      background: '#FFFEF9',
+                      color: '#263B3B',
+                      fontSize: 12,
+                      outline: 'none',
+                    }}
+                    onFocus={(e) => { e.currentTarget.style.borderColor = '#4F7C7A'; }}
+                    onBlur={(e) => { e.currentTarget.style.borderColor = '#B8CECF'; }}
                   />
                 </div>
               </div>
@@ -658,7 +746,7 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
 
             {/* Curated Aesthetic Poster Presets */}
             <div>
-              <label className="label" style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <label style={{ fontSize: 12, fontWeight: 700, color: '#263B3B', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
                 <Sparkles size={13} color="#4F7C7A" />
                 Or Pick a Curated Preset
               </label>
@@ -682,7 +770,7 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
                         borderRadius: 8,
                         overflow: 'hidden',
                         cursor: 'pointer',
-                        border: `2px solid ${isCurrent ? '#4F7C7A' : 'rgba(184,206,207,0.4)'}`,
+                        border: `2px solid ${isCurrent ? '#4F7C7A' : '#B8CECF'}`,
                         position: 'relative',
                         transition: 'transform 0.15s ease',
                       }}
@@ -697,9 +785,9 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
                       <div
                         style={{
                           padding: '4px 6px',
-                          background: 'white',
+                          background: '#FFFEF9',
                           fontSize: 10,
-                          fontWeight: 600,
+                          fontWeight: 700,
                           color: '#263B3B',
                           whiteSpace: 'nowrap',
                           overflow: 'hidden',
@@ -724,7 +812,9 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
           {/* Colors */}
           <div>
-            <label className="label" style={{ fontSize: 12, fontWeight: 600, marginBottom: 10 }}>Theme Accent Colors</label>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#263B3B', marginBottom: 10 }}>
+              Theme Accent Colors
+            </label>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <ColorPicker label="Primary Brand Color" value={theme.primary} onChange={(v) => onUpdate({ primary: v })} />
               <ColorPicker label="Secondary Accent" value={theme.secondary} onChange={(v) => onUpdate({ secondary: v })} />
@@ -734,18 +824,29 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
 
           {/* Typography */}
           <div>
-            <label className="label" style={{ fontSize: 12, fontWeight: 600, marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
-              <Type size={13} />
+            <label style={{ fontSize: 12, fontWeight: 700, color: '#263B3B', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <Type size={13} color="#4F7C7A" />
               Typography
             </label>
 
             <div style={{ marginBottom: 10 }}>
-              <label className="label" style={{ fontSize: 11 }}>Font Family</label>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 600, color: '#365F5D', marginBottom: 4 }}>
+                Font Family
+              </label>
               <select
-                className="select"
                 value={theme.fontFamily}
                 onChange={(e) => onUpdate({ fontFamily: e.target.value })}
-                style={{ fontSize: 12 }}
+                style={{
+                  width: '100%',
+                  padding: '8px 10px',
+                  borderRadius: 8,
+                  border: '1.5px solid #B8CECF',
+                  background: '#FFFEF9',
+                  color: '#263B3B',
+                  fontSize: 12,
+                  outline: 'none',
+                  cursor: 'pointer',
+                }}
               >
                 {fontOptions.map((f) => (
                   <option key={f} value={f}>{f}</option>
@@ -754,7 +855,9 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
             </div>
 
             <div>
-              <label className="label" style={{ fontSize: 11 }}>Text Scale</label>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 600, color: '#365F5D', marginBottom: 4 }}>
+                Text Scale
+              </label>
               <div style={{ display: 'flex', gap: 6 }}>
                 {sizeOptions.map((s) => (
                   <button
@@ -763,13 +866,13 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
                     onClick={() => onUpdate({ fontSize: s.value })}
                     style={{
                       flex: 1,
-                      padding: '6px 4px',
+                      padding: '7px 4px',
                       borderRadius: 6,
                       fontSize: 11,
-                      fontWeight: 600,
-                      background: theme.fontSize === s.value ? 'var(--primary)' : 'transparent',
-                      color: theme.fontSize === s.value ? 'white' : 'var(--text-main)',
-                      border: `1px solid ${theme.fontSize === s.value ? 'var(--primary)' : 'var(--input-border)'}`,
+                      fontWeight: 700,
+                      background: theme.fontSize === s.value ? '#4F7C7A' : '#FFFEF9',
+                      color: theme.fontSize === s.value ? '#FFFEF9' : '#263B3B',
+                      border: `1.5px solid ${theme.fontSize === s.value ? '#4F7C7A' : '#B8CECF'}`,
                       cursor: 'pointer',
                     }}
                   >
@@ -782,8 +885,8 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
 
           {/* Form Layout */}
           <div>
-            <label className="label" style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
-              <Layout size={13} />
+            <label style={{ fontSize: 12, fontWeight: 700, color: '#263B3B', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <Layout size={13} color="#4F7C7A" />
               Form Experience Layout
             </label>
             <div style={{ display: 'flex', gap: 8 }}>
@@ -794,13 +897,13 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
                   onClick={() => onUpdate({ layout })}
                   style={{
                     flex: 1,
-                    padding: '8px 6px',
+                    padding: '9px 6px',
                     borderRadius: 8,
-                    fontSize: 11,
-                    fontWeight: 600,
-                    background: theme.layout === layout ? 'var(--primary)' : 'transparent',
-                    color: theme.layout === layout ? 'white' : 'var(--text-main)',
-                    border: `1.5px solid ${theme.layout === layout ? 'var(--primary)' : 'var(--input-border)'}`,
+                    fontSize: 12,
+                    fontWeight: 700,
+                    background: theme.layout === layout ? '#4F7C7A' : '#FFFEF9',
+                    color: theme.layout === layout ? '#FFFEF9' : '#263B3B',
+                    border: `1.5px solid ${theme.layout === layout ? '#4F7C7A' : '#B8CECF'}`,
                     cursor: 'pointer',
                   }}
                 >
@@ -823,21 +926,33 @@ function ColorPicker({ label, value, onChange }: { label: string; value: string;
         value={value}
         onChange={(e) => onChange(e.target.value)}
         style={{
-          width: 32,
-          height: 32,
+          width: 34,
+          height: 34,
           borderRadius: 8,
-          border: '1px solid var(--input-border)',
+          border: '1.5px solid #B8CECF',
           cursor: 'pointer',
           padding: 2,
+          background: '#FFFEF9',
         }}
       />
       <div style={{ flex: 1 }}>
-        <div style={{ fontSize: 11, color: '#52796F', marginBottom: 2 }}>{label}</div>
+        <div style={{ fontSize: 11, fontWeight: 600, color: '#365F5D', marginBottom: 2 }}>{label}</div>
         <input
-          className="input"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          style={{ fontSize: 12, padding: '4px 8px' }}
+          style={{
+            width: '100%',
+            fontSize: 12,
+            padding: '6px 10px',
+            borderRadius: 6,
+            border: '1.5px solid #B8CECF',
+            background: '#FFFEF9',
+            color: '#263B3B',
+            fontFamily: 'monospace',
+            outline: 'none',
+          }}
+          onFocus={(e) => { e.currentTarget.style.borderColor = '#4F7C7A'; }}
+          onBlur={(e) => { e.currentTarget.style.borderColor = '#B8CECF'; }}
         />
       </div>
     </div>
