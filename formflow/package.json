@@ -7,6 +7,7 @@
     "server": "node server.js",
     "start:node": "node server.js",
     "connect:backend": "node scripts/connect-backend.js",
+    "test:auth": "node scripts/test-supabase-auth.js",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
