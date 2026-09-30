@@ -45,8 +45,8 @@ export default function BuilderToolbar({
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '10px 20px',
-        background: 'var(--card-bg)',
-        borderBottom: '1px solid rgba(184,206,207,0.3)',
+        background: '#FFFEF9',
+        borderBottom: '1px solid #B8CECF',
         gap: 12,
         flexWrap: 'wrap',
       }}

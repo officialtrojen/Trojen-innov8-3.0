@@ -607,8 +607,8 @@ export default function StandaloneBuilderPage() {
             <div
               style={{
                 width: 220,
-                borderRight: '1px solid rgba(184,206,207,0.3)',
-                background: 'var(--card-bg)',
+                borderRight: '1px solid #B8CECF',
+                background: '#FFFEF9',
                 overflowY: 'auto',
                 padding: 16,
                 flexShrink: 0,
@@ -680,8 +680,8 @@ export default function StandaloneBuilderPage() {
             <div
               style={{
                 width: 330,
-                borderLeft: '1px solid rgba(184,206,207,0.3)',
-                background: 'var(--card-bg)',
+                borderLeft: '1px solid #B8CECF',
+                background: '#FFFEF9',
                 overflowY: 'auto',
                 flexShrink: 0,
               }}

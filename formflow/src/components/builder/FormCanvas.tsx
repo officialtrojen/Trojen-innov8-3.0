@@ -74,8 +74,9 @@ function SortableFieldCard({
           cursor: 'pointer',
           borderLeft: isSelected ? `4px solid ${accentColor}` : '4px solid transparent',
           borderRadius: 'var(--radius)',
-          background: isSelected ? 'rgba(207,229,227,0.18)' : 'var(--card-bg)',
-          boxShadow: isSelected ? '0 4px 16px rgba(38, 59, 59, 0.08)' : undefined,
+          background: isSelected ? '#EAF4F4' : '#FFFEF9',
+          border: isSelected ? '1.5px solid #4F7C7A' : '1px solid #B8CECF',
+          boxShadow: isSelected ? '0 4px 16px rgba(38, 59, 59, 0.08)' : '0 1px 3px rgba(38, 59, 59, 0.04)',
           transition: 'all 0.15s ease',
         }}
       >
