@@ -6,26 +6,26 @@
 
 /* ---------- Design Tokens (Aesthetic Obsidian & Cyber Indigo) ---------- */
 :root {
-  /* Palette: Black, Navy Blue, Ochre Yellow, Electric Purple, White */
+  /* Palette: Deep Black, Midnight Navy, Electric Purple & Pure White */
   --page-bg: #05070D;
   --card-bg: rgba(15, 23, 42, 0.85);
-  --primary: #F59E0B;
-  --primary-hover: #D97706;
+  --primary: #8B5CF6;
+  --primary-hover: #7C3AED;
   --purple-primary: #8B5CF6;
   --purple-accent: #A855F7;
-  --purple-glow: rgba(139, 92, 246, 0.25);
-  --input-border: rgba(245, 158, 11, 0.3);
+  --purple-glow: rgba(139, 92, 246, 0.35);
+  --input-border: rgba(139, 92, 246, 0.35);
   --text-main: #FFFFFF;
   --text-muted: #F8FAFC;
-  --accent: rgba(245, 158, 11, 0.15);
+  --accent: rgba(139, 92, 246, 0.15);
 
   /* Secondary palette */
   --soft-sage: #0F172A;
   --warm-cream: #1E293B;
-  --deep-sage: #FBBF24;
-  --muted-green: #F59E0B;
-  --forest-green: #D97706;
-  --soft-mint: #FBBF24;
+  --deep-sage: #C084FC;
+  --muted-green: #8B5CF6;
+  --forest-green: #7C3AED;
+  --soft-mint: #C084FC;
 
   /* Spacing */
   --radius: 12px;
@@ -34,8 +34,8 @@
 
   /* Shadows & Glows */
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 15px rgba(245, 158, 11, 0.15);
-  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.8), 0 0 30px rgba(139, 92, 246, 0.25);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 15px rgba(139, 92, 246, 0.2);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.8), 0 0 30px rgba(139, 92, 246, 0.35);
 
   /* Typography */
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -117,11 +117,11 @@ body {
 .live-bg__blob--2 {
   width: 500px;
   height: 500px;
-  background: #F59E0B;
+  background: #7C3AED;
   top: 40%;
   right: -10%;
   animation: blob-drift-2 35s ease-in-out infinite;
-  opacity: 0.15;
+  opacity: 0.2;
 }
 
 .live-bg__blob--3 {
@@ -131,17 +131,17 @@ body {
   bottom: -10%;
   left: 20%;
   animation: blob-drift-3 28s ease-in-out infinite;
-  opacity: 0.2;
+  opacity: 0.22;
 }
 
 .live-bg__blob--4 {
   width: 400px;
   height: 400px;
-  background: #D97706;
+  background: #C084FC;
   top: 20%;
   left: 45%;
   animation: blob-drift-4 40s ease-in-out infinite;
-  opacity: 0.12;
+  opacity: 0.18;
 }
 
 .live-bg__blob--5 {
@@ -195,25 +195,7 @@ body {
   }
 }
 
-<<<<<<< HEAD
-/* ---------- Card & Clean Elevation ---------- */
-.card {
-  background: #FFFEF9;
-  border-radius: var(--radius);
-  box-shadow: 0 2px 10px rgba(38, 59, 59, 0.05);
-  border: 1px solid #B8CECF;
-  color: #263B3B;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-}
-
-.card:hover {
-  box-shadow: 0 6px 20px rgba(38, 59, 59, 0.08);
-  border-color: #4F7C7A;
-}
-
-/* ---------- Button Variants ---------- */
-=======
-/* ---------- Card & Glassmorphism (Navy Blue & Ochre) ---------- */
+/* ---------- Card & Glassmorphism (Navy Blue, Ochre & Electric Purple) ---------- */
 .card {
   background: rgba(15, 23, 42, 0.85);
   backdrop-filter: blur(16px);
@@ -225,11 +207,10 @@ body {
 
 .card:hover {
   box-shadow: var(--shadow-md);
-  border-color: rgba(245, 158, 11, 0.4);
+  border-color: rgba(139, 92, 246, 0.4);
 }
 
-/* ---------- Button Variants (Ochre Yellow Primary) ---------- */
->>>>>>> c242365 (add_purple_accents_and_streamline_landing)
+/* ---------- Button Variants ---------- */
 .btn {
   display: inline-flex;
   align-items: center;

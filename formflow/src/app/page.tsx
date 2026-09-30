@@ -231,9 +231,9 @@ function BuilderShowcaseSection() {
             gap: 6,
             padding: '6px 16px',
             borderRadius: 999,
-            background: 'rgba(245, 158, 11, 0.15)',
-            color: '#FBBF24',
-            border: '1px solid rgba(245, 158, 11, 0.3)',
+            background: 'rgba(139, 92, 246, 0.15)',
+            color: '#C084FC',
+            border: '1px solid rgba(139, 92, 246, 0.3)',
             fontSize: 13,
             fontWeight: 700,
             marginBottom: 16,
@@ -251,19 +251,19 @@ function BuilderShowcaseSection() {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 24, marginBottom: 40 }}>
         {/* Feature 1: Drag and drop */}
-        <div className="card" style={{ padding: 32, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(245, 158, 11, 0.25)' }}>
+        <div className="card" style={{ padding: 32, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(139, 92, 246, 0.25)' }}>
           <div>
             <div
               style={{
                 width: 52,
                 height: 52,
                 borderRadius: 14,
-                background: 'rgba(245, 158, 11, 0.15)',
-                border: '1px solid rgba(245, 158, 11, 0.3)',
+                background: 'rgba(139, 92, 246, 0.15)',
+                border: '1px solid rgba(139, 92, 246, 0.3)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#FBBF24',
+                color: '#C084FC',
                 marginBottom: 20,
               }}
             >
@@ -273,28 +273,28 @@ function BuilderShowcaseSection() {
               Drag & Drop Questions
             </h3>
             <p style={{ color: '#F8FAFC', fontSize: 14, lineHeight: 1.7, marginBottom: 20 }}>
-              Powered by <strong style={{ color: '#FBBF24' }}>@dnd-kit</strong>. Seamlessly drag question blocks onto the canvas, grab handles to reorder questions in real-time, and duplicate or delete with a single click.
+              Powered by <strong style={{ color: '#C084FC' }}>@dnd-kit</strong>. Seamlessly drag question blocks onto the canvas, grab handles to reorder questions in real-time, and duplicate or delete with a single click.
             </p>
           </div>
-          <div style={{ background: '#0F172A', borderRadius: 10, padding: 14, border: '1px solid rgba(245,158,11,0.2)', fontSize: 12, color: '#FFFFFF' }}>
+          <div style={{ background: '#0F172A', borderRadius: 10, padding: 14, border: '1px solid rgba(139,92,246,0.2)', fontSize: 12, color: '#FFFFFF' }}>
             ✓ Short text, paragraphs, ratings, multiple choices, dates & files
           </div>
         </div>
 
         {/* Feature 2: Background Customizer */}
-        <div className="card" style={{ padding: 32, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(245, 158, 11, 0.25)' }}>
+        <div className="card" style={{ padding: 32, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(139, 92, 246, 0.25)' }}>
           <div>
             <div
               style={{
                 width: 52,
                 height: 52,
                 borderRadius: 14,
-                background: 'rgba(245, 158, 11, 0.15)',
-                border: '1px solid rgba(245, 158, 11, 0.3)',
+                background: 'rgba(139, 92, 246, 0.15)',
+                border: '1px solid rgba(139, 92, 246, 0.3)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#FBBF24',
+                color: '#C084FC',
                 marginBottom: 20,
               }}
             >
@@ -307,25 +307,25 @@ function BuilderShowcaseSection() {
               Elevate your forms beyond plain white pages. Switch between curated color themes, smooth CSS gradients (Sunset, Aurora, Deep Ocean), subtle dot/grid architectural patterns, or upload custom wallpaper.
             </p>
           </div>
-          <div style={{ background: '#0F172A', borderRadius: 10, padding: 14, border: '1px solid rgba(245,158,11,0.2)', fontSize: 12, color: '#FFFFFF' }}>
+          <div style={{ background: '#0F172A', borderRadius: 10, padding: 14, border: '1px solid rgba(139,92,246,0.2)', fontSize: 12, color: '#FFFFFF' }}>
             ✓ Solid colors, multi-stop gradients, mesh patterns & custom images
           </div>
         </div>
 
         {/* Feature 3: Posters & Header Banners */}
-        <div className="card" style={{ padding: 32, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(245, 158, 11, 0.25)' }}>
+        <div className="card" style={{ padding: 32, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(139, 92, 246, 0.25)' }}>
           <div>
             <div
               style={{
                 width: 52,
                 height: 52,
                 borderRadius: 14,
-                background: 'rgba(245, 158, 11, 0.15)',
-                border: '1px solid rgba(245, 158, 11, 0.3)',
+                background: 'rgba(139, 92, 246, 0.15)',
+                border: '1px solid rgba(139, 92, 246, 0.3)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: '#FBBF24',
+                color: '#C084FC',
                 marginBottom: 20,
               }}
             >
@@ -338,7 +338,7 @@ function BuilderShowcaseSection() {
               Upload your event, hackathon, or organization poster directly into the form header. Choose custom banner heights, tint overlays, and display custom event titles and subtitles on top.
             </p>
           </div>
-          <div style={{ background: '#0F172A', borderRadius: 10, padding: 14, border: '1px solid rgba(245,158,11,0.2)', fontSize: 12, color: '#FFFFFF' }}>
+          <div style={{ background: '#0F172A', borderRadius: 10, padding: 14, border: '1px solid rgba(139,92,246,0.2)', fontSize: 12, color: '#FFFFFF' }}>
             ✓ Direct image file upload, curated presets, overlay dimming & titles
           </div>
         </div>
@@ -356,7 +356,7 @@ function BuilderShowcaseSection() {
           justifyContent: 'space-between',
           flexWrap: 'wrap',
           gap: 24,
-          border: '1px solid rgba(245, 158, 11, 0.35)',
+          border: '1px solid rgba(139, 92, 246, 0.35)',
           boxShadow: '0 12px 32px rgba(0, 0, 0, 0.5)',
         }}
       >
@@ -376,8 +376,8 @@ function BuilderShowcaseSection() {
             fontSize: 15,
             fontWeight: 800,
             borderRadius: 10,
-            background: 'linear-gradient(135deg, #F59E0B, #D97706)',
-            color: '#05070D',
+            background: 'linear-gradient(135deg, #8B5CF6, #7C3AED)',
+            color: '#FFFFFF',
             border: 'none',
             display: 'flex',
             alignItems: 'center',
@@ -421,19 +421,19 @@ function Features() {
         }}
       >
         {features.map((f, i) => (
-          <div key={i} className="card" style={{ padding: 32, background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(245, 158, 11, 0.25)' }}>
+          <div key={i} className="card" style={{ padding: 32, background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(139, 92, 246, 0.25)' }}>
             <div
               style={{
                 width: 48,
                 height: 48,
                 borderRadius: 12,
-                background: 'rgba(245, 158, 11, 0.15)',
-                border: '1px solid rgba(245, 158, 11, 0.3)',
+                background: 'rgba(139, 92, 246, 0.15)',
+                border: '1px solid rgba(139, 92, 246, 0.3)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 marginBottom: 20,
-                color: '#FBBF24',
+                color: '#C084FC',
               }}
             >
               <f.icon size={24} />
@@ -484,7 +484,7 @@ function HowItWorks() {
                   top: 48,
                   bottom: 0,
                   width: 2,
-                  background: 'linear-gradient(to bottom, #F59E0B, rgba(245,158,11,0.2))',
+                  background: 'linear-gradient(to bottom, #8B5CF6, rgba(139,92,246,0.2))',
                 }}
               />
             )}
@@ -494,8 +494,8 @@ function HowItWorks() {
                 width: 48,
                 height: 48,
                 borderRadius: 14,
-                background: 'linear-gradient(135deg, #F59E0B, #D97706)',
-                color: '#05070D',
+                background: 'linear-gradient(135deg, #8B5CF6, #7C3AED)',
+                color: '#FFFFFF',
                 fontWeight: 800,
                 display: 'flex',
                 alignItems: 'center',
@@ -503,7 +503,7 @@ function HowItWorks() {
                 flexShrink: 0,
                 position: 'relative',
                 zIndex: 1,
-                boxShadow: '0 0 15px rgba(245,158,11,0.4)',
+                boxShadow: '0 0 15px rgba(139,92,246,0.4)',
               }}
             >
               <s.icon size={22} />
@@ -511,7 +511,7 @@ function HowItWorks() {
 
             <div style={{ paddingTop: 4 }}>
               <h3 style={{ fontSize: 18, fontWeight: 700, color: '#FFFFFF', marginBottom: 6 }}>
-                <span style={{ color: '#FBBF24', marginRight: 8 }}>0{i + 1}</span>
+                <span style={{ color: '#C084FC', marginRight: 8 }}>0{i + 1}</span>
                 {s.title}
               </h3>
               <p style={{ color: '#F8FAFC', fontSize: 14, lineHeight: 1.7 }}>{s.desc}</p>
@@ -536,32 +536,32 @@ function LogicDemo() {
         </p>
       </div>
 
-      <div className="card" style={{ padding: 32, maxWidth: 600, margin: '0 auto', background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(245, 158, 11, 0.3)' }}>
+      <div className="card" style={{ padding: 32, maxWidth: 600, margin: '0 auto', background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(139, 92, 246, 0.3)' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <span style={{ background: '#F59E0B', color: '#05070D', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 800 }}>IF</span>
-            <div style={{ flex: 1, padding: '8px 14px', border: '1px solid rgba(245,158,11,0.25)', borderRadius: 8, fontSize: 14, color: '#FFFFFF', background: '#0F172A' }}>
+            <span style={{ background: '#8B5CF6', color: '#FFFFFF', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 800 }}>IF</span>
+            <div style={{ flex: 1, padding: '8px 14px', border: '1px solid rgba(139,92,246,0.25)', borderRadius: 8, fontSize: 14, color: '#FFFFFF', background: '#0F172A' }}>
               &quot;Are you a student?&quot;
             </div>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <span style={{ background: 'rgba(245, 158, 11, 0.2)', color: '#FBBF24', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 700, border: '1px solid rgba(245,158,11,0.35)' }}>EQUALS</span>
-            <div style={{ flex: 1, padding: '8px 14px', border: '1px solid rgba(245,158,11,0.25)', borderRadius: 8, fontSize: 14, color: '#FFFFFF', background: '#0F172A' }}>
+            <span style={{ background: 'rgba(139, 92, 246, 0.2)', color: '#C084FC', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 700, border: '1px solid rgba(139,92,246,0.35)' }}>EQUALS</span>
+            <div style={{ flex: 1, padding: '8px 14px', border: '1px solid rgba(139,92,246,0.25)', borderRadius: 8, fontSize: 14, color: '#FFFFFF', background: '#0F172A' }}>
               &quot;Yes&quot;
             </div>
           </div>
 
-          <div style={{ borderTop: '1px dashed rgba(245,158,11,0.3)', paddingTop: 16 }}>
+          <div style={{ borderTop: '1px dashed rgba(139,92,246,0.3)', paddingTop: 16 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-              <span style={{ background: 'rgba(245, 158, 11, 0.2)', color: '#FBBF24', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 700, border: '1px solid rgba(245,158,11,0.35)' }}>THEN</span>
+              <span style={{ background: 'rgba(139, 92, 246, 0.2)', color: '#C084FC', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 700, border: '1px solid rgba(139,92,246,0.35)' }}>THEN</span>
               <span style={{ fontSize: 14, color: '#FFFFFF' }}>Show &quot;College Name&quot;</span>
-              <CheckCircle2 size={16} style={{ color: '#F59E0B' }} />
+              <CheckCircle2 size={16} style={{ color: '#8B5CF6' }} />
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <span style={{ background: 'rgba(245, 158, 11, 0.2)', color: '#FBBF24', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 700, border: '1px solid rgba(245,158,11,0.35)' }}>AND</span>
+              <span style={{ background: 'rgba(139, 92, 246, 0.2)', color: '#C084FC', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 700, border: '1px solid rgba(139,92,246,0.35)' }}>AND</span>
               <span style={{ fontSize: 14, color: '#FFFFFF' }}>Show &quot;Year of Study&quot;</span>
-              <CheckCircle2 size={16} style={{ color: '#F59E0B' }} />
+              <CheckCircle2 size={16} style={{ color: '#8B5CF6' }} />
             </div>
           </div>
         </div>
@@ -590,10 +590,10 @@ function AnalyticsDemo() {
           { label: 'Avg. Rating', value: '4.6 ★', change: '+0.2' },
           { label: 'Today', value: '34', change: '+8' },
         ].map((s, i) => (
-          <div key={i} className="card" style={{ padding: 24, textAlign: 'center', background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(245, 158, 11, 0.25)' }}>
+          <div key={i} className="card" style={{ padding: 24, textAlign: 'center', background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(139, 92, 246, 0.25)' }}>
             <div style={{ fontSize: 28, fontWeight: 700, color: '#FFFFFF', marginBottom: 4 }}>{s.value}</div>
             <div style={{ fontSize: 13, color: '#F8FAFC', marginBottom: 6 }}>{s.label}</div>
-            <span style={{ fontSize: 12, color: '#FBBF24', fontWeight: 600 }}>{s.change}</span>
+            <span style={{ fontSize: 12, color: '#C084FC', fontWeight: 600 }}>{s.change}</span>
           </div>
         ))}
       </div>
@@ -612,17 +612,17 @@ function Integrations() {
         Trigger webhooks on every form submission. Integrate with Slack, Discord, Zapier, and any custom endpoint.
       </p>
 
-      <div className="card" style={{ padding: 32, maxWidth: 500, margin: '0 auto', textAlign: 'left', background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(245, 158, 11, 0.3)' }}>
+      <div className="card" style={{ padding: 32, maxWidth: 500, margin: '0 auto', textAlign: 'left', background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(139, 92, 246, 0.3)' }}>
         <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, color: '#FFFFFF' }}>Webhook Configuration</div>
         <div style={{ marginBottom: 12 }}>
           <div style={{ fontSize: 12, color: '#F8FAFC', marginBottom: 4 }}>Webhook URL</div>
-          <div style={{ padding: '8px 14px', border: '1px solid rgba(245,158,11,0.25)', borderRadius: 8, fontSize: 13, color: '#F8FAFC', background: '#0F172A' }}>
+          <div style={{ padding: '8px 14px', border: '1px solid rgba(139,92,246,0.25)', borderRadius: 8, fontSize: 13, color: '#F8FAFC', background: '#0F172A' }}>
             https://hooks.slack.com/services/...
           </div>
         </div>
         <div style={{ display: 'flex', gap: 12 }}>
           <div className="btn btn-primary btn-sm">Save Webhook</div>
-          <div className="btn btn-secondary btn-sm" style={{ background: '#0F172A', color: '#FFFFFF', border: '1px solid rgba(245,158,11,0.3)' }}>Test Webhook</div>
+          <div className="btn btn-secondary btn-sm" style={{ background: '#0F172A', color: '#FFFFFF', border: '1px solid rgba(139,92,246,0.3)' }}>Test Webhook</div>
         </div>
       </div>
     </section>
@@ -647,8 +647,8 @@ function CTA() {
           margin: '0 auto',
           padding: '60px 40px',
           background: 'linear-gradient(135deg, #0F172A, #1E293B)',
-          border: '1px solid rgba(245, 158, 11, 0.35)',
-          boxShadow: '0 0 40px rgba(245,158,11,0.2)',
+          border: '1px solid rgba(139, 92, 246, 0.35)',
+          boxShadow: '0 0 40px rgba(139,92,246,0.2)',
         }}
       >
         <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2rem)', fontWeight: 800, color: '#FFFFFF', marginBottom: 12 }}>
@@ -657,7 +657,7 @@ function CTA() {
         <p style={{ color: '#F8FAFC', marginBottom: 32, fontSize: 16 }}>
           Start creating in minutes. No credit card required.
         </p>
-        <Link href="/builder" className="btn btn-primary btn-lg" style={{ fontSize: 16, borderRadius: 12, background: 'linear-gradient(135deg, #F59E0B, #D97706)', color: '#05070D', fontWeight: 800 }}>
+        <Link href="/builder" className="btn btn-primary btn-lg" style={{ fontSize: 16, borderRadius: 12, background: 'linear-gradient(135deg, #8B5CF6, #7C3AED)', color: '#FFFFFF', fontWeight: 800 }}>
           Get Started for Free <ArrowRight size={18} />
         </Link>
       </div>
@@ -683,11 +683,11 @@ function Footer() {
             width: 28,
             height: 28,
             borderRadius: 8,
-            background: 'linear-gradient(135deg, #F59E0B, #D97706)',
+            background: 'linear-gradient(135deg, #8B5CF6, #7C3AED)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: '#05070D',
+            color: '#FFFFFF',
             fontWeight: 800,
             fontSize: 14,
           }}
