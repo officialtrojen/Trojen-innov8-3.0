@@ -32,14 +32,36 @@ export default function DashboardPage() {
   const [shareModalForm, setShareModalForm] = useState<DBForm | null>(null);
 
   useEffect(() => {
-    if (!user) return;
-
     async function load() {
+      let ownerId = user?.id;
+      if (!ownerId) {
+        const { data: authData } = await supabase.auth.getUser();
+        ownerId = authData?.user?.id;
+      }
+      if (!ownerId && typeof window !== 'undefined') {
+        ownerId = localStorage.getItem('formflow_guest_id') || undefined;
+      }
+
+      if (!ownerId) {
+        setForms([]);
+        setLoading(false);
+        return;
+      }
+
+      // If user logged in and has guest forms, migrate them
+      if (user?.id && typeof window !== 'undefined') {
+        const guestId = localStorage.getItem('formflow_guest_id');
+        if (guestId && guestId !== user.id) {
+          await supabase.from('forms').update({ owner_id: user.id }).eq('owner_id', guestId);
+          localStorage.removeItem('formflow_guest_id');
+        }
+      }
+
       // Load forms
       const { data: formsData } = await supabase
         .from('forms')
         .select('*')
-        .eq('owner_id', user!.id)
+        .eq('owner_id', ownerId)
         .order('updated_at', { ascending: false })
         .limit(10);
 

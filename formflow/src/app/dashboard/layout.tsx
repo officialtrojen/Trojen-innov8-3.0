@@ -22,6 +22,8 @@ import {
 } from 'lucide-react';
 import { AuthProvider, useAuth } from '@/components/AuthProvider';
 import LiveBackground from '@/components/LiveBackground';
+import { createClient } from '@/lib/supabase/client';
+import { DEFAULT_THEME, DEFAULT_SETTINGS } from '@/lib/types';
 
 interface NavItem {
   href: string;
@@ -85,24 +87,86 @@ function Sidebar() {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [formName, setFormName] = useState('');
   const [formDesc, setFormDesc] = useState('');
+  const [creatingForm, setCreatingForm] = useState(false);
 
   const handleSignOut = () => {
     setSigningOut(true);
     signOut();
   };
 
-  const handleModalSubmit = (e: React.FormEvent) => {
+  const handleModalSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formName.trim()) return;
+    if (!formName.trim() || creatingForm) return;
 
     const title = formName.trim();
     const description = formDesc.trim();
+    setCreatingForm(true);
 
-    setCreateModalOpen(false);
-    setFormName('');
-    setFormDesc('');
+    try {
+      const supabase = createClient();
+      let ownerId = user?.id;
+      if (!ownerId) {
+        const { data: authData } = await supabase.auth.getUser();
+        ownerId = authData?.user?.id;
+      }
+      if (!ownerId) {
+        let guestId = typeof window !== 'undefined' ? localStorage.getItem('formflow_guest_id') : null;
+        if (!guestId) {
+          guestId = 'guest_' + Math.random().toString(36).substring(2, 10);
+          if (typeof window !== 'undefined') localStorage.setItem('formflow_guest_id', guestId);
+        }
+        ownerId = guestId;
+      }
 
-    router.push(`/builder?new=true&title=${encodeURIComponent(title)}&description=${encodeURIComponent(description)}`);
+      const freshSchema = {
+        title,
+        description,
+        fields: [
+          {
+            id: 'q_' + Math.random().toString(36).substring(2, 8),
+            type: 'short_text',
+            label: 'What is your full name?',
+            required: true,
+            placeholder: 'Type your answer here...',
+          },
+        ],
+        logic: [],
+        theme: DEFAULT_THEME,
+        settings: DEFAULT_SETTINGS,
+      };
+
+      const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 20) + '-' + Math.random().toString(36).substring(2, 7);
+
+      const { data, error } = await supabase
+        .from('forms')
+        .insert({
+          owner_id: ownerId,
+          title,
+          description: description || null,
+          schema: freshSchema,
+          theme: DEFAULT_THEME,
+          status: 'published',
+          public_slug: slug,
+        })
+        .select('id, public_slug')
+        .single();
+
+      if (error) {
+        console.error('Supabase form creation error:', error);
+        alert('Could not save to Supabase: ' + error.message);
+      } else if (data) {
+        setCreateModalOpen(false);
+        setFormName('');
+        setFormDesc('');
+        router.push(`/builder?id=${data.id}`);
+        return;
+      }
+    } catch (err: any) {
+      console.error('Form creation exception:', err);
+      alert('Error creating form: ' + (err?.message || 'Unknown error'));
+    } finally {
+      setCreatingForm(false);
+    }
   };
 
   const isGoogle =
@@ -685,10 +749,26 @@ function Sidebar() {
                 </button>
                 <button
                   type="submit"
+                  disabled={!formName.trim() || creatingForm}
                   className="btn btn-primary"
-                  style={{ padding: '9px 20px', borderRadius: 8 }}
+                  style={{
+                    padding: '9px 20px',
+                    borderRadius: 8,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    cursor: !formName.trim() || creatingForm ? 'not-allowed' : 'pointer',
+                    opacity: !formName.trim() || creatingForm ? 0.7 : 1,
+                  }}
                 >
-                  Continue to Builder →
+                  {creatingForm ? (
+                    <>
+                      <span className="spinner" style={{ width: 14, height: 14 }} />
+                      <span>Saving to Supabase...</span>
+                    </>
+                  ) : (
+                    <span>Create & Open Studio →</span>
+                  )}
                 </button>
               </div>
             </form>

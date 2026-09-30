@@ -42,6 +42,7 @@ import AiFormAssistant from '@/components/builder/AiFormAssistant';
 import ShareModal from '@/components/builder/ShareModal';
 import { getBackgroundStyle, POSTER_PRESETS } from '@/lib/theme-presets';
 import { createClient } from '@/lib/supabase/client';
+import { useAuth, AuthProvider } from '@/components/AuthProvider';
 import * as XLSX from 'xlsx';
 import {
   ArrowLeft,
@@ -107,7 +108,7 @@ const INITIAL_DEMO_SCHEMA: FormSchema = {
   settings: DEFAULT_SETTINGS,
 };
 
-export default function StandaloneBuilderPage() {
+function BuilderCanvasInner() {
   const router = useRouter();
   const [schema, setSchema] = useState<FormSchema>(() => {
     if (typeof window !== 'undefined') {
@@ -128,7 +129,9 @@ export default function StandaloneBuilderPage() {
   const [mode, setMode] = useState<'edit' | 'preview'>('edit');
   const [copied, setCopied] = useState(false);
   const [saving, setSaving] = useState(false);
+  const { user: authUser } = useAuth();
   const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
+  const [cloudSyncStatus, setCloudSyncStatus] = useState<'synced' | 'saving' | 'unsaved'>('synced');
   const [showCrumpleExperience, setShowCrumpleExperience] = useState(false);
   const [isFormArmed, setIsFormArmed] = useState(false);
   const [isDraggingArmedForm, setIsDraggingArmedForm] = useState(false);
@@ -150,6 +153,39 @@ export default function StandaloneBuilderPage() {
   const [existingFormId, setExistingFormId] = useState<string | null>(null);
   const [existingPublicSlug, setExistingPublicSlug] = useState<string | null>(null);
   const trashBinRef = useRef<HTMLDivElement | null>(null);
+  const isFirstRender = useRef(true);
+
+  // Auto-sync schema updates to Supabase when editing an existing form
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    if (!existingFormId) return;
+
+    setCloudSyncStatus('unsaved');
+    const timer = setTimeout(async () => {
+      setCloudSyncStatus('saving');
+      const supabase = createClient();
+      try {
+        await supabase
+          .from('forms')
+          .update({
+            title: schema.title,
+            description: schema.description || null,
+            schema,
+            theme: schema.theme,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', existingFormId);
+        setCloudSyncStatus('synced');
+      } catch (err) {
+        console.warn('Auto-save to Supabase error:', err);
+      }
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, [schema, existingFormId]);
 
   // Global pointer tracking when dragging armed form
   useEffect(() => {
@@ -511,13 +547,21 @@ export default function StandaloneBuilderPage() {
   // --- Save / Publish to Account ---
   const handleSaveToAccount = async () => {
     setSaving(true);
+    setCloudSyncStatus('saving');
     const supabase = createClient();
 
-    if (!user) {
-      // Save draft and redirect to signup/login
-      localStorage.setItem('formflow_builder_draft', JSON.stringify(schema));
-      router.push('/signup?redirect=/builder');
-      return;
+    let ownerId = authUser?.id || user?.id;
+    if (!ownerId) {
+      const { data: authData } = await supabase.auth.getUser();
+      ownerId = authData?.user?.id;
+    }
+    if (!ownerId) {
+      let guestId = typeof window !== 'undefined' ? localStorage.getItem('formflow_guest_id') : null;
+      if (!guestId) {
+        guestId = 'guest_' + Math.random().toString(36).substring(2, 10);
+        if (typeof window !== 'undefined') localStorage.setItem('formflow_guest_id', guestId);
+      }
+      ownerId = guestId;
     }
 
     try {
@@ -537,6 +581,7 @@ export default function StandaloneBuilderPage() {
         if (error) {
           alert('Could not update form: ' + error.message);
         } else {
+          setCloudSyncStatus('synced');
           setPublishedFormInfo({
             isOpen: true,
             publicSlug: existingPublicSlug || generateSlug(),
@@ -549,7 +594,7 @@ export default function StandaloneBuilderPage() {
         const { data, error } = await supabase
           .from('forms')
           .insert({
-            owner_id: user.id,
+            owner_id: ownerId,
             title: schema.title,
             description: schema.description || null,
             schema,
@@ -565,6 +610,7 @@ export default function StandaloneBuilderPage() {
         } else if (data) {
           setExistingFormId(data.id);
           setExistingPublicSlug(data.public_slug);
+          setCloudSyncStatus('synced');
           setPublishedFormInfo({
             isOpen: true,
             publicSlug: data.public_slug,
@@ -654,10 +700,45 @@ export default function StandaloneBuilderPage() {
                 border: 'none',
                 background: 'transparent',
                 outline: 'none',
-                width: 280,
+                width: 240,
               }}
               placeholder="Form Title"
             />
+
+            {/* Cloud Sync Status Badge */}
+            {existingFormId && (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '4px 10px',
+                  borderRadius: 20,
+                  fontSize: 11,
+                  fontWeight: 600,
+                  background: cloudSyncStatus === 'synced' ? 'rgba(52, 211, 153, 0.15)' : 'rgba(251, 191, 36, 0.15)',
+                  color: cloudSyncStatus === 'synced' ? '#059669' : '#D97706',
+                  border: `1px solid ${cloudSyncStatus === 'synced' ? 'rgba(52, 211, 153, 0.35)' : 'rgba(251, 191, 36, 0.35)'}`,
+                }}
+                title={cloudSyncStatus === 'synced' ? 'Saved to Supabase database' : 'Saving changes to cloud...'}
+              >
+                <div
+                  style={{
+                    width: 6,
+                    height: 6,
+                    borderRadius: '50%',
+                    background: cloudSyncStatus === 'synced' ? '#10B981' : '#F59E0B',
+                  }}
+                />
+                <span>
+                  {cloudSyncStatus === 'synced'
+                    ? 'Synced to Cloud'
+                    : cloudSyncStatus === 'saving'
+                    ? 'Saving...'
+                    : 'Unsaved'}
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Mode Switcher: Edit vs Live Preview */}
@@ -1053,5 +1134,13 @@ export default function StandaloneBuilderPage() {
         }
       `}</style>
     </DndContext>
+  );
+}
+
+export default function StandaloneBuilderPage() {
+  return (
+    <AuthProvider>
+      <BuilderCanvasInner />
+    </AuthProvider>
   );
 }

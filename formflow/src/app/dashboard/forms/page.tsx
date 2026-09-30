@@ -17,13 +17,35 @@ export default function MyFormsPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) return;
-
     async function loadForms() {
+      let ownerId = user?.id;
+      if (!ownerId) {
+        const { data: authData } = await supabase.auth.getUser();
+        ownerId = authData?.user?.id;
+      }
+      if (!ownerId && typeof window !== 'undefined') {
+        ownerId = localStorage.getItem('formflow_guest_id') || undefined;
+      }
+
+      if (!ownerId) {
+        setForms([]);
+        setLoading(false);
+        return;
+      }
+
+      // If user logged in and has guest forms, migrate them
+      if (user?.id && typeof window !== 'undefined') {
+        const guestId = localStorage.getItem('formflow_guest_id');
+        if (guestId && guestId !== user.id) {
+          await supabase.from('forms').update({ owner_id: user.id }).eq('owner_id', guestId);
+          localStorage.removeItem('formflow_guest_id');
+        }
+      }
+
       const { data } = await supabase
         .from('forms')
         .select('*')
-        .eq('owner_id', user!.id)
+        .eq('owner_id', ownerId)
         .order('updated_at', { ascending: false });
         
       if (data) {
