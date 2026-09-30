@@ -1,725 +1,1029 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import {
   Layers,
-  GitBranch,
-  Palette,
-  Share2,
-  BarChart3,
-  Webhook,
   ArrowRight,
-  CheckCircle2,
-  MousePointerClick,
+  Sparkles,
+  Compass,
+  Radio,
   Eye,
   Send,
-  Menu,
-  X,
+  Share2,
+  Cpu,
+  ChevronDown,
+  Satellite,
+  Globe2,
 } from 'lucide-react';
-import LiveBackground from '@/components/LiveBackground';
 
-/* ── Navigation ── */
-function Navbar() {
-  const [open, setOpen] = React.useState(false);
+export default function ParallaxDeepSpaceLandingPage() {
+  const [scrollY, setScrollY] = useState(0);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [activeSection, setActiveSection] = useState('hero');
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  // Smooth scroll listener via requestAnimationFrame
+  useEffect(() => {
+    let ticking = false;
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setScrollY(window.scrollY);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Smooth mouse movement for 3D cursor parallax
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      const { innerWidth, innerHeight } = window;
+      const x = (e.clientX - innerWidth / 2) / (innerWidth / 2);
+      const y = (e.clientY - innerHeight / 2) / (innerHeight / 2);
+      setMousePos({ x, y });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  // Active section spy for HUD
+  useEffect(() => {
+    if (scrollY < 700) setActiveSection('deep-space');
+    else if (scrollY < 1600) setActiveSection('orbit-genesis');
+    else if (scrollY < 2600) setActiveSection('telemetry-core');
+    else if (scrollY < 3600) setActiveSection('void-logic');
+    else setActiveSection('station-dock');
+  }, [scrollY]);
+
+  // Deep Starfield Canvas animation (Layer 0 & 1)
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let animationId: number;
+    let width = (canvas.width = window.innerWidth);
+    let height = (canvas.height = window.innerHeight);
+
+    const handleResize = () => {
+      if (!canvas) return;
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    };
+    window.addEventListener('resize', handleResize);
+
+    // Create 180 stars with different depths (z: 1 to 4)
+    const stars = Array.from({ length: 180 }, () => ({
+      x: Math.random() * width,
+      y: Math.random() * height * 4,
+      z: Math.random() * 3 + 0.6,
+      radius: Math.random() * 1.3 + 0.3,
+      alpha: Math.random() * 0.7 + 0.2,
+      twinkleSpeed: Math.random() * 0.02 + 0.005,
+      twinkleOffset: Math.random() * Math.PI * 2,
+    }));
+
+    let frame = 0;
+    const render = () => {
+      frame++;
+      ctx.clearRect(0, 0, width, height);
+
+      // Deep pure space clear
+      ctx.fillStyle = '#020306';
+      ctx.fillRect(0, 0, width, height);
+
+      // Draw each star with its parallax speed
+      stars.forEach((star) => {
+        // Multi-depth parallax calculation for starfield
+        const starParallaxSpeed = 0.06 * star.z;
+        const screenY = (star.y - scrollY * starParallaxSpeed) % (height * 3);
+        const wrappedY = screenY < 0 ? screenY + height * 3 : screenY;
+
+        // Only draw if within visible viewport
+        if (wrappedY >= -10 && wrappedY <= height + 10) {
+          const mouseShiftX = mousePos.x * (star.z * 6);
+          const mouseShiftY = mousePos.y * (star.z * 6);
+
+          const brightness =
+            star.alpha + Math.sin(frame * star.twinkleSpeed + star.twinkleOffset) * 0.25;
+          const clampedBrightness = Math.max(0.1, Math.min(1, brightness));
+
+          ctx.beginPath();
+          ctx.arc(
+            star.x + mouseShiftX,
+            wrappedY + mouseShiftY,
+            star.radius,
+            0,
+            Math.PI * 2
+          );
+          ctx.fillStyle =
+            star.z > 2.5
+              ? `rgba(224, 242, 254, ${clampedBrightness})`
+              : star.z > 1.5
+              ? `rgba(203, 213, 225, ${clampedBrightness * 0.8})`
+              : `rgba(148, 163, 184, ${clampedBrightness * 0.5})`;
+          ctx.fill();
+        }
+      });
+
+      animationId = requestAnimationFrame(render);
+    };
+
+    render();
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      cancelAnimationFrame(animationId);
+    };
+  }, [scrollY, mousePos]);
+
+  // Computed Space Depth in Astronomical Units
+  const depthAU = Math.round(120 + scrollY * 4.2);
+
   return (
-    <nav
+    <div
       style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 50,
-        background: 'rgba(11, 15, 25, 0.8)',
-        backdropFilter: 'blur(16px)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+        background: '#020306',
+        color: '#E2E8F0',
+        minHeight: '480vh',
+        position: 'relative',
+        overflowX: 'hidden',
+        fontFamily:
+          '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
       }}
     >
+      {/* ========================================================================= */}
+      {/* LAYER 0 & 1: FIXED MULTI-DEPTH STARFIELD CANVAS                           */}
+      {/* ========================================================================= */}
+      <canvas
+        ref={canvasRef}
+        style={{
+          position: 'fixed',
+          inset: 0,
+          width: '100vw',
+          height: '100vh',
+          pointerEvents: 'none',
+          zIndex: 0,
+        }}
+      />
+
+      {/* Subtle Cosmic Depth Vignette (Pure Deep Black Space) */}
       <div
         style={{
-          maxWidth: 1200,
-          margin: '0 auto',
-          padding: '0 24px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          height: 64,
+          position: 'fixed',
+          inset: 0,
+          pointerEvents: 'none',
+          zIndex: 1,
+          background:
+            'radial-gradient(ellipse 90% 75% at 50% 50%, transparent 40%, rgba(2, 3, 6, 0.75) 85%, #020306 100%)',
         }}
-      >
-        <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
+      />
+
+      {/* ========================================================================= */}
+      {/* LAYER 5: FOREGROUND INTERFACE & STORY CONTENT                             */}
+      {/* Generous black space voids, clean minimalist typography                   */}
+      {/* ========================================================================= */}
+      <div style={{ position: 'relative', zIndex: 10 }}>
+        {/* Top Minimal Navigation */}
+        <header
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 72,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '0 40px',
+            background: scrollY > 40 ? 'rgba(2, 3, 6, 0.85)' : 'transparent',
+            backdropFilter: scrollY > 40 ? 'blur(16px)' : 'none',
+            borderBottom:
+              scrollY > 40 ? '1px solid rgba(255, 255, 255, 0.07)' : '1px solid transparent',
+            transition: 'all 0.3s ease',
+            zIndex: 100,
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div
+              style={{
+                width: 34,
+                height: 34,
+                borderRadius: 9,
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#E2E8F0',
+              }}
+            >
+              <Layers size={18} />
+            </div>
+            <span
+              style={{
+                fontSize: 16,
+                fontWeight: 700,
+                letterSpacing: '-0.02em',
+                color: '#FFFFFF',
+              }}
+            >
+              FormFlow <span style={{ color: '#64748B', fontWeight: 400 }}>Cosmic</span>
+            </span>
+          </div>
+
+          <nav
+            style={{ display: 'flex', alignItems: 'center', gap: 28 }}
+            className="hidden-mobile"
+          >
+            <a
+              href="#architecture"
+              style={{ fontSize: 13, color: '#94A3B8', textDecoration: 'none', fontWeight: 500 }}
+            >
+              Depth Layers
+            </a>
+            <a
+              href="#builder-orbit"
+              style={{ fontSize: 13, color: '#94A3B8', textDecoration: 'none', fontWeight: 500 }}
+            >
+              Orbit Engine
+            </a>
+            <a
+              href="#telemetry"
+              style={{ fontSize: 13, color: '#94A3B8', textDecoration: 'none', fontWeight: 500 }}
+            >
+              Telemetry
+            </a>
+          </nav>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            <Link
+              href="/login"
+              style={{
+                fontSize: 13,
+                fontWeight: 600,
+                color: '#CBD5E1',
+                textDecoration: 'none',
+                padding: '8px 16px',
+              }}
+            >
+              Sign In
+            </Link>
+            <Link
+              href="/builder"
+              style={{
+                fontSize: 13,
+                fontWeight: 600,
+                color: '#020306',
+                background: '#F8FAFC',
+                padding: '9px 18px',
+                borderRadius: 8,
+                textDecoration: 'none',
+                boxShadow: '0 0 20px rgba(255, 255, 255, 0.15)',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              Launch Studio →
+            </Link>
+          </div>
+        </header>
+
+        {/* SECTION 1: HERO VIEWPORT (Vast Calm Black Space) */}
+        <section
+          style={{
+            minHeight: '100vh',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            padding: '140px 8vw 60px',
+            maxWidth: 1200,
+          }}
+        >
+          {/* Subtle Status Pill */}
           <div
             style={{
-              width: 36,
-              height: 36,
-              borderRadius: 10,
-              background: 'linear-gradient(135deg, #8B5CF6 0%, #F59E0B 100%)',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '6px 14px',
+              borderRadius: 999,
+              background: 'rgba(255, 255, 255, 0.03)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              width: 'fit-content',
+              marginBottom: 28,
+            }}
+          >
+            <span
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: '50%',
+                background: '#38BDF8',
+                boxShadow: '0 0 8px #38BDF8',
+              }}
+            />
+            <span
+              style={{
+                fontSize: 12,
+                fontWeight: 600,
+                color: '#94A3B8',
+                letterSpacing: '0.04em',
+                textTransform: 'uppercase',
+              }}
+            >
+              Multi-Depth Parallax Architecture • v3.0
+            </span>
+          </div>
+
+          <h1
+            style={{
+              fontSize: 'clamp(2.8rem, 6.5vw, 5.2rem)',
+              fontWeight: 800,
+              lineHeight: 1.08,
+              letterSpacing: '-0.03em',
+              color: '#FFFFFF',
+              margin: '0 0 24px',
+              maxWidth: 820,
+            }}
+          >
+            Forms engineered across dimensions of depth.
+          </h1>
+
+          <p
+            style={{
+              fontSize: 'clamp(1.05rem, 1.8vw, 1.25rem)',
+              color: '#94A3B8',
+              lineHeight: 1.7,
+              maxWidth: 580,
+              margin: '0 0 44px',
+              fontWeight: 400,
+            }}
+          >
+            Move through an independent multi-layered cosmos. Background starfields, celestial
+            midground bodies, orbital stations, and foreground intelligence move at autonomous
+            speeds as you scroll.
+          </p>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+            <Link
+              href="/builder"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 10,
+                background: '#FFFFFF',
+                color: '#020306',
+                padding: '14px 28px',
+                borderRadius: 10,
+                fontWeight: 700,
+                fontSize: 14,
+                textDecoration: 'none',
+                boxShadow: '0 4px 24px rgba(255, 255, 255, 0.18)',
+              }}
+            >
+              Build New Form <ArrowRight size={16} />
+            </Link>
+
+            <Link
+              href="/dashboard"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 8,
+                background: 'rgba(255, 255, 255, 0.03)',
+                color: '#E2E8F0',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
+                padding: '14px 24px',
+                borderRadius: 10,
+                fontWeight: 600,
+                fontSize: 14,
+                textDecoration: 'none',
+              }}
+            >
+              <Compass size={16} style={{ color: '#94A3B8' }} /> Explore Workspace
+            </Link>
+          </div>
+
+          {/* Scroll Indicator */}
+          <div
+            style={{
+              marginTop: '12vh',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+              color: '#64748B',
+              fontSize: 12,
+              fontWeight: 600,
+              letterSpacing: '0.05em',
+              textTransform: 'uppercase',
+            }}
+          >
+            <ChevronDown size={16} style={{ animation: 'bounce 2s infinite' }} />
+            <span>Scroll downward to activate multi-depth parallax layers</span>
+          </div>
+        </section>
+
+        {/* GENEROUS CALM BLACK SPACE VOID */}
+        <div style={{ height: '35vh' }} />
+
+        {/* SECTION 2: DEPTH ARCHITECTURE (MIDGROUND PARALLAX ENCOUNTER) */}
+        <section
+          id="architecture"
+          style={{
+            padding: '80px 8vw',
+            maxWidth: 1240,
+            margin: '0 auto',
+          }}
+        >
+          <div style={{ maxWidth: 640, marginBottom: 56 }}>
+            <span
+              style={{
+                fontSize: 12,
+                color: '#38BDF8',
+                fontWeight: 700,
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                display: 'block',
+                marginBottom: 10,
+              }}
+            >
+              Layer Separation Matrix
+            </span>
+            <h2
+              style={{
+                fontSize: 'clamp(2rem, 3.8vw, 3.2rem)',
+                fontWeight: 800,
+                letterSpacing: '-0.02em',
+                color: '#FFFFFF',
+                lineHeight: 1.15,
+                margin: '0 0 16px',
+              }}
+            >
+              Independent movement across four optical planes.
+            </h2>
+            <p style={{ color: '#94A3B8', fontSize: 15, lineHeight: 1.7, margin: 0 }}>
+              Each element exists on an isolated z-coordinate. As viewport scroll velocity changes,
+              background geometry and midground vehicles shift at fractional speeds.
+            </p>
+          </div>
+
+          {/* 3 Architecture Glassmorphism Cards with generous black space */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+              gap: 24,
+            }}
+          >
+            <div
+              style={{
+                padding: '32px 28px',
+                background: 'rgba(15, 23, 42, 0.45)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                borderRadius: 16,
+                backdropFilter: 'blur(12px)',
+              }}
+            >
+              <div
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: 10,
+                  background: 'rgba(56, 189, 248, 0.08)',
+                  border: '1px solid rgba(56, 189, 248, 0.2)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#38BDF8',
+                  marginBottom: 20,
+                }}
+              >
+                <Globe2 size={22} />
+              </div>
+              <h3 style={{ fontSize: 18, fontWeight: 700, color: '#FFFFFF', marginBottom: 10 }}>
+                Layer 01 • Deep Celestial Horizon
+              </h3>
+              <p style={{ color: '#94A3B8', fontSize: 14, lineHeight: 1.6, margin: '0 0 16px' }}>
+                Infinite canvas starfield and concentric ringed planets rendered at 0.18x scroll
+                velocity. Distant, calm, and unchanging.
+              </p>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#64748B', letterSpacing: '0.04em' }}>
+                SPEED VELOCITY: 0.18x • DEPTH: 12,000 AU
+              </div>
+            </div>
+
+            <div
+              style={{
+                padding: '32px 28px',
+                background: 'rgba(15, 23, 42, 0.45)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                borderRadius: 16,
+                backdropFilter: 'blur(12px)',
+              }}
+            >
+              <div
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: 10,
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#E2E8F0',
+                  marginBottom: 20,
+                }}
+              >
+                <Satellite size={22} />
+              </div>
+              <h3 style={{ fontSize: 18, fontWeight: 700, color: '#FFFFFF', marginBottom: 10 }}>
+                Layer 02 • Orbital Midground
+              </h3>
+              <p style={{ color: '#94A3B8', fontSize: 14, lineHeight: 1.6, margin: '0 0 16px' }}>
+                Modular space stations and golden reconnaissance satellites drifting at 0.42x and
+                0.65x velocities, responding dynamically to mouse cursor angle.
+              </p>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#64748B', letterSpacing: '0.04em' }}>
+                SPEED VELOCITY: 0.55x • DEPTH: 4,500 AU
+              </div>
+            </div>
+
+            <div
+              style={{
+                padding: '32px 28px',
+                background: 'rgba(15, 23, 42, 0.45)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                borderRadius: 16,
+                backdropFilter: 'blur(12px)',
+              }}
+            >
+              <div
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: 10,
+                  background: 'rgba(168, 85, 247, 0.08)',
+                  border: '1px solid rgba(168, 85, 247, 0.2)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#C084FC',
+                  marginBottom: 20,
+                }}
+              >
+                <Cpu size={22} />
+              </div>
+              <h3 style={{ fontSize: 18, fontWeight: 700, color: '#FFFFFF', marginBottom: 10 }}>
+                Layer 03 • Intelligence Foreground
+              </h3>
+              <p style={{ color: '#94A3B8', fontSize: 14, lineHeight: 1.6, margin: '0 0 16px' }}>
+                High-contrast typography, interactive form logic builders, and real-time response
+                graphs locked to native scroll for optimal readability.
+              </p>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#64748B', letterSpacing: '0.04em' }}>
+                SPEED VELOCITY: 1.00x • FOREGROUND
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* GENEROUS CALM BLACK SPACE VOID */}
+        <div style={{ height: '40vh' }} />
+
+        {/* SECTION 3: THE FORM ENGINE ORBIT (Interactive Capabilities) */}
+        <section
+          id="builder-orbit"
+          style={{
+            padding: '80px 8vw',
+            maxWidth: 1240,
+            margin: '0 auto',
+          }}
+        >
+          <div
+            style={{
+              background: 'rgba(8, 12, 20, 0.65)',
+              border: '1px solid rgba(255, 255, 255, 0.09)',
+              borderRadius: 24,
+              padding: 'clamp(36px, 6vw, 64px)',
+              backdropFilter: 'blur(16px)',
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+              gap: 48,
+              alignItems: 'center',
+            }}
+          >
+            <div>
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '4px 10px',
+                  borderRadius: 6,
+                  background: 'rgba(56, 189, 248, 0.1)',
+                  color: '#38BDF8',
+                  fontSize: 11,
+                  fontWeight: 700,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em',
+                  marginBottom: 16,
+                }}
+              >
+                <Radio size={12} /> Autonomous Logic & Distribution
+              </div>
+              <h2
+                style={{
+                  fontSize: 'clamp(1.8rem, 3.2vw, 2.6rem)',
+                  fontWeight: 800,
+                  color: '#FFFFFF',
+                  lineHeight: 1.2,
+                  margin: '0 0 20px',
+                }}
+              >
+                Instant URL Generation & Real-time Submissions
+              </h2>
+              <p style={{ color: '#94A3B8', fontSize: 15, lineHeight: 1.7, margin: '0 0 28px' }}>
+                Publish a form with one click to receive an immutable shareable URL. Send it to
+                anyone anywhere in the world—responses feed directly into your encrypted dashboard
+                analytics without respondent signups.
+              </p>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div
+                    style={{
+                      width: 20,
+                      height: 20,
+                      borderRadius: '50%',
+                      background: 'rgba(16, 185, 129, 0.15)',
+                      color: '#10B981',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: 12,
+                      fontWeight: 800,
+                    }}
+                  >
+                    ✓
+                  </div>
+                  <span style={{ fontSize: 14, color: '#E2E8F0', fontWeight: 500 }}>
+                    Instant shareable link with QR code & one-click clipboard copy
+                  </span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div
+                    style={{
+                      width: 20,
+                      height: 20,
+                      borderRadius: '50%',
+                      background: 'rgba(16, 185, 129, 0.15)',
+                      color: '#10B981',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: 12,
+                      fontWeight: 800,
+                    }}
+                  >
+                    ✓
+                  </div>
+                  <span style={{ fontSize: 14, color: '#E2E8F0', fontWeight: 500 }}>
+                    Conditional skip branching & mathematical logic rules
+                  </span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div
+                    style={{
+                      width: 20,
+                      height: 20,
+                      borderRadius: '50%',
+                      background: 'rgba(16, 185, 129, 0.15)',
+                      color: '#10B981',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: 12,
+                      fontWeight: 800,
+                    }}
+                  >
+                    ✓
+                  </div>
+                  <span style={{ fontSize: 14, color: '#E2E8F0', fontWeight: 500 }}>
+                    Live customizable posters, backgrounds & typography themes
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Mocked Glass Studio Telemetry Box */}
+            <div
+              style={{
+                background: '#040711',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                borderRadius: 16,
+                padding: 24,
+                boxShadow: '0 24px 60px rgba(0, 0, 0, 0.6)',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  paddingBottom: 16,
+                  borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                  marginBottom: 18,
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span
+                    style={{ width: 8, height: 8, borderRadius: '50%', background: '#10B981' }}
+                  />
+                  <span style={{ fontSize: 13, fontWeight: 700, color: '#FFFFFF' }}>
+                    Live Form Distribution
+                  </span>
+                </div>
+                <span style={{ fontSize: 11, color: '#64748B', fontWeight: 600 }}>
+                  STATUS: LIVE
+                </span>
+              </div>
+
+              <div
+                style={{
+                  background: 'rgba(255, 255, 255, 0.02)',
+                  borderRadius: 10,
+                  padding: '12px 14px',
+                  border: '1px solid rgba(255, 255, 255, 0.06)',
+                  marginBottom: 16,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 12,
+                    color: '#94A3B8',
+                    fontFamily: 'monospace',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    maxWidth: 240,
+                  }}
+                >
+                  https://formflow.app/f/voyager-expedition
+                </span>
+                <span
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: '#38BDF8',
+                    cursor: 'pointer',
+                    flexShrink: 0,
+                  }}
+                >
+                  Copy URL
+                </span>
+              </div>
+
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(3, 1fr)',
+                  gap: 12,
+                  textAlign: 'center',
+                }}
+              >
+                <div
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.02)',
+                    padding: '14px 8px',
+                    borderRadius: 8,
+                  }}
+                >
+                  <div style={{ fontSize: 20, fontWeight: 800, color: '#FFFFFF' }}>1,842</div>
+                  <div style={{ fontSize: 11, color: '#64748B', marginTop: 4 }}>Submissions</div>
+                </div>
+                <div
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.02)',
+                    padding: '14px 8px',
+                    borderRadius: 8,
+                  }}
+                >
+                  <div style={{ fontSize: 20, fontWeight: 800, color: '#38BDF8' }}>98.4%</div>
+                  <div style={{ fontSize: 11, color: '#64748B', marginTop: 4 }}>Completion</div>
+                </div>
+                <div
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.02)',
+                    padding: '14px 8px',
+                    borderRadius: 8,
+                  }}
+                >
+                  <div style={{ fontSize: 20, fontWeight: 800, color: '#10B981' }}>18ms</div>
+                  <div style={{ fontSize: 11, color: '#64748B', marginTop: 4 }}>Latency</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* GENEROUS CALM BLACK SPACE VOID */}
+        <div style={{ height: '45vh' }} />
+
+        {/* SECTION 4: CALL TO ACTION IN DEEP SPACE */}
+        <section
+          id="telemetry"
+          style={{
+            padding: '100px 8vw 140px',
+            textAlign: 'center',
+            maxWidth: 820,
+            margin: '0 auto',
+          }}
+        >
+          <div
+            style={{
+              width: 52,
+              height: 52,
+              borderRadius: 14,
+              background: 'rgba(255, 255, 255, 0.04)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#FFFFFF',
-              fontWeight: 800,
-              fontSize: 18,
-              boxShadow: '0 0 16px rgba(139, 92, 246, 0.4)',
+              margin: '0 auto 24px',
+              color: '#38BDF8',
             }}
           >
-            F
+            <Sparkles size={24} />
           </div>
-          <span style={{ fontWeight: 700, fontSize: 20, color: '#FFFFFF' }}>FormFlow</span>
-        </Link>
 
-        {/* Desktop nav */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 24 }} className="hidden-mobile">
-          <Link href="/builder" style={{ color: '#C084FC', textDecoration: 'none', fontSize: 14, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}>
-            ⚡ Form Builder
-          </Link>
-          <a href="#features" style={{ color: '#FFFFFF', textDecoration: 'none', fontSize: 14, fontWeight: 500 }}>Features</a>
-          <a href="#builder-features" style={{ color: '#FFFFFF', textDecoration: 'none', fontSize: 14, fontWeight: 500 }}>Posters & Themes</a>
-          <a href="#how-it-works" style={{ color: '#FFFFFF', textDecoration: 'none', fontSize: 14, fontWeight: 500 }}>How It Works</a>
-          <Link href="/login" className="btn btn-ghost btn-sm" style={{ color: '#FFFFFF' }}>Log In</Link>
-          <Link href="/builder" className="btn btn-primary btn-sm">Start Building</Link>
-        </div>
+          <h2
+            style={{
+              fontSize: 'clamp(2.2rem, 4.4vw, 3.6rem)',
+              fontWeight: 800,
+              letterSpacing: '-0.03em',
+              color: '#FFFFFF',
+              lineHeight: 1.15,
+              margin: '0 0 20px',
+            }}
+          >
+            Ready to deploy your next form?
+          </h2>
 
-        {/* Mobile toggle */}
-        <button
-          onClick={() => setOpen(!open)}
-          className="btn btn-ghost"
-          style={{ display: 'none', padding: 8, color: '#FFFFFF' }}
-          id="mobile-nav-toggle"
-        >
-          {open ? <X size={24} /> : <Menu size={24} />}
-        </button>
-      </div>
-
-      {/* Mobile dropdown */}
-      {open && (
-        <div
-          style={{
-            background: '#0F172A',
-            padding: '16px 24px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 12,
-            borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-          }}
-        >
-          <Link href="/builder" style={{ color: '#C084FC', fontWeight: 700, textDecoration: 'none' }} onClick={() => setOpen(false)}>⚡ Start Building (Drag & Drop)</Link>
-          <a href="#features" style={{ color: '#FFFFFF', textDecoration: 'none' }} onClick={() => setOpen(false)}>Features</a>
-          <a href="#builder-features" style={{ color: '#FFFFFF', textDecoration: 'none' }} onClick={() => setOpen(false)}>Posters & Themes</a>
-          <a href="#how-it-works" style={{ color: '#FFFFFF', textDecoration: 'none' }} onClick={() => setOpen(false)}>How It Works</a>
-          <Link href="/login" style={{ color: '#FFFFFF', textDecoration: 'none' }} onClick={() => setOpen(false)}>Log In</Link>
-          <Link href="/builder" className="btn btn-primary" onClick={() => setOpen(false)}>Start Building Free</Link>
-        </div>
-      )}
-
-      <style>{`
-        @media (max-width: 768px) {
-          .hidden-mobile { display: none !important; }
-          #mobile-nav-toggle { display: flex !important; }
-        }
-      `}</style>
-    </nav>
-  );
-}
-
-/* ── Hero ── */
-function Hero() {
-  return (
-    <section
-      style={{
-        paddingTop: 140,
-        paddingBottom: 80,
-        textAlign: 'center',
-        maxWidth: 900,
-        margin: '0 auto',
-        padding: '140px 24px 80px',
-        position: 'relative',
-        zIndex: 1,
-      }}
-    >
-      <div
-        style={{
-          display: 'inline-block',
-          padding: '6px 16px',
-          borderRadius: 999,
-          background: 'rgba(139, 92, 246, 0.15)',
-          color: '#C084FC',
-          border: '1px solid rgba(139, 92, 246, 0.35)',
-          fontSize: 13,
-          fontWeight: 700,
-          marginBottom: 24,
-        }}
-      >
-        ✨ Free for students & clubs
-      </div>
-
-      <h1
-        style={{
-          fontSize: 'clamp(2.2rem, 5vw, 3.8rem)',
-          fontWeight: 800,
-          lineHeight: 1.15,
-          color: '#FFFFFF',
-          marginBottom: 20,
-          letterSpacing: '-0.02em',
-        }}
-      >
-        Build Smarter Forms.{' '}
-        <span style={{ background: 'linear-gradient(135deg, #FBBF24 0%, #C084FC 50%, #8B5CF6 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-          Automate Every Response.
-        </span>
-      </h1>
-
-      <p
-        style={{
-          fontSize: 'clamp(1rem, 2vw, 1.2rem)',
-          color: '#F8FAFC',
-          maxWidth: 600,
-          margin: '0 auto 40px',
-          lineHeight: 1.7,
-        }}
-      >
-        Create powerful forms, surveys and conditional workflows visually — without writing code.
-      </p>
-
-      <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 20 }}>
-        <Link
-          href="/builder"
-          className="btn btn-primary btn-lg"
-          style={{
-            fontSize: 16,
-            borderRadius: 12,
-            padding: '14px 28px',
-            background: 'linear-gradient(135deg, #8B5CF6 0%, #F59E0B 100%)',
-            boxShadow: '0 8px 24px rgba(139, 92, 246, 0.35)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-            color: '#FFFFFF',
-            fontWeight: 800,
-          }}
-        >
-          ⚡ Start Building Form (Drag & Drop) <ArrowRight size={18} />
-        </Link>
-        <Link href="#builder-features" className="btn btn-secondary btn-lg" style={{ fontSize: 16, borderRadius: 12, padding: '14px 24px', background: '#0F172A', color: '#FFFFFF', border: '1px solid rgba(139, 92, 246, 0.35)' }}>
-          🎨 Custom Backgrounds & Posters
-        </Link>
-      </div>
-
-      <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 40 }}>
-        <span style={{ fontSize: 12, padding: '6px 14px', background: '#0F172A', border: '1px solid rgba(139, 92, 246, 0.3)', borderRadius: 20, color: '#C084FC', fontWeight: 600 }}>
-          ✨ Drag & Drop Builder (dnd-kit)
-        </span>
-        <span style={{ fontSize: 12, padding: '6px 14px', background: '#0F172A', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: 20, color: '#FBBF24', fontWeight: 600 }}>
-          🎨 Solid, Gradients & Patterns
-        </span>
-        <span style={{ fontSize: 12, padding: '6px 14px', background: '#0F172A', border: '1px solid rgba(139, 92, 246, 0.3)', borderRadius: 20, color: '#C084FC', fontWeight: 600 }}>
-          🖼️ Custom Form Posters & Banners
-        </span>
-      </div>
-    </section>
-  );
-}
-
-/* ── Builder Showcase: Drag & Drop, Backgrounds & Posters ── */
-function BuilderShowcaseSection() {
-  return (
-    <section id="builder-features" style={{ padding: '80px 24px', maxWidth: 1200, margin: '0 auto', position: 'relative', zIndex: 1 }}>
-      <div style={{ textAlign: 'center', marginBottom: 54 }}>
-        <div
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 6,
-            padding: '6px 16px',
-            borderRadius: 999,
-            background: 'rgba(139, 92, 246, 0.15)',
-            color: '#C084FC',
-            border: '1px solid rgba(139, 92, 246, 0.3)',
-            fontSize: 13,
-            fontWeight: 700,
-            marginBottom: 16,
-          }}
-        >
-          ✨ New Visual Studio
-        </div>
-        <h2 style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)', fontWeight: 800, color: '#FFFFFF', marginBottom: 14 }}>
-          Drag-and-Drop Building, Custom Backgrounds & Posters
-        </h2>
-        <p style={{ color: '#F8FAFC', maxWidth: 640, margin: '0 auto', fontSize: 16, lineHeight: 1.6 }}>
-          Design stunning, on-brand forms in seconds with our fluid drag-and-drop canvas, customizable backdrop styling, and visual header posters.
-        </p>
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 24, marginBottom: 40 }}>
-        {/* Feature 1: Drag and drop */}
-        <div className="card" style={{ padding: 32, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(139, 92, 246, 0.25)' }}>
-          <div>
-            <div
-              style={{
-                width: 52,
-                height: 52,
-                borderRadius: 14,
-                background: 'rgba(139, 92, 246, 0.15)',
-                border: '1px solid rgba(139, 92, 246, 0.3)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#C084FC',
-                marginBottom: 20,
-              }}
-            >
-              <MousePointerClick size={26} />
-            </div>
-            <h3 style={{ fontSize: 20, fontWeight: 700, color: '#FFFFFF', marginBottom: 10 }}>
-              Drag & Drop Questions
-            </h3>
-            <p style={{ color: '#F8FAFC', fontSize: 14, lineHeight: 1.7, marginBottom: 20 }}>
-              Powered by <strong style={{ color: '#C084FC' }}>@dnd-kit</strong>. Seamlessly drag question blocks onto the canvas, grab handles to reorder questions in real-time, and duplicate or delete with a single click.
-            </p>
-          </div>
-          <div style={{ background: '#0F172A', borderRadius: 10, padding: 14, border: '1px solid rgba(139,92,246,0.2)', fontSize: 12, color: '#FFFFFF' }}>
-            ✓ Short text, paragraphs, ratings, multiple choices, dates & files
-          </div>
-        </div>
-
-        {/* Feature 2: Background Customizer */}
-        <div className="card" style={{ padding: 32, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(139, 92, 246, 0.25)' }}>
-          <div>
-            <div
-              style={{
-                width: 52,
-                height: 52,
-                borderRadius: 14,
-                background: 'rgba(139, 92, 246, 0.15)',
-                border: '1px solid rgba(139, 92, 246, 0.3)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#C084FC',
-                marginBottom: 20,
-              }}
-            >
-              <Palette size={26} />
-            </div>
-            <h3 style={{ fontSize: 20, fontWeight: 700, color: '#FFFFFF', marginBottom: 10 }}>
-              Custom Backgrounds & Gradients
-            </h3>
-            <p style={{ color: '#F8FAFC', fontSize: 14, lineHeight: 1.7, marginBottom: 20 }}>
-              Elevate your forms beyond plain white pages. Switch between curated color themes, smooth CSS gradients (Sunset, Aurora, Deep Ocean), subtle dot/grid architectural patterns, or upload custom wallpaper.
-            </p>
-          </div>
-          <div style={{ background: '#0F172A', borderRadius: 10, padding: 14, border: '1px solid rgba(139,92,246,0.2)', fontSize: 12, color: '#FFFFFF' }}>
-            ✓ Solid colors, multi-stop gradients, mesh patterns & custom images
-          </div>
-        </div>
-
-        {/* Feature 3: Posters & Header Banners */}
-        <div className="card" style={{ padding: 32, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(139, 92, 246, 0.25)' }}>
-          <div>
-            <div
-              style={{
-                width: 52,
-                height: 52,
-                borderRadius: 14,
-                background: 'rgba(139, 92, 246, 0.15)',
-                border: '1px solid rgba(139, 92, 246, 0.3)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#C084FC',
-                marginBottom: 20,
-              }}
-            >
-              <Eye size={26} />
-            </div>
-            <h3 style={{ fontSize: 20, fontWeight: 700, color: '#FFFFFF', marginBottom: 10 }}>
-              Add Posters & Cover Banners
-            </h3>
-            <p style={{ color: '#F8FAFC', fontSize: 14, lineHeight: 1.7, marginBottom: 20 }}>
-              Upload your event, hackathon, or organization poster directly into the form header. Choose custom banner heights, tint overlays, and display custom event titles and subtitles on top.
-            </p>
-          </div>
-          <div style={{ background: '#0F172A', borderRadius: 10, padding: 14, border: '1px solid rgba(139,92,246,0.2)', fontSize: 12, color: '#FFFFFF' }}>
-            ✓ Direct image file upload, curated presets, overlay dimming & titles
-          </div>
-        </div>
-      </div>
-
-      {/* Direct CTA Banner */}
-      <div
-        style={{
-          background: 'linear-gradient(135deg, #1E293B 0%, #0F172A 100%)',
-          borderRadius: 16,
-          padding: '40px 32px',
-          color: 'white',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          flexWrap: 'wrap',
-          gap: 24,
-          border: '1px solid rgba(139, 92, 246, 0.35)',
-          boxShadow: '0 12px 32px rgba(0, 0, 0, 0.5)',
-        }}
-      >
-        <div>
-          <h3 style={{ fontSize: 22, fontWeight: 800, margin: '0 0 8px 0', color: '#FFFFFF' }}>
-            Ready to design your customized form?
-          </h3>
-          <p style={{ margin: 0, color: '#F8FAFC', fontSize: 15, maxWidth: 520 }}>
-            Open the visual drag & drop builder immediately. Add questions, pick your background, and upload a poster in real time.
+          <p
+            style={{
+              color: '#94A3B8',
+              fontSize: 'clamp(1rem, 1.6vw, 1.15rem)',
+              lineHeight: 1.7,
+              maxWidth: 540,
+              margin: '0 auto 36px',
+            }}
+          >
+            Experience intuitive drag-and-drop form building with multi-depth custom poster themes,
+            advanced validation, and effortless response tracking.
           </p>
-        </div>
 
-        <Link
-          href="/builder"
-          className="btn btn-primary btn-lg"
-          style={{
-            fontSize: 15,
-            fontWeight: 800,
-            borderRadius: 10,
-            background: 'linear-gradient(135deg, #8B5CF6, #7C3AED)',
-            color: '#FFFFFF',
-            border: 'none',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-          }}
-        >
-          ⚡ Open Form Builder Now <ArrowRight size={18} />
-        </Link>
-      </div>
-    </section>
-  );
-}
-
-/* ── Features ── */
-const features = [
-  { icon: Layers, title: 'Visual Form Builder', desc: 'Drag-and-drop fields onto a visual canvas. Configure properties, validations, and layouts without any code.' },
-  { icon: GitBranch, title: 'Conditional Logic', desc: 'Create smart branching workflows. Show, hide, or jump to questions based on user responses.' },
-  { icon: Palette, title: 'Custom Themes', desc: 'Customize colors, fonts, layouts and branding. Make every form match your organization\'s identity.' },
-  { icon: Share2, title: 'Public Shareable Links', desc: 'Publish forms instantly with a unique URL. Share via email, social media, or embed in websites.' },
-  { icon: BarChart3, title: 'Response Analytics', desc: 'Visualize responses with charts and graphs. Track submissions, ratings, and trends in real-time.' },
-  { icon: Webhook, title: 'Webhook Integrations', desc: 'Trigger external services on every submission. Connect to Slack, Zapier, Discord, or any API endpoint.' },
-];
-
-function Features() {
-  return (
-    <section id="features" style={{ padding: '80px 24px', maxWidth: 1200, margin: '0 auto', position: 'relative', zIndex: 1 }}>
-      <div style={{ textAlign: 'center', marginBottom: 60 }}>
-        <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', fontWeight: 700, color: '#FFFFFF', marginBottom: 12 }}>
-          Everything you need to build powerful forms
-        </h2>
-        <p style={{ color: '#F8FAFC', maxWidth: 600, margin: '0 auto', fontSize: 16 }}>
-          A complete toolkit for creating, distributing, and analyzing forms and surveys.
-        </p>
-      </div>
-
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-          gap: 24,
-        }}
-      >
-        {features.map((f, i) => (
-          <div key={i} className="card" style={{ padding: 32, background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(139, 92, 246, 0.25)' }}>
-            <div
-              style={{
-                width: 48,
-                height: 48,
-                borderRadius: 12,
-                background: 'rgba(139, 92, 246, 0.15)',
-                border: '1px solid rgba(139, 92, 246, 0.3)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginBottom: 20,
-                color: '#C084FC',
-              }}
-            >
-              <f.icon size={24} />
-            </div>
-            <h3 style={{ fontSize: 18, fontWeight: 700, color: '#FFFFFF', marginBottom: 8 }}>{f.title}</h3>
-            <p style={{ color: '#F8FAFC', fontSize: 14, lineHeight: 1.7 }}>{f.desc}</p>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-/* ── How It Works ── */
-const steps = [
-  { icon: MousePointerClick, title: 'Design Your Form', desc: 'Drag fields onto the canvas and configure every detail with the properties panel.' },
-  { icon: GitBranch, title: 'Add Smart Logic', desc: 'Build conditional rules so your form adapts to each respondent\'s answers.' },
-  { icon: Eye, title: 'Preview & Publish', desc: 'Preview on any device, then publish with one click to generate a shareable link.' },
-  { icon: Send, title: 'Collect & Analyze', desc: 'Responses stream in real-time. View analytics, export data, and trigger webhooks.' },
-];
-
-function HowItWorks() {
-  return (
-    <section id="how-it-works" style={{ padding: '80px 24px', maxWidth: 900, margin: '0 auto', position: 'relative', zIndex: 1 }}>
-      <div style={{ textAlign: 'center', marginBottom: 60 }}>
-        <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', fontWeight: 700, color: '#FFFFFF', marginBottom: 12 }}>How It Works</h2>
-        <p style={{ color: '#F8FAFC', maxWidth: 500, margin: '0 auto', fontSize: 16 }}>Four simple steps from idea to insights.</p>
-      </div>
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-        {steps.map((s, i) => (
           <div
-            key={i}
             style={{
               display: 'flex',
-              gap: 24,
-              alignItems: 'flex-start',
-              position: 'relative',
-              paddingBottom: i < steps.length - 1 ? 48 : 0,
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: 16,
+              flexWrap: 'wrap',
             }}
           >
-            {/* Line */}
-            {i < steps.length - 1 && (
-              <div
-                style={{
-                  position: 'absolute',
-                  left: 23,
-                  top: 48,
-                  bottom: 0,
-                  width: 2,
-                  background: 'linear-gradient(to bottom, #8B5CF6, rgba(139,92,246,0.2))',
-                }}
-              />
-            )}
-
-            <div
+            <Link
+              href="/builder"
               style={{
-                width: 48,
-                height: 48,
-                borderRadius: 14,
-                background: 'linear-gradient(135deg, #8B5CF6, #7C3AED)',
-                color: '#FFFFFF',
-                fontWeight: 800,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                flexShrink: 0,
-                position: 'relative',
-                zIndex: 1,
-                boxShadow: '0 0 15px rgba(139,92,246,0.4)',
+                background: '#FFFFFF',
+                color: '#020306',
+                padding: '14px 32px',
+                borderRadius: 10,
+                fontWeight: 700,
+                fontSize: 14,
+                textDecoration: 'none',
+                boxShadow: '0 4px 28px rgba(255, 255, 255, 0.2)',
               }}
             >
-              <s.icon size={22} />
-            </div>
+              Start Building Free →
+            </Link>
 
-            <div style={{ paddingTop: 4 }}>
-              <h3 style={{ fontSize: 18, fontWeight: 700, color: '#FFFFFF', marginBottom: 6 }}>
-                <span style={{ color: '#C084FC', marginRight: 8 }}>0{i + 1}</span>
-                {s.title}
-              </h3>
-              <p style={{ color: '#F8FAFC', fontSize: 14, lineHeight: 1.7 }}>{s.desc}</p>
-            </div>
+            <Link
+              href="/login"
+              style={{
+                background: 'rgba(255, 255, 255, 0.04)',
+                color: '#E2E8F0',
+                border: '1px solid rgba(255, 255, 255, 0.14)',
+                padding: '14px 28px',
+                borderRadius: 10,
+                fontWeight: 600,
+                fontSize: 14,
+                textDecoration: 'none',
+              }}
+            >
+              Sign In to Account
+            </Link>
           </div>
-        ))}
-      </div>
-    </section>
-  );
-}
+        </section>
 
-/* ── Conditional Logic Demo ── */
-function LogicDemo() {
-  return (
-    <section style={{ padding: '80px 24px', maxWidth: 900, margin: '0 auto', position: 'relative', zIndex: 1 }}>
-      <div style={{ textAlign: 'center', marginBottom: 48 }}>
-        <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', fontWeight: 700, color: '#FFFFFF', marginBottom: 12 }}>
-          Conditional Logic That Actually Works
-        </h2>
-        <p style={{ color: '#F8FAFC', maxWidth: 500, margin: '0 auto', fontSize: 16 }}>
-          Build branching paths so respondents only see relevant questions.
-        </p>
-      </div>
-
-      <div className="card" style={{ padding: 32, maxWidth: 600, margin: '0 auto', background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(139, 92, 246, 0.3)' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <span style={{ background: '#8B5CF6', color: '#FFFFFF', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 800 }}>IF</span>
-            <div style={{ flex: 1, padding: '8px 14px', border: '1px solid rgba(139,92,246,0.25)', borderRadius: 8, fontSize: 14, color: '#FFFFFF', background: '#0F172A' }}>
-              &quot;Are you a student?&quot;
-            </div>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <span style={{ background: 'rgba(139, 92, 246, 0.2)', color: '#C084FC', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 700, border: '1px solid rgba(139,92,246,0.35)' }}>EQUALS</span>
-            <div style={{ flex: 1, padding: '8px 14px', border: '1px solid rgba(139,92,246,0.25)', borderRadius: 8, fontSize: 14, color: '#FFFFFF', background: '#0F172A' }}>
-              &quot;Yes&quot;
-            </div>
-          </div>
-
-          <div style={{ borderTop: '1px dashed rgba(139,92,246,0.3)', paddingTop: 16 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-              <span style={{ background: 'rgba(139, 92, 246, 0.2)', color: '#C084FC', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 700, border: '1px solid rgba(139,92,246,0.35)' }}>THEN</span>
-              <span style={{ fontSize: 14, color: '#FFFFFF' }}>Show &quot;College Name&quot;</span>
-              <CheckCircle2 size={16} style={{ color: '#8B5CF6' }} />
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <span style={{ background: 'rgba(139, 92, 246, 0.2)', color: '#C084FC', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 700, border: '1px solid rgba(139,92,246,0.35)' }}>AND</span>
-              <span style={{ fontSize: 14, color: '#FFFFFF' }}>Show &quot;Year of Study&quot;</span>
-              <CheckCircle2 size={16} style={{ color: '#8B5CF6' }} />
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ── Analytics Demo ── */
-function AnalyticsDemo() {
-  return (
-    <section style={{ padding: '80px 24px', maxWidth: 1000, margin: '0 auto', position: 'relative', zIndex: 1 }}>
-      <div style={{ textAlign: 'center', marginBottom: 48 }}>
-        <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', fontWeight: 700, color: '#FFFFFF', marginBottom: 12 }}>
-          Real-Time Analytics & Insights
-        </h2>
-        <p style={{ color: '#F8FAFC', maxWidth: 500, margin: '0 auto', fontSize: 16 }}>
-          Watch responses come in live. Understand your data at a glance.
-        </p>
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 20, maxWidth: 800, margin: '0 auto' }}>
-        {[
-          { label: 'Total Responses', value: '1,247', change: '+12%' },
-          { label: 'Completion Rate', value: '89%', change: '+3%' },
-          { label: 'Avg. Rating', value: '4.6 ★', change: '+0.2' },
-          { label: 'Today', value: '34', change: '+8' },
-        ].map((s, i) => (
-          <div key={i} className="card" style={{ padding: 24, textAlign: 'center', background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(139, 92, 246, 0.25)' }}>
-            <div style={{ fontSize: 28, fontWeight: 700, color: '#FFFFFF', marginBottom: 4 }}>{s.value}</div>
-            <div style={{ fontSize: 13, color: '#F8FAFC', marginBottom: 6 }}>{s.label}</div>
-            <span style={{ fontSize: 12, color: '#C084FC', fontWeight: 600 }}>{s.change}</span>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-/* ── Integrations ── */
-function Integrations() {
-  return (
-    <section id="integrations" style={{ padding: '80px 24px', maxWidth: 900, margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 1 }}>
-      <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', fontWeight: 700, color: '#FFFFFF', marginBottom: 12 }}>
-        Connect to Your Favorite Tools
-      </h2>
-      <p style={{ color: '#F8FAFC', maxWidth: 500, margin: '0 auto 40px', fontSize: 16 }}>
-        Trigger webhooks on every form submission. Integrate with Slack, Discord, Zapier, and any custom endpoint.
-      </p>
-
-      <div className="card" style={{ padding: 32, maxWidth: 500, margin: '0 auto', textAlign: 'left', background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(139, 92, 246, 0.3)' }}>
-        <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, color: '#FFFFFF' }}>Webhook Configuration</div>
-        <div style={{ marginBottom: 12 }}>
-          <div style={{ fontSize: 12, color: '#F8FAFC', marginBottom: 4 }}>Webhook URL</div>
-          <div style={{ padding: '8px 14px', border: '1px solid rgba(139,92,246,0.25)', borderRadius: 8, fontSize: 13, color: '#F8FAFC', background: '#0F172A' }}>
-            https://hooks.slack.com/services/...
-          </div>
-        </div>
-        <div style={{ display: 'flex', gap: 12 }}>
-          <div className="btn btn-primary btn-sm">Save Webhook</div>
-          <div className="btn btn-secondary btn-sm" style={{ background: '#0F172A', color: '#FFFFFF', border: '1px solid rgba(139,92,246,0.3)' }}>Test Webhook</div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ── CTA ── */
-function CTA() {
-  return (
-    <section
-      style={{
-        padding: '80px 24px',
-        textAlign: 'center',
-        position: 'relative',
-        zIndex: 1,
-      }}
-    >
-      <div
-        className="card"
-        style={{
-          maxWidth: 700,
-          margin: '0 auto',
-          padding: '60px 40px',
-          background: 'linear-gradient(135deg, #0F172A, #1E293B)',
-          border: '1px solid rgba(139, 92, 246, 0.35)',
-          boxShadow: '0 0 40px rgba(139,92,246,0.2)',
-        }}
-      >
-        <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2rem)', fontWeight: 800, color: '#FFFFFF', marginBottom: 12 }}>
-          Ready to build smarter forms?
-        </h2>
-        <p style={{ color: '#F8FAFC', marginBottom: 32, fontSize: 16 }}>
-          Start creating in minutes. No credit card required.
-        </p>
-        <Link href="/builder" className="btn btn-primary btn-lg" style={{ fontSize: 16, borderRadius: 12, background: 'linear-gradient(135deg, #8B5CF6, #7C3AED)', color: '#FFFFFF', fontWeight: 800 }}>
-          Get Started for Free <ArrowRight size={18} />
-        </Link>
-      </div>
-    </section>
-  );
-}
-
-/* ── Footer ── */
-function Footer() {
-  return (
-    <footer
-      style={{
-        borderTop: '1px solid rgba(255,255,255,0.08)',
-        padding: '40px 24px',
-        textAlign: 'center',
-        position: 'relative',
-        zIndex: 1,
-      }}
-    >
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 12 }}>
-        <div
+        {/* Minimal Cosmic Footer */}
+        <footer
           style={{
-            width: 28,
-            height: 28,
-            borderRadius: 8,
-            background: 'linear-gradient(135deg, #8B5CF6, #7C3AED)',
+            borderTop: '1px solid rgba(255, 255, 255, 0.06)',
+            padding: '36px 40px',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
-            color: '#FFFFFF',
-            fontWeight: 800,
-            fontSize: 14,
+            justifyContent: 'space-between',
+            maxWidth: 1300,
+            margin: '0 auto',
+            fontSize: 13,
+            color: '#64748B',
+            flexWrap: 'wrap',
+            gap: 16,
           }}
         >
-          F
-        </div>
-        <span style={{ fontWeight: 700, fontSize: 16, color: '#FFFFFF' }}>FormFlow</span>
-      </div>
-      <p style={{ color: '#F8FAFC', fontSize: 13 }}>
-        © 2026 FormFlow. Built with ❤️ by team trojen
-      </p>
-    </footer>
-  );
-}
+          <div>© 2026 FormFlow. Built with ❤️ by team trojen</div>
 
-/* ── Page ── */
-export default function LandingPage() {
-  return (
-    <>
-      <LiveBackground />
-      <Navbar />
-      <main>
-        <Hero />
-        <BuilderShowcaseSection />
-        <Features />
-        <HowItWorks />
-        <LogicDemo />
-        <AnalyticsDemo />
-        <Integrations />
-        <CTA />
-      </main>
-      <Footer />
-    </>
+          <div style={{ display: 'flex', gap: 24 }}>
+            <Link href="/builder" style={{ color: '#94A3B8', textDecoration: 'none' }}>
+              Form Studio
+            </Link>
+            <Link href="/dashboard" style={{ color: '#94A3B8', textDecoration: 'none' }}>
+              Dashboard
+            </Link>
+            <Link href="/login" style={{ color: '#94A3B8', textDecoration: 'none' }}>
+              Login
+            </Link>
+            <Link href="/signup" style={{ color: '#94A3B8', textDecoration: 'none' }}>
+              Create Account
+            </Link>
+          </div>
+        </footer>
+      </div>
+
+      {/* ========================================================================= */}
+      {/* FLOATING TELEMETRY HUD (Depth & Active Layer Indicator)                   */}
+      {/* ========================================================================= */}
+      <div
+        style={{
+          position: 'fixed',
+          bottom: 24,
+          right: 28,
+          zIndex: 90,
+          background: 'rgba(2, 4, 8, 0.75)',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+          borderRadius: 12,
+          padding: '10px 16px',
+          backdropFilter: 'blur(12px)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 14,
+          fontSize: 12,
+          color: '#94A3B8',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
+          pointerEvents: 'none',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <span
+            style={{
+              width: 6,
+              height: 6,
+              borderRadius: '50%',
+              background: '#38BDF8',
+              boxShadow: '0 0 6px #38BDF8',
+            }}
+          />
+          <span style={{ color: '#CBD5E1', fontWeight: 600 }}>Parallax Active</span>
+        </div>
+        <div style={{ width: 1, height: 16, background: 'rgba(255, 255, 255, 0.1)' }} />
+        <div>
+          Depth: <span style={{ color: '#FFFFFF', fontWeight: 700 }}>{depthAU.toLocaleString()} AU</span>
+        </div>
+        <div style={{ width: 1, height: 16, background: 'rgba(255, 255, 255, 0.1)' }} />
+        <div style={{ textTransform: 'capitalize' }}>{activeSection.replace('-', ' ')}</div>
+      </div>
+
+      <style>{`
+        @keyframes bounce {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(4px); }
+        }
+        @media (max-width: 768px) {
+          .hidden-mobile { display: none !important; }
+        }
+      `}</style>
+    </div>
   );
 }

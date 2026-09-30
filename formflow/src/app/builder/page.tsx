@@ -450,7 +450,12 @@ export default function StandaloneBuilderPage() {
       if (error) {
         alert('Could not save form: ' + error.message);
       } else if (data) {
-        router.push(`/dashboard/forms/${data.id}/edit`);
+        setPublishedFormInfo({
+          isOpen: true,
+          publicSlug: data.public_slug,
+          formId: data.id,
+          title: schema.title,
+        });
       }
     } catch (err: unknown) {
       alert('Error saving form');
@@ -486,9 +491,23 @@ export default function StandaloneBuilderPage() {
             <Link
               href="/"
               className="btn btn-ghost btn-sm"
-              style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 10px', fontSize: 13 }}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '6px 14px',
+                fontSize: 12,
+                fontWeight: 600,
+                color: '#334155',
+                background: '#F8FAFC',
+                border: '1px solid #CBD5E1',
+                borderRadius: 8,
+                boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
+                textDecoration: 'none',
+                transition: 'all 0.15s ease',
+              }}
             >
-              <ArrowLeft size={16} /> Home
+              <ArrowLeft size={15} style={{ color: '#475569' }} /> Home
             </Link>
 
             <div style={{ width: 1, height: 24, background: 'rgba(184,206,207,0.5)' }} />
@@ -693,11 +712,38 @@ export default function StandaloneBuilderPage() {
             <button
               type="button"
               onClick={handleSaveToAccount}
-              className="btn btn-primary btn-sm"
+              className="btn btn-sm"
               disabled={saving}
-              style={{ fontSize: 12, borderRadius: 8 }}
+              style={{
+                fontSize: 12,
+                fontWeight: 600,
+                borderRadius: 8,
+                padding: '7px 16px',
+                background: '#1E293B',
+                color: '#FFFFFF',
+                border: '1px solid #0F172A',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.06)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 7,
+                cursor: saving ? 'not-allowed' : 'pointer',
+                opacity: saving ? 0.75 : 1,
+                transition: 'all 0.15s ease',
+              }}
+              onMouseEnter={(e) => {
+                if (!saving) {
+                  e.currentTarget.style.background = '#0F172A';
+                  e.currentTarget.style.boxShadow = '0 3px 10px rgba(15, 23, 42, 0.2)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!saving) {
+                  e.currentTarget.style.background = '#1E293B';
+                  e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.06)';
+                }
+              }}
             >
-              {saving ? <span className="spinner" /> : <Save size={14} />}
+              {saving ? <span className="spinner" /> : <Save size={14} style={{ color: '#FFFFFF' }} />}
               {user ? 'Save to Dashboard' : 'Save & Publish'}
             </button>
           </div>
@@ -759,29 +805,8 @@ export default function StandaloneBuilderPage() {
                   title={schema.title}
                   description={schema.description}
                   onOpenThemePanel={() => setActivePanel('theme')}
-                  isFormArmed={isFormArmed}
-                  onArmForm={setIsFormArmed}
-                  onStartDragForm={handleStartDragForm}
                 />
               </div>
-
-              {/* Bottom-right Delete Trash Bin Icon */}
-              <FormDeleteTrashBin
-                isFormArmed={isFormArmed}
-                onArmToggle={setIsFormArmed}
-                onCrumpleDelete={() => setIsCrumpling(true)}
-                schema={schema}
-                trashBinRef={trashBinRef}
-                isOverTrash={isOverTrash}
-                isCrumpling={isCrumpling}
-                onTrashClick={() => {
-                  if (isFormArmed) {
-                    setIsCrumpling(true);
-                  } else {
-                    setIsFormArmed(true);
-                  }
-                }}
-              />
             </div>
 
             {/* Right: Customization Panels */}
@@ -859,94 +884,19 @@ export default function StandaloneBuilderPage() {
         )}
       </DragOverlay>
 
-      {/* Floating Drag Ghost when armed form is dragged */}
-      {isDraggingArmedForm && dragPointer && (
-        <div
-          style={{
-            position: 'fixed',
-            left: dragPointer.x,
-            top: dragPointer.y,
-            transform: `translate(-50%, -50%) rotate(${isOverTrash ? 18 : -6}deg) scale(${isOverTrash ? 0.35 : 0.75})`,
-            width: 280,
-            height: 340,
-            borderRadius: 14,
-            background: '#FFFEF9',
-            border: `2.5px dashed ${isOverTrash ? '#F87171' : '#4F7C7A'}`,
-            boxShadow: '0 20px 50px rgba(38, 59, 59, 0.35)',
-            pointerEvents: 'none',
-            zIndex: 9990,
-            overflow: 'hidden',
-            transition: 'transform 0.15s ease, border-color 0.15s ease',
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-        >
-          <div
-            style={{
-              height: 48,
-              background: '#4F7C7A',
-              padding: '10px 14px',
-              color: '#FFFEF9',
-              fontWeight: 800,
-              fontSize: 13,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}
-          >
-            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 160 }}>
-              {schema.title || 'Untitled Form'}
-            </span>
-            <span
-              style={{
-                fontSize: 10,
-                background: 'rgba(255,254,249,0.25)',
-                padding: '2px 6px',
-                borderRadius: 4,
-              }}
-            >
-              📄 Form Sheet
-            </span>
-          </div>
-          <div style={{ padding: 14, flex: 1, background: '#F8FBFA', display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <div style={{ height: 10, width: '60%', background: '#CFE5E3', borderRadius: 5 }} />
-            <div style={{ height: 10, width: '85%', background: '#EAF4F4', borderRadius: 5 }} />
-            <div style={{ height: 32, background: '#FFFEF9', border: '1px solid #B8CECF', borderRadius: 8, marginTop: 10 }} />
-            <div style={{ height: 32, background: '#FFFEF9', border: '1px solid #B8CECF', borderRadius: 8 }} />
-          </div>
-          <div
-            style={{
-              padding: '10px 12px',
-              background: isOverTrash ? '#FEF2F2' : '#EAF4F4',
-              textAlign: 'center',
-              fontSize: 12,
-              fontWeight: 800,
-              color: isOverTrash ? '#DC2626' : '#365F5D',
-            }}
-          >
-            {isOverTrash ? '🔥 Release to Crumple & Delete!' : 'Dragging to Delete Icon ↘️'}
-          </div>
-        </div>
-      )}
-
-      {/* 3D Paper Crumple Crunch Animation Overlay */}
-      <FormCrunchAnimationOverlay
-        isOpen={isCrumpling}
-        schema={schema}
-        onComplete={() => {
-          setIsCrumpling(false);
-          setIsFormArmed(false);
-          setIsOverTrash(false);
-          handleNewForm();
+      {/* Share Modal Dialog upon publishing */}
+      <ShareModal
+        isOpen={publishedFormInfo.isOpen}
+        onClose={() => {
+          const formId = publishedFormInfo.formId;
+          setPublishedFormInfo((prev) => ({ ...prev, isOpen: false }));
+          if (formId) {
+            router.push(`/dashboard/forms/${formId}/edit`);
+          }
         }}
-      />
-
-      {/* 3D WebGL Paper Crumple Experience */}
-      <FormCrumpleExperience
-        isOpen={showCrumpleExperience}
-        onClose={() => setShowCrumpleExperience(false)}
-        onNewForm={handleNewForm}
-        schema={schema}
+        formTitle={publishedFormInfo.title}
+        publicSlug={publishedFormInfo.publicSlug}
+        formId={publishedFormInfo.formId}
       />
 
       {/* AI Form Assistant Floating Chatbox */}

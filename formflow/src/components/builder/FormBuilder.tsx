@@ -380,29 +380,8 @@ export default function FormBuilder({
                 title={schema.title}
                 description={schema.description}
                 onOpenThemePanel={() => setActivePanel('theme')}
-                isFormArmed={isFormArmed}
-                onArmForm={setIsFormArmed}
-                onStartDragForm={handleStartDragForm}
               />
             </div>
-
-            {/* Bottom-right Delete Trash Bin Icon */}
-            <FormDeleteTrashBin
-              isFormArmed={isFormArmed}
-              onArmToggle={setIsFormArmed}
-              onCrumpleDelete={() => setIsCrumpling(true)}
-              schema={schema}
-              trashBinRef={trashBinRef}
-              isOverTrash={isOverTrash}
-              isCrumpling={isCrumpling}
-              onTrashClick={() => {
-                if (isFormArmed) {
-                  setIsCrumpling(true);
-                } else {
-                  setIsFormArmed(true);
-                }
-              }}
-            />
           </div>
 
           {/* Right: Properties / Logic / Theme */}
