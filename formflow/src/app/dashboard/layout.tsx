@@ -25,6 +25,7 @@ import { AuthProvider, useAuth } from '@/components/AuthProvider';
 import LiveBackground from '@/components/LiveBackground';
 import { createClient } from '@/lib/supabase/client';
 import { DEFAULT_THEME, DEFAULT_SETTINGS } from '@/lib/types';
+import FormalAlertModal from '@/components/ui/FormalAlertModal';
 
 interface NavItem {
   href: string;
@@ -90,6 +91,19 @@ function Sidebar() {
   const [formDesc, setFormDesc] = useState('');
   const [formNameError, setFormNameError] = useState<string | null>(null);
   const [creatingForm, setCreatingForm] = useState(false);
+  const [formalModalInfo, setFormalModalInfo] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    type?: 'warning' | 'error' | 'info' | 'success';
+    primaryActionText?: string;
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    type: 'warning',
+    primaryActionText: 'Change Name',
+  });
 
   const handleSignOut = () => {
     setSigningOut(true);
@@ -130,7 +144,14 @@ function Sidebar() {
         .maybeSingle();
 
       if (existingForm) {
-        setFormNameError(`A form named "${title}" already exists. Please choose a different name.`);
+        setFormalModalInfo({
+          isOpen: true,
+          title: 'Form Name Already Exists',
+          message: `A form named "${title}" already exists in your account. Please choose a different name for your new form.`,
+          type: 'warning',
+          primaryActionText: 'Change Name',
+        });
+        setFormNameError(`A form named "${title}" already exists.`);
         setCreatingForm(false);
         return;
       }
@@ -170,7 +191,26 @@ function Sidebar() {
 
       if (error) {
         console.error('Supabase form creation error:', error);
-        alert('Could not save to Supabase: ' + error.message);
+        if (error.message.includes('idx_forms_unique_owner_title') || error.message.includes('duplicate key')) {
+          setFormalModalInfo({
+            isOpen: true,
+            title: 'Form Name Already Exists',
+            message: `A form named "${title}" already exists in your account. Please choose a different name for your new form.`,
+            type: 'warning',
+            primaryActionText: 'Change Name',
+          });
+          setFormNameError(`A form named "${title}" already exists.`);
+        } else {
+          setFormalModalInfo({
+            isOpen: true,
+            title: 'Unable to Save Form',
+            message: error.message || 'An error occurred while saving to Supabase.',
+            type: 'error',
+            primaryActionText: 'Close',
+          });
+        }
+        setCreatingForm(false);
+        return;
       } else if (data) {
         setCreateModalOpen(false);
         setFormName('');
@@ -180,7 +220,13 @@ function Sidebar() {
       }
     } catch (err: any) {
       console.error('Form creation exception:', err);
-      alert('Error creating form: ' + (err?.message || 'Unknown error'));
+      setFormalModalInfo({
+        isOpen: true,
+        title: 'Error Creating Form',
+        message: err?.message || 'An unexpected error occurred while communicating with the database.',
+        type: 'error',
+        primaryActionText: 'Close',
+      });
     } finally {
       setCreatingForm(false);
     }
@@ -817,6 +863,16 @@ function Sidebar() {
           </div>
         </div>
       )}
+
+      {/* Formal Alert / Warning Modal */}
+      <FormalAlertModal
+        isOpen={formalModalInfo.isOpen}
+        onClose={() => setFormalModalInfo((prev) => ({ ...prev, isOpen: false }))}
+        title={formalModalInfo.title}
+        message={formalModalInfo.message}
+        type={formalModalInfo.type}
+        primaryActionText={formalModalInfo.primaryActionText}
+      />
 
       <style>{`
         @media (max-width: 768px) {

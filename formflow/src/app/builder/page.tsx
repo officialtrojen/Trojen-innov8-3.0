@@ -43,6 +43,7 @@ import ShareModal from '@/components/builder/ShareModal';
 import { getBackgroundStyle, POSTER_PRESETS } from '@/lib/theme-presets';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth, AuthProvider } from '@/components/AuthProvider';
+import FormalAlertModal from '@/components/ui/FormalAlertModal';
 import * as XLSX from 'xlsx';
 import {
   ArrowLeft,
@@ -149,6 +150,19 @@ function BuilderCanvasInner() {
     formId: '',
     publicSlug: '',
     title: '',
+  });
+  const [formalModalInfo, setFormalModalInfo] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    type?: 'warning' | 'error' | 'info' | 'success';
+    primaryActionText?: string;
+  }>({
+    isOpen: false,
+    title: '',
+    message: '',
+    type: 'warning',
+    primaryActionText: 'Understood',
   });
   const [existingFormId, setExistingFormId] = useState<string | null>(null);
   const [existingPublicSlug, setExistingPublicSlug] = useState<string | null>(null);
@@ -579,7 +593,23 @@ function BuilderCanvasInner() {
           .eq('id', existingFormId);
 
         if (error) {
-          alert('Could not update form: ' + error.message);
+          if (error.message.includes('idx_forms_unique_owner_title') || error.message.includes('duplicate key')) {
+            setFormalModalInfo({
+              isOpen: true,
+              title: 'Form Name Already Exists',
+              message: `Another form with this title already exists in your workspace. Please choose a unique title.`,
+              type: 'warning',
+              primaryActionText: 'Change Title',
+            });
+          } else {
+            setFormalModalInfo({
+              isOpen: true,
+              title: 'Could Not Update Form',
+              message: error.message || 'An error occurred while updating form.',
+              type: 'error',
+              primaryActionText: 'Close',
+            });
+          }
         } else {
           setCloudSyncStatus('synced');
           setPublishedFormInfo({
@@ -599,7 +629,13 @@ function BuilderCanvasInner() {
           .maybeSingle();
 
         if (duplicate) {
-          alert(`A form named "${schema.title.trim()}" already exists in your account. Please change the form title.`);
+          setFormalModalInfo({
+            isOpen: true,
+            title: 'Form Name Already Exists',
+            message: `A form named "${schema.title.trim()}" already exists in your account. Please choose a different title to save.`,
+            type: 'warning',
+            primaryActionText: 'Change Title',
+          });
           setCloudSyncStatus('unsaved');
           setSaving(false);
           return;
@@ -621,7 +657,23 @@ function BuilderCanvasInner() {
           .single();
 
         if (error) {
-          alert('Could not save form: ' + error.message);
+          if (error.message.includes('idx_forms_unique_owner_title') || error.message.includes('duplicate key')) {
+            setFormalModalInfo({
+              isOpen: true,
+              title: 'Form Name Already Exists',
+              message: `A form named "${schema.title.trim()}" already exists in your account. Please choose a different title to save.`,
+              type: 'warning',
+              primaryActionText: 'Change Title',
+            });
+          } else {
+            setFormalModalInfo({
+              isOpen: true,
+              title: 'Could Not Save Form',
+              message: error.message || 'An error occurred while saving form.',
+              type: 'error',
+              primaryActionText: 'Close',
+            });
+          }
         } else if (data) {
           setExistingFormId(data.id);
           setExistingPublicSlug(data.public_slug);
@@ -634,8 +686,14 @@ function BuilderCanvasInner() {
           });
         }
       }
-    } catch (err: unknown) {
-      alert('Error saving form');
+    } catch (err: any) {
+      setFormalModalInfo({
+        isOpen: true,
+        title: 'Error Saving Form',
+        message: err?.message || 'An unexpected error occurred while saving.',
+        type: 'error',
+        primaryActionText: 'Close',
+      });
     } finally {
       setSaving(false);
     }
@@ -1121,6 +1179,16 @@ function BuilderCanvasInner() {
         formTitle={publishedFormInfo.title}
         publicSlug={publishedFormInfo.publicSlug}
         formId={publishedFormInfo.formId}
+      />
+
+      {/* Formal Alert / Warning Modal */}
+      <FormalAlertModal
+        isOpen={formalModalInfo.isOpen}
+        onClose={() => setFormalModalInfo((prev) => ({ ...prev, isOpen: false }))}
+        title={formalModalInfo.title}
+        message={formalModalInfo.message}
+        type={formalModalInfo.type}
+        primaryActionText={formalModalInfo.primaryActionText}
       />
 
       {/* AI Form Assistant Floating Chatbox */}
