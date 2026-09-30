@@ -190,7 +190,6 @@ body {
   }
 }
 
-<<<<<<< HEAD
 /* ---------- Card & Clean Elevation ---------- */
 .card {
   background: #FFFEF9;
@@ -204,24 +203,9 @@ body {
 .card:hover {
   box-shadow: 0 6px 20px rgba(38, 59, 59, 0.08);
   border-color: #4F7C7A;
-=======
-/* ---------- Card & Glassmorphism (Navy Blue & Ochre) ---------- */
-.card {
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(16px);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
-.card:hover {
-  box-shadow: var(--shadow-md);
-  border-color: rgba(245, 158, 11, 0.4);
->>>>>>> 3b77820 (update_colors)
-}
-
-/* ---------- Button Variants (Ochre Yellow Primary) ---------- */
+/* ---------- Button Variants ---------- */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -231,13 +215,8 @@ body {
   border: none;
   border-radius: var(--radius-sm);
   font-family: var(--font-sans);
-<<<<<<< HEAD
   font-size: 13px;
   font-weight: 600;
-=======
-  font-size: 14px;
-  font-weight: 700;
->>>>>>> 3b77820 (update_colors)
   cursor: pointer;
   transition: all 0.2s ease;
   text-decoration: none;
@@ -245,7 +224,6 @@ body {
 }
 
 .btn-primary {
-<<<<<<< HEAD
   background: #4F7C7A;
   color: #FFFEF9;
   box-shadow: 0 2px 8px rgba(79, 124, 122, 0.25);
@@ -257,18 +235,6 @@ body {
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(79, 124, 122, 0.35);
   color: #FFFEF9;
-=======
-  background: linear-gradient(135deg, #F59E0B, #D97706);
-  color: #05070D;
-  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
-}
-
-.btn-primary:hover {
-  background: linear-gradient(135deg, #FBBF24, #F59E0B);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5);
-  color: #000000;
->>>>>>> 3b77820 (update_colors)
 }
 
 .btn-primary:active {
@@ -276,7 +242,6 @@ body {
 }
 
 .btn-secondary {
-<<<<<<< HEAD
   background: #EAF4F4;
   color: #263B3B;
   border: 1.5px solid #B8CECF;
@@ -286,24 +251,6 @@ body {
   background: #CFE5E3;
   border-color: #4F7C7A;
   color: #263B3B;
-=======
-  background: rgba(15, 23, 42, 0.9);
-  color: #FFFFFF;
-  border: 1px solid rgba(245, 158, 11, 0.35);
-  backdrop-filter: blur(8px);
-}
-
-.btn-secondary:hover {
-  background: rgba(245, 158, 11, 0.15);
-  border-color: #F59E0B;
-  color: #FBBF24;
-}
-
-.btn-secondary:hover {
-  background: rgba(99, 102, 241, 0.2);
-  border-color: rgba(99, 102, 241, 0.5);
-  color: white;
->>>>>>> 3b77820 (update_colors)
 }
 
 .btn-ghost {
@@ -317,13 +264,13 @@ body {
 }
 
 .btn-danger {
-  background: #E74C3C;
-  color: white;
-  box-shadow: 0 2px 8px rgba(231, 76, 60, 0.25);
+  background: #F87171;
+  color: #FFFEF9;
+  box-shadow: 0 2px 8px rgba(248, 113, 113, 0.25);
 }
 
 .btn-danger:hover {
-  background: #C0392B;
+  background: #EF4444;
 }
 
 .btn-sm {
