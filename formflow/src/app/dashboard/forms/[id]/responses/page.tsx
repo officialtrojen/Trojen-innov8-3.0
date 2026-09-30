@@ -7,6 +7,7 @@ import { useAuth } from '@/components/AuthProvider';
 import { DBForm, DBResponse } from '@/lib/types';
 import { formatDateTime, responsesToCSV, downloadFile } from '@/lib/utils';
 import { Download, Trash2, Eye, Search, X } from 'lucide-react';
+import * as XLSX from 'xlsx';
 
 export default function ResponsesPage() {
   const params = useParams();
@@ -59,11 +60,42 @@ export default function ResponsesPage() {
     };
   }, [formId, user, supabase]);
 
-  const handleExport = () => {
+  const handleExportCsv = () => {
     if (!form || responses.length === 0) return;
     const fields = form.schema.fields.map((f) => ({ id: f.id, label: f.label }));
     const csv = responsesToCSV(fields, responses);
     downloadFile(csv, `${form.title.replace(/\s+/g, '_')}_responses.csv`, 'text/csv;charset=utf-8;');
+  };
+
+  const handleExportExcel = () => {
+    if (!form || responses.length === 0) return;
+    const data = responses.map((r, i) => {
+      const row: any = {
+        '#': responses.length - i,
+        'Submitted At': formatDateTime(r.submitted_at),
+      };
+      form.schema.fields.forEach(f => {
+        let val = r.answers[f.id];
+        if (Array.isArray(val)) val = val.join(', ');
+        row[f.label] = val === null || val === undefined ? '' : String(val);
+      });
+      return row;
+    });
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Responses");
+    XLSX.writeFile(wb, `${form.title.replace(/\s+/g, '_')}_responses.xlsx`);
+  };
+
+  const handleExportJson = () => {
+    if (!form || responses.length === 0) return;
+    const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(responses, null, 2));
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute('href', dataStr);
+    downloadAnchor.setAttribute('download', `${form.title.replace(/\s+/g, '_')}_responses.json`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
   };
 
   const handleDelete = async (responseId: string) => {
@@ -95,9 +127,79 @@ export default function ResponsesPage() {
           <h1 style={{ fontSize: 24, fontWeight: 700, color: '#263B3B', marginBottom: 4 }}>Responses</h1>
           <p style={{ color: '#52796F', fontSize: 14 }}>{form.title} — {responses.length} response{responses.length !== 1 ? 's' : ''}</p>
         </div>
-        <button onClick={handleExport} className="btn btn-primary btn-sm" disabled={responses.length === 0}>
-          <Download size={16} /> Export CSV
-        </button>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            background: '#EAF4F4',
+            border: '1.5px solid #B8CECF',
+            borderRadius: 8,
+            overflow: 'hidden',
+          }}
+        >
+          <button
+            type="button"
+            onClick={handleExportCsv}
+            disabled={responses.length === 0}
+            style={{
+              fontSize: 12,
+              fontWeight: 700,
+              color: '#263B3B',
+              background: 'transparent',
+              border: 'none',
+              padding: '6px 12px',
+              cursor: responses.length === 0 ? 'not-allowed' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              opacity: responses.length === 0 ? 0.5 : 1,
+            }}
+            title="Download Form Responses as CSV"
+          >
+            <Download size={14} /> Export CSV
+          </button>
+          <div style={{ width: 1, height: 18, background: '#B8CECF' }} />
+          <button
+            type="button"
+            onClick={handleExportExcel}
+            disabled={responses.length === 0}
+            style={{
+              fontSize: 12,
+              fontWeight: 700,
+              color: '#263B3B',
+              background: 'transparent',
+              border: 'none',
+              padding: '6px 12px',
+              cursor: responses.length === 0 ? 'not-allowed' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              opacity: responses.length === 0 ? 0.5 : 1,
+            }}
+            title="Download Form Responses as Excel (.xlsx)"
+          >
+            <Download size={14} /> Export Excel
+          </button>
+          <div style={{ width: 1, height: 18, background: '#B8CECF' }} />
+          <button
+            type="button"
+            onClick={handleExportJson}
+            disabled={responses.length === 0}
+            style={{
+              fontSize: 11,
+              fontWeight: 600,
+              color: '#365F5D',
+              background: 'transparent',
+              border: 'none',
+              padding: '6px 9px',
+              cursor: responses.length === 0 ? 'not-allowed' : 'pointer',
+              opacity: responses.length === 0 ? 0.5 : 1,
+            }}
+            title="Download Form Responses as JSON"
+          >
+            JSON
+          </button>
+        </div>
       </div>
 
       {/* Search */}

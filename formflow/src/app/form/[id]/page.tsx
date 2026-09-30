@@ -10,10 +10,12 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const { id } = await params;
   const supabase = await createServerSupabaseClient();
+  
+  // The 'id' in the URL is actually the schema.id (a nanoid like form_xxx)
   const { data: form } = await supabase
     .from('forms')
     .select('*')
-    .eq('id', id)
+    .contains('schema', { id: id })
     .single();
 
   if (!form) {
@@ -33,15 +35,17 @@ export default async function FormPage({
 }) {
   const { id } = await params;
   const supabase = await createServerSupabaseClient();
+  
+  // The 'id' in the URL is actually the schema.id (a nanoid like form_xxx)
   const { data: form } = await supabase
     .from('forms')
     .select('*')
-    .eq('id', id)
+    .contains('schema', { id: id })
     .single();
 
   if (!form) {
     notFound();
   }
 
-  return <RespondentForm form={(form as DBForm).schema} />;
+  return <RespondentForm form={(form as DBForm).schema as any} />;
 }

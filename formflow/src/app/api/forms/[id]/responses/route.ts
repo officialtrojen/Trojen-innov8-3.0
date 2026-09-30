@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getFormById, getResponses, saveResponse } from '@/lib/storage';
+import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { FormResponse } from '@/types/form';
 
 async function triggerWebhooks(form: any, response: FormResponse) {
@@ -81,8 +81,25 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const responses = await getResponses(id);
-    return NextResponse.json(responses);
+    const supabase = await createServerSupabaseClient();
+    
+    // The ID in the URL might be the schema ID, so we find the real form UUID
+    const { data: dbForm } = await supabase
+      .from('forms')
+      .select('id')
+      .contains('schema', { id: id })
+      .single();
+
+    if (!dbForm) {
+      return NextResponse.json({ error: 'Form not found' }, { status: 404 });
+    }
+
+    const { data: responses } = await supabase
+      .from('responses')
+      .select('*')
+      .eq('form_id', dbForm.id);
+
+    return NextResponse.json(responses || []);
   } catch (error) {
     return NextResponse.json({ error: 'Failed to fetch responses' }, { status: 500 });
   }
@@ -94,31 +111,47 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
-    const form = await getFormById(id);
-    if (!form) {
+    const supabase = await createServerSupabaseClient();
+
+    // The ID in the URL is the schema ID, so we find the real form UUID
+    const { data: dbForm } = await supabase
+      .from('forms')
+      .select('*')
+      .contains('schema', { id: id })
+      .single();
+
+    if (!dbForm) {
       return NextResponse.json({ error: 'Form not found' }, { status: 404 });
     }
 
     const body = await request.json();
-    const newResponse: FormResponse = {
-      id: `resp_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
-      formId: id,
-      submittedAt: new Date().toISOString(),
+    const newResponse = {
+      form_id: dbForm.id,
       answers: body.answers || {},
-      respondentMeta: {
+      respondent_meta: {
         device: body.respondentMeta?.device || 'desktop',
         durationSeconds: body.respondentMeta?.durationSeconds || 0,
         userAgent: body.respondentMeta?.userAgent || 'Browser',
       },
     };
 
-    const saved = await saveResponse(newResponse);
+    const { data: saved, error } = await supabase
+      .from('responses')
+      .insert(newResponse)
+      .select('*')
+      .single();
+
+    if (error) {
+      console.error('Supabase insert error:', error);
+      return NextResponse.json({ error: 'Failed to submit response to database' }, { status: 500 });
+    }
 
     // Trigger registered webhooks asynchronously
-    triggerWebhooks(form, saved);
+    triggerWebhooks(dbForm.schema, saved);
 
     return NextResponse.json(saved, { status: 201 });
   } catch (error) {
+    console.error('Submission error:', error);
     return NextResponse.json({ error: 'Failed to submit response' }, { status: 500 });
   }
 }

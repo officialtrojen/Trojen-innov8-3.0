@@ -39,6 +39,7 @@ import FormCrunchAnimationOverlay from '@/components/builder/FormCrunchAnimation
 import FormCrumpleExperience from '@/components/builder/FormCrumpleExperience';
 import { getBackgroundStyle, POSTER_PRESETS } from '@/lib/theme-presets';
 import { createClient } from '@/lib/supabase/client';
+import * as XLSX from 'xlsx';
 import {
   ArrowLeft,
   Eye,
@@ -361,6 +362,27 @@ export default function StandaloneBuilderPage() {
     downloadAnchor.remove();
   };
 
+  const handleExportExcel = () => {
+    const data = schema.fields.map((f, i) => {
+      let extra = f.placeholder || '';
+      if (f.options) extra = f.options.join('; ');
+      if (f.type === 'rating') extra = `Rating (1 - 5 stars)`;
+      return {
+        Order: i + 1,
+        'Field ID': f.id,
+        Type: f.type,
+        Label: f.label,
+        Required: f.required ? 'Yes' : 'No',
+        'Placeholder / Options': extra
+      };
+    });
+    
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Fields");
+    XLSX.writeFile(wb, `${schema.title.toLowerCase().replace(/[^a-z0-9]+/g, '_')}_fields.xlsx`);
+  };
+
   // --- Save / Publish to Account ---
   const handleSaveToAccount = async () => {
     setSaving(true);
@@ -563,6 +585,26 @@ export default function StandaloneBuilderPage() {
                 title="Download Form Questions & Structure as CSV"
               >
                 <Download size={14} /> Export CSV
+              </button>
+              <div style={{ width: 1, height: 18, background: '#B8CECF' }} />
+              <button
+                type="button"
+                onClick={handleExportExcel}
+                style={{
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: '#263B3B',
+                  background: 'transparent',
+                  border: 'none',
+                  padding: '6px 12px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                }}
+                title="Download as Excel (.xlsx)"
+              >
+                <Download size={14} /> Export Excel
               </button>
               <div style={{ width: 1, height: 18, background: '#B8CECF' }} />
               <button

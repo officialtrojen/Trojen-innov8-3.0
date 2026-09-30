@@ -28,6 +28,9 @@ function SortableFieldCard({
   onDuplicate: () => void;
   primaryColor?: string;
 }) {
+  const [hoveredStar, setHoveredStar] = React.useState<number | null>(null);
+  const [selectedStar, setSelectedStar] = React.useState<number>(3);
+  
   const {
     attributes,
     listeners,
@@ -153,30 +156,39 @@ function SortableFieldCard({
             )}
             {field.type === 'rating' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                  {[1, 2, 3, 4, 5].map((starIndex) => (
-                    <span
-                      key={starIndex}
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        cursor: 'pointer',
-                        transition: 'transform 0.15s ease',
-                      }}
-                      title={`Star ${starIndex}`}
-                    >
-                      <Star
-                        size={22}
+                <div style={{ display: 'flex', gap: 6, alignItems: 'center' }} onMouseLeave={() => setHoveredStar(null)}>
+                  {[1, 2, 3, 4, 5].map((starIndex) => {
+                    const activeRating = hoveredStar !== null ? hoveredStar : selectedStar;
+                    const isActive = starIndex <= activeRating;
+                    return (
+                      <span
+                        key={starIndex}
                         style={{
-                          color: '#F59E0B',
-                          fill: starIndex <= 3 ? '#F59E0B' : '#EAF4F4',
-                          stroke: starIndex <= 3 ? '#D97706' : '#B8CECF',
-                          transition: 'all 0.15s ease',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          cursor: 'pointer',
+                          transition: 'transform 0.15s ease',
                         }}
-                      />
-                    </span>
-                  ))}
+                        title={`Star ${starIndex}`}
+                        onMouseEnter={() => setHoveredStar(starIndex)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedStar(starIndex);
+                        }}
+                      >
+                        <Star
+                          size={22}
+                          style={{
+                            color: '#F59E0B',
+                            fill: isActive ? '#F59E0B' : '#EAF4F4',
+                            stroke: isActive ? '#D97706' : '#B8CECF',
+                            transition: 'all 0.15s ease',
+                          }}
+                        />
+                      </span>
+                    );
+                  })}
                 </div>
                 <div style={{ fontSize: 11, color: '#365F5D', fontWeight: 600 }}>
                   Tap on the stars to rate (1 - 5 stars)
