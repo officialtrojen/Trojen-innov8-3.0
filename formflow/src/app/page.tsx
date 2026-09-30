@@ -237,8 +237,8 @@ function Hero() {
           }}
         >
           {/* Left panel */}
-          <div style={{ borderRight: '1px solid rgba(255,255,255,0.08)', padding: 16 }}>
-            <div style={{ fontWeight: 600, marginBottom: 16, color: '#A5B4FC', fontSize: 12, textTransform: 'uppercase', letterSpacing: 1 }}>Field Types</div>
+          <div style={{ borderRight: '1px solid rgba(255,255,255,0.12)', padding: 16 }}>
+            <div style={{ fontWeight: 700, marginBottom: 16, color: '#C084FC', fontSize: 12, textTransform: 'uppercase', letterSpacing: 1.2 }}>Field Types</div>
             {['Short Text', 'Paragraph', 'Multiple Choice', 'Rating Stars', 'File Upload', 'Date Picker'].map((t, i) => (
               <div
                 key={i}
@@ -246,11 +246,12 @@ function Hero() {
                   padding: '8px 12px',
                   borderRadius: 8,
                   marginBottom: 4,
-                  background: i === 0 ? 'rgba(99,102,241,0.2)' : 'transparent',
-                  color: i === 0 ? '#C7D2FE' : '#9CA3AF',
+                  background: i === 0 ? 'rgba(99,102,241,0.25)' : 'transparent',
+                  color: i === 0 ? '#FFFFFF' : '#E2E8F0',
                   cursor: 'pointer',
                   fontSize: 13,
-                  fontWeight: i === 0 ? 600 : 400,
+                  fontWeight: i === 0 ? 700 : 500,
+                  border: i === 0 ? '1px solid rgba(99,102,241,0.4)' : '1px solid transparent',
                 }}
               >
                 {t}
@@ -275,8 +276,8 @@ function Hero() {
 
             <div style={{ padding: 20 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                <span style={{ fontWeight: 700, fontSize: 15, color: '#F3F4F6' }}>Participant Registration</span>
-                <Link href="/builder" style={{ fontSize: 12, color: 'var(--primary)', fontWeight: 600, textDecoration: 'none' }}>Open Live Builder →</Link>
+                <span style={{ fontWeight: 700, fontSize: 15, color: '#FFFFFF' }}>Participant Registration</span>
+                <Link href="/builder" style={{ fontSize: 12, color: '#818CF8', fontWeight: 700, textDecoration: 'none' }}>Open Live Builder →</Link>
               </div>
               {[
                 { label: 'Full Name', type: 'Short Text' },
@@ -293,36 +294,36 @@ function Hero() {
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     cursor: 'grab',
-                    background: 'rgba(15, 23, 42, 0.8)',
-                    borderColor: 'rgba(255,255,255,0.08)',
+                    background: 'rgba(15, 23, 42, 0.9)',
+                    borderColor: 'rgba(255,255,255,0.15)',
                   }}
                 >
                   <div>
-                    <span style={{ fontWeight: 500, fontSize: 13, color: '#F3F4F6' }}>{q.label}</span>
-                    <span style={{ color: '#818CF8', fontSize: 11, marginLeft: 8 }}>{q.type}</span>
+                    <span style={{ fontWeight: 600, fontSize: 13, color: '#FFFFFF' }}>{q.label}</span>
+                    <span style={{ color: '#A5B4FC', fontSize: 11, marginLeft: 8, fontWeight: 600 }}>{q.type}</span>
                   </div>
-                  <span style={{ color: '#6B7280' }}>⋮⋮</span>
+                  <span style={{ color: '#94A3B8' }}>⋮⋮</span>
                 </div>
               ))}
             </div>
           </div>
 
           {/* Right panel */}
-          <div style={{ borderLeft: '1px solid rgba(255,255,255,0.08)', padding: 16 }}>
-            <div style={{ fontWeight: 600, marginBottom: 16, color: '#A5B4FC', fontSize: 12, textTransform: 'uppercase', letterSpacing: 1 }}>Properties</div>
+          <div style={{ borderLeft: '1px solid rgba(255,255,255,0.12)', padding: 16 }}>
+            <div style={{ fontWeight: 700, marginBottom: 16, color: '#C084FC', fontSize: 12, textTransform: 'uppercase', letterSpacing: 1.2 }}>Properties</div>
             <div style={{ marginBottom: 12 }}>
-              <div style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 4 }}>Question</div>
-              <div style={{ padding: '6px 10px', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 6, fontSize: 13, background: 'rgba(15, 23, 42, 0.8)', color: '#F3F4F6' }}>Full Name</div>
+              <div style={{ fontSize: 12, color: '#E2E8F0', marginBottom: 4, fontWeight: 600 }}>Question</div>
+              <div style={{ padding: '6px 10px', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 6, fontSize: 13, background: 'rgba(15, 23, 42, 0.9)', color: '#FFFFFF', fontWeight: 600 }}>Full Name</div>
             </div>
             <div style={{ marginBottom: 12 }}>
-              <div style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 4 }}>Required</div>
+              <div style={{ fontSize: 12, color: '#E2E8F0', marginBottom: 4, fontWeight: 600 }}>Required</div>
               <div style={{ width: 36, height: 20, borderRadius: 10, background: '#6366F1', position: 'relative' }}>
                 <div style={{ width: 16, height: 16, borderRadius: 8, background: 'white', position: 'absolute', top: 2, right: 2 }} />
               </div>
             </div>
             <div>
-              <div style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 4 }}>Placeholder</div>
-              <div style={{ padding: '6px 10px', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 6, fontSize: 13, color: '#6B7280', background: 'rgba(15, 23, 42, 0.8)' }}>Enter name...</div>
+              <div style={{ fontSize: 12, color: '#E2E8F0', marginBottom: 4, fontWeight: 600 }}>Placeholder</div>
+              <div style={{ padding: '6px 10px', border: '1px solid rgba(255,255,255,0.2)', borderRadius: 6, fontSize: 13, color: '#CBD5E1', background: 'rgba(15, 23, 42, 0.9)' }}>Enter name...</div>
             </div>
           </div>
         </div>
