@@ -50,6 +50,15 @@ export default function AiFormAssistant({
   const [isMinimized, setIsMinimized] = useState(false);
   const chatEndRef = useRef<HTMLDivElement | null>(null);
 
+  const [userMemory, setUserMemory] = useState<any>(() => {
+    try {
+      const saved = localStorage.getItem('formflow_ai_user_memory');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+
   useEffect(() => {
     if (isOpen && !isMinimized) {
       chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -98,7 +107,8 @@ export default function AiFormAssistant({
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
 
-    setMessages((prev) => [...prev, userMsg]);
+    const updatedMessages = [...messages, userMsg];
+    setMessages(updatedMessages);
     if (!promptText) setInputPrompt('');
     setLoading(true);
 
@@ -109,6 +119,8 @@ export default function AiFormAssistant({
         body: JSON.stringify({
           prompt: textToSend,
           currentSchema,
+          chatHistory: updatedMessages,
+          userMemory,
         }),
       });
 
@@ -116,6 +128,15 @@ export default function AiFormAssistant({
 
       if (data.error) {
         throw new Error(data.error);
+      }
+
+      if (data.learnedMemory) {
+        setUserMemory(data.learnedMemory);
+        try {
+          localStorage.setItem('formflow_ai_user_memory', JSON.stringify(data.learnedMemory));
+        } catch {
+          // ignore quota
+        }
       }
 
       const aiMsg: ChatMessage = {
@@ -213,8 +234,10 @@ export default function AiFormAssistant({
               </span>
             </div>
             {!isMinimized && (
-              <div style={{ fontSize: 11, color: '#94A3B8' }}>
-                Prompt to build & customize forms
+              <div style={{ fontSize: 11, color: '#94A3B8', display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
+                <span style={{ color: '#6EE7B7', fontWeight: 600 }}>🌐 Web Search</span>
+                <span>•</span>
+                <span style={{ color: '#C084FC', fontWeight: 600 }}>🧠 Learned Memory</span>
               </div>
             )}
           </div>

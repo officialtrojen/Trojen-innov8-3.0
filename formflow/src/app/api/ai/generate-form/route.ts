@@ -14,14 +14,101 @@ export async function POST(req: Request) {
 
     // Check if Gemini API Key exists for live Gemini AI completion
     const apiKey = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+    const { chatHistory, userMemory } = await req.json().catch(() => ({ chatHistory: [], userMemory: null }));
 
     if (apiKey) {
       const modelsToTry = [
-        'gemini-1.5-flash',
         'gemini-2.0-flash',
-        'gemini-2.5-flash',
-        'gemini-1.5-pro'
+        'gemini-1.5-flash',
+        'gemini-1.5-pro',
+        'gemini-2.0-flash-lite'
       ];
+
+      // Format previous conversation turn history for multi-turn learning
+      const formattedContents: any[] = [];
+
+      if (Array.isArray(chatHistory) && chatHistory.length > 0) {
+        chatHistory.slice(-8).forEach((msg: any) => {
+          if (msg.sender === 'user') {
+            formattedContents.push({
+              role: 'user',
+              parts: [{ text: msg.text }],
+            });
+          } else if (msg.sender === 'ai') {
+            formattedContents.push({
+              role: 'model',
+              parts: [{ text: msg.text }],
+            });
+          }
+        });
+      }
+
+      // Context instructions for Web Search & User Memory Learning
+      const systemInstruction = `You are an expert AI Form Builder & Web Researcher for FormFlow.
+You create, extend, and modify interactive web form schemas based on natural language user requests.
+
+WEB SEARCH GROUNDING & KNOWLEDGE:
+Use online industry standards, real-world best practices, and search knowledge to generate highly accurate questions, logical field groupings, standard select options, and placeholders for any domain (e.g. Medical Intakes, Job Applications, ISO Compliance, Event Registrations, Customer NPS, University Registrations).
+
+LEARNED USER MEMORY & PREFERENCES:
+${userMemory ? JSON.stringify(userMemory, null, 2) : 'No prior user memory recorded yet.'}
+(Incorporate the user's preferred styles, colors, question patterns, and past preferences into the generated schema).
+
+CURRENT FORM SCHEMA ON CANVAS:
+${currentSchema ? JSON.stringify(currentSchema, null, 2) : 'None (Blank Canvas)'}
+
+AVAILABLE FIELD TYPES:
+- "short_text": Single-line text input
+- "paragraph": Multi-line text input
+- "multiple_choice": Dropdown/radio selection with "options" array
+- "yes_no": Binary Yes/No switch
+- "rating": Star rating (1-5)
+- "file_upload": File/document attachment
+- "date_picker": Date selector
+- "welcome_screen": Header poster screen
+
+RULES FOR OUTPUT:
+1. Return ONLY a valid JSON object without markdown formatting.
+2. If modifying or adding to currentSchema, preserve existing question IDs ('id') when updating them, and generate new 'q_...' IDs for new questions.
+3. Provide a helpful, friendly summary in 'replyMessage' explaining what was created or modified and what web standards/learnings were used.
+
+JSON Structure required:
+{
+  "replyMessage": "Detailed friendly message explaining what was added/updated",
+  "actionType": "create" | "add_fields" | "theme" | "modify",
+  "learnedMemory": {
+    "preferredTheme": "string description",
+    "favoriteFieldTypes": ["list"],
+    "commonTopics": ["list"]
+  },
+  "schema": {
+    "title": "Form Title",
+    "description": "Form Description",
+    "fields": [
+      {
+        "id": "q_123",
+        "type": "short_text",
+        "label": "Field Label",
+        "required": true,
+        "placeholder": "Sample placeholder",
+        "options": ["Option 1", "Option 2"]
+      }
+    ],
+    "theme": {
+      "primary": "#8B5CF6",
+      "background": "#05070D",
+      "backgroundType": "solid",
+      "posterTitle": "Title",
+      "posterSubtitle": "Subtitle"
+    }
+  }
+}`;
+
+      // Append current turn
+      formattedContents.push({
+        role: 'user',
+        parts: [{ text: `${systemInstruction}\n\nUser Request: "${prompt}"` }],
+      });
 
       for (const model of modelsToTry) {
         try {
@@ -31,44 +118,8 @@ export async function POST(req: Request) {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
-                contents: [
-                  {
-                    parts: [
-                      {
-                        text: `You are an AI Form Builder Expert. Analyze this user prompt and generate or modify a JSON form schema for FormFlow.
-User Prompt: "${prompt}"
-
-Current Schema (if any): ${currentSchema ? JSON.stringify(currentSchema) : 'None'}
-
-Return ONLY a valid JSON object with the following structure:
-{
-  "replyMessage": "A friendly summary of what was generated/modified",
-  "actionType": "create" | "add_fields" | "theme" | "modify",
-  "schema": {
-    "title": "String title",
-    "description": "String description",
-    "fields": [
-      {
-        "id": "q_unique",
-        "type": "short_text" | "paragraph" | "multiple_choice" | "yes_no" | "rating" | "file_upload" | "date_picker" | "welcome_screen",
-        "label": "Question Label",
-        "required": boolean,
-        "placeholder": "Optional placeholder",
-        "options": ["Option 1", "Option 2"]
-      }
-    ],
-    "theme": {
-      "primary": "#8B5CF6",
-      "background": "#05070D",
-      "backgroundType": "solid"
-    }
-  }
-}
-Return strict JSON only without markdown formatting.`,
-                      },
-                    ],
-                  },
-                ],
+                contents: formattedContents,
+                tools: [{ googleSearch: {} }],
               }),
             }
           );
