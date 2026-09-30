@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import {
   Layers,
   LayoutDashboard,
@@ -78,13 +78,31 @@ const navSections: NavSection[] = [
 
 function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { user, signOut } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [formName, setFormName] = useState('');
+  const [formDesc, setFormDesc] = useState('');
 
   const handleSignOut = () => {
     setSigningOut(true);
     signOut();
+  };
+
+  const handleModalSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formName.trim()) return;
+
+    const title = formName.trim();
+    const description = formDesc.trim();
+
+    setCreateModalOpen(false);
+    setFormName('');
+    setFormDesc('');
+
+    router.push(`/builder?new=true&title=${encodeURIComponent(title)}&description=${encodeURIComponent(description)}`);
   };
 
   const isGoogle =
@@ -143,11 +161,15 @@ function Sidebar() {
 
       {/* Primary CTA - Create Form Button matching Landing Page primary button */}
       <div style={{ padding: '0 12px', marginBottom: 18 }}>
-        <Link
-          href="/builder"
-          onClick={() => setMobileOpen(false)}
+        <button
+          type="button"
+          onClick={() => {
+            setMobileOpen(false);
+            setCreateModalOpen(true);
+          }}
           className="create-form-btn-glow"
           style={{
+            width: '100%',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
@@ -155,7 +177,8 @@ function Sidebar() {
             borderRadius: 9,
             background: '#FFFFFF',
             color: '#000000',
-            textDecoration: 'none',
+            border: '1px solid #FFFFFF',
+            cursor: 'pointer',
             fontSize: 13.5,
             fontWeight: 600,
           }}
@@ -181,7 +204,7 @@ function Sidebar() {
             <Sparkles size={11} color="#FFFFFF" />
             <span>New</span>
           </span>
-        </Link>
+        </button>
       </div>
 
       {/* Nav links grouped into clean sections */}
@@ -528,6 +551,150 @@ function Sidebar() {
       <aside className="sidebar desktop-sidebar">
         {sidebarContent}
       </aside>
+
+      {/* Create Form Modal asking for Form Name and Description */}
+      {createModalOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 100,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 20,
+            background: 'rgba(2, 3, 6, 0.85)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+          }}
+          onClick={() => setCreateModalOpen(false)}
+        >
+          <div
+            style={{
+              width: '100%',
+              maxWidth: 480,
+              background: '#080C1A',
+              border: '1px solid rgba(255, 255, 255, 0.12)',
+              borderRadius: 16,
+              padding: '28px 24px',
+              boxShadow: '0 25px 60px rgba(0, 0, 0, 0.85)',
+              position: 'relative',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              onClick={() => setCreateModalOpen(false)}
+              style={{
+                position: 'absolute',
+                top: 18,
+                right: 18,
+                background: 'transparent',
+                border: 'none',
+                color: '#94A3B8',
+                cursor: 'pointer',
+                padding: 4,
+              }}
+            >
+              <X size={20} />
+            </button>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+              <div
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: 8,
+                  background: 'rgba(255, 255, 255, 0.08)',
+                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#FFFFFF',
+                }}
+              >
+                <PlusCircle size={18} />
+              </div>
+              <h2 style={{ fontSize: 18, fontWeight: 700, color: '#F8FAFC', margin: 0 }}>
+                Create New Form
+              </h2>
+            </div>
+
+            <p style={{ color: '#94A3B8', fontSize: 13, marginBottom: 20, lineHeight: 1.5 }}>
+              Enter a name and description for your form before moving to the studio builder.
+            </p>
+
+            <form onSubmit={handleModalSubmit}>
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ display: 'block', fontSize: 12.5, fontWeight: 600, color: '#E2E8F0', marginBottom: 6 }}>
+                  Form Name <span style={{ color: '#F87171' }}>*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  autoFocus
+                  value={formName}
+                  onChange={(e) => setFormName(e.target.value)}
+                  placeholder="e.g., Customer Feedback, Event RSVP"
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    borderRadius: 8,
+                    background: 'rgba(255, 255, 255, 0.04)',
+                    border: '1px solid rgba(255, 255, 255, 0.14)',
+                    color: '#FFFFFF',
+                    fontSize: 14,
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+
+              <div style={{ marginBottom: 24 }}>
+                <label style={{ display: 'block', fontSize: 12.5, fontWeight: 600, color: '#E2E8F0', marginBottom: 6 }}>
+                  Description <span style={{ color: '#64748B', fontWeight: 400 }}>(Optional)</span>
+                </label>
+                <textarea
+                  rows={3}
+                  value={formDesc}
+                  onChange={(e) => setFormDesc(e.target.value)}
+                  placeholder="Briefly describe what this form is for..."
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    borderRadius: 8,
+                    background: 'rgba(255, 255, 255, 0.04)',
+                    border: '1px solid rgba(255, 255, 255, 0.14)',
+                    color: '#FFFFFF',
+                    fontSize: 14,
+                    outline: 'none',
+                    resize: 'vertical',
+                    boxSizing: 'border-box',
+                  }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+                <button
+                  type="button"
+                  onClick={() => setCreateModalOpen(false)}
+                  className="btn btn-ghost"
+                  style={{ padding: '9px 18px', color: '#94A3B8' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  style={{ padding: '9px 20px', borderRadius: 8 }}
+                >
+                  Continue to Builder →
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       <style>{`
         @media (max-width: 768px) {

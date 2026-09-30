@@ -232,15 +232,44 @@ export default function StandaloneBuilderPage() {
     }
   }, []);
 
-  // Load from local storage or check auth
+  // Load from query params, local storage, and check auth
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem('formflow_builder_draft');
-      if (saved) {
-        setSchema(JSON.parse(saved));
+    let initialized = false;
+
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const urlTitle = params.get('title');
+      const urlDesc = params.get('description');
+      const isNew = params.get('new') === 'true';
+
+      if (urlTitle || isNew) {
+        const freshSchema: FormSchema = {
+          title: urlTitle ? decodeURIComponent(urlTitle) : 'Untitled Form',
+          description: urlDesc ? decodeURIComponent(urlDesc) : '',
+          fields: [],
+          logic: [],
+          theme: DEFAULT_THEME,
+          settings: DEFAULT_SETTINGS,
+        };
+        setSchema(freshSchema);
+        try {
+          localStorage.setItem('formflow_builder_draft', JSON.stringify(freshSchema));
+        } catch {}
+        setSelectedFieldId(null);
+        setActivePanel('properties');
+        initialized = true;
       }
-    } catch {
-      // Ignore parse errors
+    }
+
+    if (!initialized) {
+      try {
+        const saved = localStorage.getItem('formflow_builder_draft');
+        if (saved) {
+          setSchema(JSON.parse(saved));
+        }
+      } catch {
+        // Ignore parse errors
+      }
     }
 
     const supabase = createClient();
