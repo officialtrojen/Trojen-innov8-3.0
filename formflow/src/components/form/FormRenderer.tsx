@@ -403,26 +403,26 @@ export default function FormRenderer({ schema, onSubmit, readOnly = false }: For
   const currentPoster = schema.theme.posterUrl || schema.theme.bannerUrl;
   const posterHeight = schema.theme.posterHeight || 180;
   const overlayOpacity = (schema.theme.posterOverlay ?? 20) / 100;
-
   // ---------- Single Page Layout ----------
   return (
     <div
       style={{
         minHeight: '100vh',
         fontFamily: schema.theme.fontFamily,
-        padding: '40px 24px',
+        padding: '48px 32px',
         ...getBackgroundStyle(schema.theme),
       }}
     >
-      <form onSubmit={handleSubmit} style={{ maxWidth: 680, margin: '0 auto' }}>
+      <form onSubmit={handleSubmit} style={{ maxWidth: 700, margin: '0 auto', width: '100%' }}>
         <div
           style={{
             background: 'white',
-            borderRadius: 16,
+            borderRadius: 20,
             overflow: 'hidden',
-            boxShadow: '0 8px 30px rgba(0,0,0,0.08)',
-            marginBottom: 24,
-            border: '1px solid rgba(184,206,207,0.35)',
+            boxShadow: '0 24px 64px rgba(38, 59, 59, 0.15), 0 8px 24px rgba(38, 59, 59, 0.08), 0 1px 3px rgba(38, 59, 59, 0.05)',
+            marginBottom: 48,
+            border: '1px solid rgba(184,206,207,0.5)',
+            transition: 'box-shadow 0.3s ease',
           }}
         >
           {/* POSTER DISPLAY */}
@@ -454,17 +454,17 @@ export default function FormRenderer({ schema, onSubmit, readOnly = false }: For
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'flex-end',
-                  padding: '24px 32px',
+                  padding: '28px 36px',
                   color: 'white',
                 }}
               >
                 {schema.theme.posterTitle && (
-                  <h2 style={{ fontSize: 24, fontWeight: 800, margin: '0 0 4px 0', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
+                  <h2 style={{ fontSize: 24, fontWeight: 800, margin: '0 0 6px 0', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
                     {schema.theme.posterTitle}
                   </h2>
                 )}
                 {schema.theme.posterSubtitle && (
-                  <p style={{ fontSize: 13, margin: 0, opacity: 0.9, textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}>
+                  <p style={{ fontSize: 14, margin: 0, opacity: 0.9, textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}>
                     {schema.theme.posterSubtitle}
                   </p>
                 )}
@@ -472,9 +472,10 @@ export default function FormRenderer({ schema, onSubmit, readOnly = false }: For
             </div>
           )}
 
-          <div style={{ padding: '36px 36px 20px' }}>
+          {/* Form Content Wrapper with Generous Side Spacing */}
+          <div style={{ padding: '40px 48px 44px' }}>
             {/* Header */}
-            <h1 style={{ fontSize: baseFontSize + 8, fontWeight: 800, color: schema.theme.text, marginBottom: 8 }}>
+            <h1 style={{ fontSize: baseFontSize + 8, fontWeight: 800, color: schema.theme.text, marginBottom: 8, letterSpacing: '-0.02em' }}>
               {schema.title}
             </h1>
             {schema.description && (
@@ -482,48 +483,56 @@ export default function FormRenderer({ schema, onSubmit, readOnly = false }: For
                 {schema.description}
               </p>
             )}
-          </div>
 
-          {/* Progress bar */}
-          {schema.settings.showProgressBar && visibleFields.length > 0 && (
-            <div style={{ marginBottom: 32 }}>
-              <div style={{ height: 4, borderRadius: 2, background: 'rgba(0,0,0,0.06)' }}>
-                <div
-                  style={{
-                    height: '100%',
-                    borderRadius: 2,
-                    background: schema.theme.primary,
-                    width: `${(Object.keys(answers).filter((k) => answers[k] !== null && answers[k] !== undefined && answers[k] !== '').length / visibleFields.length) * 100}%`,
-                    transition: 'width 0.3s ease',
-                  }}
-                />
+            {/* Progress bar */}
+            {schema.settings.showProgressBar && visibleFields.length > 0 && (
+              <div style={{ marginBottom: 32 }}>
+                <div style={{ height: 4, borderRadius: 2, background: 'rgba(0,0,0,0.06)' }}>
+                  <div
+                    style={{
+                      height: '100%',
+                      borderRadius: 2,
+                      background: schema.theme.primary,
+                      width: `${(Object.keys(answers).filter((k) => answers[k] !== null && answers[k] !== undefined && answers[k] !== '').length / visibleFields.length) * 100}%`,
+                      transition: 'width 0.3s ease',
+                    }}
+                  />
+                </div>
               </div>
+            )}
+
+            {/* Fields with Spacing */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {visibleFields.map(renderField)}
             </div>
-          )}
 
-          {/* Fields */}
-          {visibleFields.map(renderField)}
+            {errors._form && (
+              <div style={{ background: '#f8d7da', color: '#721c24', padding: '12px 16px', borderRadius: 10, fontSize: 13, marginBottom: 16 }}>
+                {errors._form}
+              </div>
+            )}
 
-          {errors._form && (
-            <div style={{ background: '#f8d7da', color: '#721c24', padding: '10px 14px', borderRadius: 8, fontSize: 13, marginBottom: 16 }}>
-              {errors._form}
-            </div>
-          )}
-
-          {!readOnly && (
-            <button
-              type="submit"
-              className="btn btn-primary btn-lg"
-              style={{
-                width: '100%',
-                background: schema.theme.primary,
-                borderRadius: 10,
-              }}
-              disabled={submitting}
-            >
-              {submitting ? <span className="spinner" /> : (schema.settings.submitButtonText || 'Submit')}
-            </button>
-          )}
+            {!readOnly && (
+              <div style={{ marginTop: 28 }}>
+                <button
+                  type="submit"
+                  className="btn btn-primary btn-lg"
+                  style={{
+                    width: '100%',
+                    background: schema.theme.primary,
+                    borderRadius: 12,
+                    padding: '14px 24px',
+                    fontSize: 15,
+                    fontWeight: 700,
+                    boxShadow: '0 4px 16px rgba(38, 59, 59, 0.18)',
+                  }}
+                  disabled={submitting}
+                >
+                  {submitting ? <span className="spinner" /> : (schema.settings.submitButtonText || 'Submit')}
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </form>
     </div>

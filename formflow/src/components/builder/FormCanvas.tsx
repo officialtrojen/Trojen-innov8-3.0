@@ -309,17 +309,17 @@ export default function FormCanvas({
           }
         }}
         style={{
-          borderRadius: 16,
+          borderRadius: 20,
           overflow: 'hidden',
           background: 'white',
           boxShadow: isFormArmed
             ? '0 0 0 3px #E74C3C, 0 16px 45px rgba(231, 76, 60, 0.25)'
-            : '0 8px 30px rgba(38, 59, 59, 0.08)',
+            : '0 24px 64px rgba(38, 59, 59, 0.14), 0 8px 24px rgba(38, 59, 59, 0.07), 0 1px 3px rgba(38, 59, 59, 0.05)',
           border: isFormArmed
             ? '2.5px solid #E74C3C'
             : isOver
             ? '2px dashed var(--primary)'
-            : '1px solid rgba(184,206,207,0.4)',
+            : '1px solid rgba(184,206,207,0.5)',
           cursor: isFormArmed ? 'grab' : 'default',
           transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
           transform: isFormArmed ? 'scale(0.992)' : 'none',

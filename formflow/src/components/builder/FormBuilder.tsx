@@ -324,7 +324,7 @@ export default function FormBuilder({
               style={{
                 flex: 1,
                 overflowY: 'auto',
-                padding: '24px 32px',
+                padding: '36px 32px',
                 transition: 'background 0.3s ease',
               }}
               className="builder-canvas"

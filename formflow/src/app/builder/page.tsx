@@ -634,7 +634,7 @@ export default function StandaloneBuilderPage() {
                 style={{
                   flex: 1,
                   overflowY: 'auto',
-                  padding: '28px 24px',
+                  padding: '36px 32px',
                 }}
                 className="builder-canvas"
               >
