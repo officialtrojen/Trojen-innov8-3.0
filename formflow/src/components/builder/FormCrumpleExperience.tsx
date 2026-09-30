@@ -31,7 +31,7 @@ function escapeXml(unsafe: string): string {
   });
 }
 
-function generateFormPaperSvg(schema: FormSchema): string {
+export function generateFormPaperSvg(schema: FormSchema): string {
   const fields = schema.fields.slice(0, 5);
   const questionsMarkup = fields
     .map((f, i) => {

@@ -209,6 +209,9 @@ interface FormCanvasProps {
   description?: string;
   onOpenThemePanel?: () => void;
   onOpenCrumple?: () => void;
+  isFormArmed?: boolean;
+  onArmForm?: (armed: boolean) => void;
+  onStartDragForm?: (e: React.PointerEvent) => void;
 }
 
 export default function FormCanvas({
@@ -222,8 +225,36 @@ export default function FormCanvas({
   description,
   onOpenThemePanel,
   onOpenCrumple,
+  isFormArmed,
+  onArmForm,
+  onStartDragForm,
 }: FormCanvasProps) {
   const { setNodeRef, isOver } = useDroppable({ id: 'canvas-drop-zone' });
+  const lastClickTimeRef = React.useRef<number>(0);
+  const clickCountRef = React.useRef<number>(0);
+
+  const handleFormClick = (e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    if (target.closest('input, textarea, select, button, a, [contenteditable="true"]')) return;
+    const now = Date.now();
+    if (now - lastClickTimeRef.current < 650) {
+      clickCountRef.current += 1;
+    } else {
+      clickCountRef.current = 1;
+    }
+    lastClickTimeRef.current = now;
+
+    if (clickCountRef.current >= 2) {
+      clickCountRef.current = 0;
+      onArmForm?.(true);
+    }
+  };
+
+  const handleFormDoubleClick = (e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    if (target.closest('input, textarea, select, button, a, [contenteditable="true"]')) return;
+    onArmForm?.(true);
+  };
 
   const currentPoster = theme?.posterUrl || theme?.bannerUrl;
   const posterHeight = theme?.posterHeight || 180;
@@ -242,14 +273,83 @@ export default function FormCanvas({
         transition: 'all 0.2s ease',
       }}
     >
+      {/* Armed Form Notification Banner */}
+      {isFormArmed && (
+        <div
+          style={{
+            marginBottom: 14,
+            padding: '12px 18px',
+            borderRadius: 12,
+            background: '#4F7C7A',
+            color: '#FFFEF9',
+            fontSize: 13,
+            fontWeight: 700,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            boxShadow: '0 6px 20px rgba(79, 124, 122, 0.35)',
+            border: '2px solid #CFE5E3',
+            animation: 'fadeIn 0.2s ease',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ fontSize: 18 }}>🖐️</span>
+            <div>
+              <div>Form Sheet Selected!</div>
+              <div style={{ fontSize: 11, fontWeight: 500, opacity: 0.9 }}>
+                Click & drag this card down to the Delete Icon in the bottom-right corner ↘️ to crumple & discard
+              </div>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onArmForm?.(false);
+            }}
+            style={{
+              background: 'rgba(255, 254, 249, 0.2)',
+              border: 'none',
+              color: '#FFFEF9',
+              padding: '6px 12px',
+              borderRadius: 8,
+              fontSize: 12,
+              fontWeight: 700,
+              cursor: 'pointer',
+            }}
+          >
+            ✕ Cancel
+          </button>
+        </div>
+      )}
+
       {/* Live Form Container */}
       <div
+        onClick={handleFormClick}
+        onDoubleClick={handleFormDoubleClick}
+        onPointerDown={(e) => {
+          if (isFormArmed) {
+            const target = e.target as HTMLElement;
+            if (!target.closest('input, textarea, select, button, a')) {
+              onStartDragForm?.(e);
+            }
+          }
+        }}
         style={{
           borderRadius: 16,
           overflow: 'hidden',
           background: '#FFFEF9',
-          boxShadow: '0 8px 32px rgba(38, 59, 59, 0.1)',
-          border: isOver ? '2px dashed #4F7C7A' : '1px solid #B8CECF',
+          boxShadow: isFormArmed
+            ? '0 16px 40px rgba(79, 124, 122, 0.25), 0 0 0 3px #4F7C7A'
+            : '0 8px 32px rgba(38, 59, 59, 0.1)',
+          border: isFormArmed
+            ? '2px dashed #4F7C7A'
+            : isOver
+            ? '2px dashed #4F7C7A'
+            : '1px solid #B8CECF',
+          cursor: isFormArmed ? 'grab' : 'default',
+          transform: isFormArmed ? 'scale(0.995)' : 'none',
+          transition: 'all 0.2s ease',
         }}
       >
         {/* POSTER DISPLAY IN FORM HEADER */}
