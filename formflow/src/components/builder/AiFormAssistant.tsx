@@ -14,6 +14,7 @@ import {
   Check,
   RefreshCw,
   Zap,
+  RotateCcw,
 } from 'lucide-react';
 
 interface AiFormAssistantProps {
@@ -41,18 +42,60 @@ export default function AiFormAssistant({
   onOpen,
   onToggle,
 }: AiFormAssistantProps) {
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: 'welcome',
-      sender: 'ai',
-      text: '👋 Hi! I am your AI Form Builder Assistant. Tell me what kind of form you want to create or edit (e.g. "Build a Job Application form" or "Add a 5-star rating question").',
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    },
-  ]);
+  const [messages, setMessages] = useState<ChatMessage[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('formflow_ai_chat_messages');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            return parsed;
+          }
+        }
+      } catch {
+        // Ignore parse error
+      }
+    }
+    return [
+      {
+        id: 'welcome',
+        sender: 'ai',
+        text: '👋 Hi! I am your AI Form Builder Assistant. Tell me what kind of form you want to create or edit (e.g. "Build a Job Application form" or "Add a 5-star rating question").',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      },
+    ];
+  });
+
+  // Auto-save chat messages to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem('formflow_ai_chat_messages', JSON.stringify(messages));
+    } catch {
+      // Ignore quota error
+    }
+  }, [messages]);
+
   const [inputPrompt, setInputPrompt] = useState('');
   const [loading, setLoading] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const chatEndRef = useRef<HTMLDivElement | null>(null);
+
+  const handleClearChat = () => {
+    const freshWelcome: ChatMessage[] = [
+      {
+        id: 'welcome_' + Date.now(),
+        sender: 'ai',
+        text: '👋 Chat cleared! How can I help you build or customize your form today?',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      },
+    ];
+    setMessages(freshWelcome);
+    try {
+      localStorage.removeItem('formflow_ai_chat_messages');
+    } catch {
+      // ignore
+    }
+  };
 
   const [userMemory, setUserMemory] = useState<any>(() => {
     try {
@@ -252,6 +295,14 @@ export default function AiFormAssistant({
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }} onClick={(e) => e.stopPropagation()}>
+          <button
+            type="button"
+            onClick={handleClearChat}
+            style={{ background: 'none', border: 'none', color: '#94A3B8', padding: 4, cursor: 'pointer' }}
+            title="Clear Chat History"
+          >
+            <RotateCcw size={15} />
+          </button>
           <button
             type="button"
             onClick={() => setIsMinimized(!isMinimized)}
