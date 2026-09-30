@@ -127,44 +127,65 @@ export default function LoginPage() {
             width: '100%',
             maxWidth: 440,
             padding: 36,
-            background: 'rgba(15, 23, 42, 0.95)',
-            backdropFilter: 'blur(16px)',
-            borderRadius: 24,
-            boxShadow: '0 24px 60px rgba(0,0,0,0.8), 0 0 30px rgba(139, 92, 246, 0.2)',
-            border: '1px solid rgba(139, 92, 246, 0.35)',
+            background: 'rgba(8, 12, 20, 0.72)',
+            backdropFilter: 'blur(20px)',
+            borderRadius: 20,
+            boxShadow: '0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.06)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
             color: '#FFFFFF',
           }}
         >
-          {/* Logo */}
-          <Link
-            href="/"
-            style={{
-              textDecoration: 'none',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10,
-              marginBottom: 24,
-            }}
-          >
-            <div
+          {/* Logo + Back */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 24 }}>
+            <Link
+              href="/"
+              title="Back to home"
               style={{
-                width: 38,
-                height: 38,
-                borderRadius: 12,
-                background: 'linear-gradient(135deg, #8B5CF6, #7C3AED)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: 'white',
-                fontWeight: 800,
-                fontSize: 18,
-                boxShadow: '0 4px 14px rgba(139, 92, 246, 0.5)',
+                width: 32,
+                height: 32,
+                borderRadius: 8,
+                background: 'rgba(255,255,255,0.05)',
+                border: '1px solid rgba(255,255,255,0.12)',
+                color: '#94A3B8',
+                textDecoration: 'none',
+                flexShrink: 0,
+                transition: 'all 0.2s',
+              }}
+              onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = '#FFFFFF'; }}
+              onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; e.currentTarget.style.color = '#94A3B8'; }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </Link>
+            <Link
+              href="/"
+              style={{
+                textDecoration: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
               }}
             >
-              F
+            <div
+              style={{
+                width: 34,
+                height: 34,
+                borderRadius: 9,
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#E2E8F0',
+              }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
             </div>
-            <span style={{ fontWeight: 800, fontSize: 20, color: '#FFFFFF' }}>FormFlow</span>
-          </Link>
+            <span style={{ fontWeight: 700, fontSize: 16, letterSpacing: '-0.02em', color: '#FFFFFF' }}>FormFlow</span>
+            </Link>
+          </div>
 
           <h1 style={{ fontSize: 24, fontWeight: 800, color: '#FFFFFF', marginBottom: 6 }}>
             Welcome to FormFlow
