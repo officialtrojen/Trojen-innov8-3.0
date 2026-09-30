@@ -60,14 +60,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       password,
       options: { data: { name } },
     });
-    if (!error && data.user) {
+    if (error) {
+      const msg = error.message?.includes('Database error saving new user')
+        ? 'Database trigger error in Supabase. Please run the SQL script in scripts/fix-database-error.sql in your Supabase Dashboard SQL Editor.'
+        : error.message;
+      return { error: msg, session: null };
+    }
+    if (data.user) {
       await supabase.from('profiles').upsert({
         id: data.user.id,
         name,
         email: email.trim(),
       });
     }
-    return { error: error?.message ?? null, session: data?.session ?? null };
+    return { error: null, session: data?.session ?? null };
   };
 
   const signIn = async (email: string, password: string) => {
@@ -221,7 +227,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         password,
         options: { data: { name }, emailRedirectTo: undefined },
       });
-      if (error) return { error: error.message };
+      if (error) {
+        const msg = error.message?.includes('Database error saving new user')
+          ? 'Database trigger error in Supabase. Please run the SQL script in scripts/fix-database-error.sql in your Supabase Dashboard SQL Editor.'
+          : error.message;
+        return { error: msg };
+      }
 
       // Step 2: If user already existed (identities empty), fall back to signInWithOtp
       if (data.user && (!data.user.identities || data.user.identities.length === 0)) {

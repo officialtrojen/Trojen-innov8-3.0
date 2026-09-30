@@ -17,15 +17,23 @@ create table if not exists public.profiles (
 -- Enable Row Level Security (RLS)
 alter table public.profiles enable row level security;
 
+-- Drop old policies
+drop policy if exists "Users can view their own profile" on public.profiles;
+drop policy if exists "Users can update their own profile" on public.profiles;
+drop policy if exists "Service role can insert profiles" on public.profiles;
+drop policy if exists "Allow profile select" on public.profiles;
+drop policy if exists "Allow profile insert" on public.profiles;
+drop policy if exists "Allow profile update" on public.profiles;
+
 -- RLS Policies for Profiles
-create policy "Users can view their own profile" on public.profiles
-  for select using (auth.uid() = id);
+create policy "Allow profile select" on public.profiles
+  for select using (true);
 
-create policy "Users can update their own profile" on public.profiles
-  for update using (auth.uid() = id);
-
-create policy "Service role can insert profiles" on public.profiles
+create policy "Allow profile insert" on public.profiles
   for insert with check (true);
+
+create policy "Allow profile update" on public.profiles
+  for update using (auth.uid() = id);
 
 -- 2. Automatic Profile Creation Trigger on User Sign Up (Email & Google OAuth)
 create or replace function public.handle_new_user()
@@ -35,15 +43,27 @@ begin
   values (
     new.id,
     new.email,
-    coalesce(new.raw_user_meta_data->>'name', new.raw_user_meta_data->>'full_name', split_part(new.email, '@', 1)),
+    coalesce(
+      new.raw_user_meta_data->>'name',
+      new.raw_user_meta_data->>'full_name',
+      split_part(coalesce(new.email, ''), '@', 1),
+      'User'
+    ),
     new.raw_user_meta_data->>'avatar_url'
   )
   on conflict (id) do update set
     name = excluded.name,
-    avatar_url = excluded.avatar_url;
+    email = excluded.email,
+    avatar_url = coalesce(excluded.avatar_url, public.profiles.avatar_url),
+    updated_at = now();
   return new;
+exception
+  when others then
+    -- Never abort user creation if profile insert has an issue
+    raise warning 'handle_new_user failed: %', sqlerrm;
+    return new;
 end;
-$$ language plpgsql security definer;
+$$ language plpgsql security definer set search_path = public;
 
 -- Create Trigger on auth.users
 drop trigger if exists on_auth_user_created on auth.users;
