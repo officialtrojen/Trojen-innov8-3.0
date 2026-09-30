@@ -67,10 +67,10 @@ export default function PreviewFormPage() {
           <Link href={`/dashboard/forms/${formId}/edit`} className="btn btn-ghost btn-sm">
             <ArrowLeft size={16} /> Back to Editor
           </Link>
-          <h1 style={{ fontSize: 18, fontWeight: 600, color: '#263B3B' }}>Preview: {form.title}</h1>
+          <h1 style={{ fontSize: 18, fontWeight: 600, color: '#F8FAFC' }}>Preview: {form.title}</h1>
         </div>
 
-        <div style={{ display: 'flex', gap: 4, background: 'var(--accent)', borderRadius: 8, padding: 3 }}>
+        <div style={{ display: 'flex', gap: 4, background: 'rgba(255,255,255,0.06)', borderRadius: 8, padding: 3, border: '1px solid rgba(255,255,255,0.08)' }}>
           {([
             { key: 'desktop', icon: Monitor },
             { key: 'tablet', icon: Tablet },
@@ -81,9 +81,9 @@ export default function PreviewFormPage() {
               onClick={() => setDevice(d.key)}
               className="btn btn-sm"
               style={{
-                background: device === d.key ? 'white' : 'transparent',
-                color: device === d.key ? 'var(--primary)' : '#52796F',
-                boxShadow: device === d.key ? 'var(--shadow-sm)' : 'none',
+                background: device === d.key ? 'rgba(56, 189, 248, 0.2)' : 'transparent',
+                color: device === d.key ? '#38BDF8' : '#94A3B8',
+                boxShadow: device === d.key ? '0 2px 8px rgba(0,0,0,0.3)' : 'none',
                 borderRadius: 6,
                 border: 'none',
                 padding: '6px 10px',
@@ -103,8 +103,8 @@ export default function PreviewFormPage() {
           transition: 'max-width 0.3s ease',
           borderRadius: 12,
           overflow: 'hidden',
-          boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
-          border: '1px solid rgba(184,206,207,0.3)',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
         }}
       >
         <FormRenderer schema={form.schema} readOnly />

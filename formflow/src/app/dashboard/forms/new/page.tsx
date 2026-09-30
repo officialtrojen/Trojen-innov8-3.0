@@ -55,8 +55,8 @@ export default function NewFormPage() {
 
   return (
     <div style={{ maxWidth: 560, margin: '0 auto', paddingTop: 40 }}>
-      <h1 style={{ fontSize: 24, fontWeight: 700, color: '#263B3B', marginBottom: 4 }}>Create a New Form</h1>
-      <p style={{ color: '#52796F', fontSize: 14, marginBottom: 32 }}>Give your form a name and start building.</p>
+      <h1 style={{ fontSize: 26, fontWeight: 700, color: '#F8FAFC', marginBottom: 4, letterSpacing: '-0.02em' }}>Create a New Form</h1>
+      <p style={{ color: '#94A3B8', fontSize: 14, marginBottom: 32 }}>Give your form a name and start building.</p>
 
       <form onSubmit={handleCreate}>
         <div className="card" style={{ padding: 32 }}>

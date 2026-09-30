@@ -101,18 +101,18 @@ export default function DashboardPage() {
   }
 
   const statCards = [
-    { label: 'Total Forms', value: stats.totalForms, icon: FileText, color: '#4F7C7A' },
-    { label: 'Published Forms', value: stats.publishedForms, icon: Globe, color: '#52796F' },
-    { label: 'Total Responses', value: stats.totalResponses, icon: MessageSquare, color: '#3F6258' },
-    { label: 'Avg per Form', value: stats.avgResponseRate, icon: TrendingUp, color: '#4F7C7A' },
+    { label: 'Total Forms', value: stats.totalForms, icon: FileText, color: '#38BDF8', bg: 'rgba(56, 189, 248, 0.12)' },
+    { label: 'Published Forms', value: stats.publishedForms, icon: Globe, color: '#34D399', bg: 'rgba(52, 211, 153, 0.12)' },
+    { label: 'Total Responses', value: stats.totalResponses, icon: MessageSquare, color: '#818CF8', bg: 'rgba(129, 140, 248, 0.12)' },
+    { label: 'Avg per Form', value: stats.avgResponseRate, icon: TrendingUp, color: '#FBBF24', bg: 'rgba(251, 191, 36, 0.12)' },
   ];
 
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32, flexWrap: 'wrap', gap: 16 }}>
         <div>
-          <h1 style={{ fontSize: 24, fontWeight: 700, color: '#263B3B', marginBottom: 4 }}>Dashboard</h1>
-          <p style={{ color: '#52796F', fontSize: 14 }}>Welcome back! Here&apos;s an overview of your forms.</p>
+          <h1 style={{ fontSize: 26, fontWeight: 700, color: '#F8FAFC', marginBottom: 4, letterSpacing: '-0.02em' }}>Dashboard</h1>
+          <p style={{ color: '#94A3B8', fontSize: 14 }}>Welcome back! Here&apos;s an overview of your forms.</p>
         </div>
         <Link href="/dashboard/forms/new" className="btn btn-primary">
           <PlusCircle size={18} /> Create Form
@@ -124,29 +124,29 @@ export default function DashboardPage() {
         {statCards.map((s, i) => (
           <div key={i} className="card" style={{ padding: 24 }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-              <span style={{ fontSize: 13, color: '#52796F', fontWeight: 500 }}>{s.label}</span>
-              <div style={{ width: 36, height: 36, borderRadius: 10, background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: s.color }}>
+              <span style={{ fontSize: 13, color: '#94A3B8', fontWeight: 500 }}>{s.label}</span>
+              <div style={{ width: 36, height: 36, borderRadius: 10, background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', color: s.color }}>
                 <s.icon size={18} />
               </div>
             </div>
-            <div style={{ fontSize: 28, fontWeight: 700, color: '#263B3B' }}>{s.value}</div>
+            <div style={{ fontSize: 28, fontWeight: 700, color: '#F8FAFC' }}>{s.value}</div>
           </div>
         ))}
       </div>
 
       {/* Recent forms */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-        <h2 style={{ fontSize: 18, fontWeight: 600, color: '#263B3B' }}>Recent Forms</h2>
-        <Link href="/dashboard/forms" style={{ color: 'var(--primary)', fontSize: 14, fontWeight: 500, textDecoration: 'none' }}>
+        <h2 style={{ fontSize: 18, fontWeight: 600, color: '#F8FAFC' }}>Recent Forms</h2>
+        <Link href="/dashboard/forms" style={{ color: '#38BDF8', fontSize: 14, fontWeight: 500, textDecoration: 'none' }}>
           View All →
         </Link>
       </div>
 
       {forms.length === 0 ? (
         <div className="card" style={{ padding: 48, textAlign: 'center' }}>
-          <FileText size={40} style={{ color: '#B8CECF', marginBottom: 16 }} />
-          <h3 style={{ fontSize: 18, fontWeight: 600, color: '#263B3B', marginBottom: 8 }}>No forms yet</h3>
-          <p style={{ color: '#52796F', fontSize: 14, marginBottom: 24 }}>Create your first form to get started.</p>
+          <FileText size={40} style={{ color: '#64748B', marginBottom: 16 }} />
+          <h3 style={{ fontSize: 18, fontWeight: 600, color: '#F8FAFC', marginBottom: 8 }}>No forms yet</h3>
+          <p style={{ color: '#94A3B8', fontSize: 14, marginBottom: 24 }}>Create your first form to get started.</p>
           <Link href="/dashboard/forms/new" className="btn btn-primary">
             <PlusCircle size={18} /> Create Your First Form
           </Link>
@@ -156,17 +156,17 @@ export default function DashboardPage() {
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
               <thead>
-                <tr style={{ borderBottom: '1px solid rgba(184,206,207,0.3)' }}>
-                  <th style={{ padding: '12px 16px', textAlign: 'left', color: '#52796F', fontWeight: 500, fontSize: 13 }}>Form Name</th>
-                  <th style={{ padding: '12px 16px', textAlign: 'left', color: '#52796F', fontWeight: 500, fontSize: 13 }}>Status</th>
-                  <th style={{ padding: '12px 16px', textAlign: 'left', color: '#52796F', fontWeight: 500, fontSize: 13 }}>Updated</th>
-                  <th style={{ padding: '12px 16px', textAlign: 'right', color: '#52796F', fontWeight: 500, fontSize: 13 }}>Actions</th>
+                <tr style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                  <th style={{ padding: '12px 16px', textAlign: 'left', color: '#94A3B8', fontWeight: 500, fontSize: 13 }}>Form Name</th>
+                  <th style={{ padding: '12px 16px', textAlign: 'left', color: '#94A3B8', fontWeight: 500, fontSize: 13 }}>Status</th>
+                  <th style={{ padding: '12px 16px', textAlign: 'left', color: '#94A3B8', fontWeight: 500, fontSize: 13 }}>Updated</th>
+                  <th style={{ padding: '12px 16px', textAlign: 'right', color: '#94A3B8', fontWeight: 500, fontSize: 13 }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {forms.map((form) => (
-                  <tr key={form.id} style={{ borderBottom: '1px solid rgba(184,206,207,0.15)' }}>
-                    <td style={{ padding: '14px 16px', fontWeight: 500, color: '#263B3B' }}>
+                  <tr key={form.id} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                    <td style={{ padding: '14px 16px', fontWeight: 500, color: '#F8FAFC' }}>
                       {truncate(form.title, 40)}
                     </td>
                     <td style={{ padding: '14px 16px' }}>
@@ -174,7 +174,7 @@ export default function DashboardPage() {
                         {form.status.charAt(0).toUpperCase() + form.status.slice(1)}
                       </span>
                     </td>
-                    <td style={{ padding: '14px 16px', color: '#52796F' }}>{formatDate(form.updated_at)}</td>
+                    <td style={{ padding: '14px 16px', color: '#94A3B8' }}>{formatDate(form.updated_at)}</td>
                     <td style={{ padding: '14px 16px' }}>
                       <div style={{ display: 'flex', gap: 4, justifyContent: 'flex-end' }}>
                         <Link href={`/dashboard/forms/${form.id}/edit`} className="btn btn-ghost btn-sm" title="Edit">
@@ -205,7 +205,7 @@ export default function DashboardPage() {
                         <button onClick={() => handleDuplicate(form)} className="btn btn-ghost btn-sm" title="Duplicate">
                           <Copy size={15} />
                         </button>
-                        <button onClick={() => handleDelete(form.id)} className="btn btn-ghost btn-sm" title="Delete" style={{ color: '#e74c3c' }}>
+                        <button onClick={() => handleDelete(form.id)} className="btn btn-ghost btn-sm" title="Delete" style={{ color: '#ef4444' }}>
                           <Trash2 size={15} />
                         </button>
                       </div>

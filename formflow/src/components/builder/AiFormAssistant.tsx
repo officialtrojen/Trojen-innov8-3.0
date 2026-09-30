@@ -50,51 +50,13 @@ export default function AiFormAssistant({
   const [isMinimized, setIsMinimized] = useState(false);
   const chatEndRef = useRef<HTMLDivElement | null>(null);
 
-  const [userMemory, setUserMemory] = useState<any>(() => {
-    try {
-      const saved = localStorage.getItem('formflow_ai_user_memory');
-      return saved ? JSON.parse(saved) : null;
-    } catch {
-      return null;
-    }
-  });
-
   useEffect(() => {
     if (isOpen && !isMinimized) {
       chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages, isOpen, isMinimized]);
 
-  if (!isOpen) {
-    return (
-      <button
-        type="button"
-        onClick={onClose}
-        style={{
-          position: 'fixed',
-          bottom: 24,
-          right: 24,
-          zIndex: 1000,
-          padding: '12px 22px',
-          borderRadius: 99,
-          background: 'linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%)',
-          color: '#FFFFFF',
-          fontWeight: 800,
-          fontSize: 14,
-          border: '1.5px solid rgba(255, 255, 255, 0.25)',
-          boxShadow: '0 12px 35px rgba(139, 92, 246, 0.6), 0 0 24px rgba(139, 92, 246, 0.4)',
-          cursor: 'pointer',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 10,
-          transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)',
-        }}
-      >
-        <Sparkles size={18} color="#FDE047" />
-        <span>✨ Open AI Form Assistant</span>
-      </button>
-    );
-  }
+  if (!isOpen) return null;
 
   const handleSendPrompt = async (promptText?: string) => {
     const textToSend = promptText || inputPrompt.trim();
@@ -107,8 +69,7 @@ export default function AiFormAssistant({
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     };
 
-    const updatedMessages = [...messages, userMsg];
-    setMessages(updatedMessages);
+    setMessages((prev) => [...prev, userMsg]);
     if (!promptText) setInputPrompt('');
     setLoading(true);
 
@@ -119,8 +80,6 @@ export default function AiFormAssistant({
         body: JSON.stringify({
           prompt: textToSend,
           currentSchema,
-          chatHistory: updatedMessages,
-          userMemory,
         }),
       });
 
@@ -128,15 +87,6 @@ export default function AiFormAssistant({
 
       if (data.error) {
         throw new Error(data.error);
-      }
-
-      if (data.learnedMemory) {
-        setUserMemory(data.learnedMemory);
-        try {
-          localStorage.setItem('formflow_ai_user_memory', JSON.stringify(data.learnedMemory));
-        } catch {
-          // ignore quota
-        }
       }
 
       const aiMsg: ChatMessage = {
@@ -234,10 +184,8 @@ export default function AiFormAssistant({
               </span>
             </div>
             {!isMinimized && (
-              <div style={{ fontSize: 11, color: '#94A3B8', display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
-                <span style={{ color: '#6EE7B7', fontWeight: 600 }}>🌐 Web Search</span>
-                <span>•</span>
-                <span style={{ color: '#C084FC', fontWeight: 600 }}>🧠 Learned Memory</span>
+              <div style={{ fontSize: 11, color: '#94A3B8' }}>
+                Prompt to build & customize forms
               </div>
             )}
           </div>

@@ -178,35 +178,19 @@ export default function FormRenderer({ schema, onSubmit, readOnly = false }: For
     const error = errors[field.id];
 
     return (
-      <div key={field.id} style={{ marginBottom: 28, fontFamily: field.fontFamily || undefined }}>
+      <div key={field.id} style={{ marginBottom: 28 }}>
         <label
           style={{
             display: 'block',
             fontSize: baseFontSize,
-            fontWeight: 600,
+            fontWeight: 500,
             color: schema.theme.text,
-            marginBottom: field.description ? 4 : 8,
-            fontFamily: field.fontFamily || undefined,
+            marginBottom: 8,
           }}
         >
           {field.label}
           {field.required && <span style={{ color: '#e74c3c', marginLeft: 4 }}>*</span>}
         </label>
-
-        {field.description && (
-          <p
-            style={{
-              fontSize: baseFontSize - 2,
-              color: schema.theme.text,
-              opacity: 0.7,
-              marginTop: 0,
-              marginBottom: 10,
-              fontFamily: field.fontFamily || undefined,
-            }}
-          >
-            {field.description}
-          </p>
-        )}
 
         {field.type === 'short_text' && (
           <input

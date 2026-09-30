@@ -2,8 +2,7 @@
 
 import React from 'react';
 import { FormField } from '@/types/form';
-import { Plus, Trash2, X, Sliders, CheckCircle2, Type, Check } from 'lucide-react';
-import { FIELD_FONT_OPTIONS } from '@/lib/font-presets';
+import { Plus, Trash2, X, Sliders, CheckCircle2 } from 'lucide-react';
 
 interface FieldPropertiesPanelProps {
   field: FormField | null;
@@ -92,81 +91,6 @@ export const FieldPropertiesPanel: React.FC<FieldPropertiesPanelProps> = ({
             placeholder="Optional context for respondent..."
             className="w-full bg-zinc-950 border border-zinc-700/80 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
           />
-        </div>
-
-        {/* Typography / 10 Font Options */}
-        <div className="p-3 rounded-xl bg-zinc-950/60 border border-zinc-800 space-y-2.5">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5 text-[11px] font-medium text-zinc-300">
-              <Type className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Field Typography (Font)</span>
-            </div>
-            <span className="text-[10px] px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 font-semibold">
-              10 Fonts
-            </span>
-          </div>
-
-          <div className="flex items-center justify-between p-2 rounded-lg bg-zinc-900 border border-zinc-800">
-            <div>
-              <div className="text-[10px] text-zinc-500 font-medium">Active Font</div>
-              <div
-                className="text-xs font-semibold text-zinc-200"
-                style={{ fontFamily: field.fontFamily || 'inherit' }}
-              >
-                {field.fontFamily || 'Theme Default'}
-              </div>
-            </div>
-            {field.fontFamily && (
-              <button
-                type="button"
-                onClick={() => onUpdateField({ ...field, fontFamily: undefined })}
-                className="text-[10px] px-2 py-1 rounded bg-zinc-800 text-zinc-400 hover:text-zinc-200 transition-colors"
-              >
-                Reset
-              </button>
-            )}
-          </div>
-
-          <div className="max-h-52 overflow-y-auto space-y-1.5 pr-1">
-            {FIELD_FONT_OPTIONS.map((f) => {
-              const isSelected = field.fontFamily === f.name;
-              return (
-                <button
-                  key={f.name}
-                  type="button"
-                  onClick={() => onUpdateField({ ...field, fontFamily: f.name })}
-                  className={`w-full text-left p-2 rounded-lg border transition-all flex items-center justify-between ${
-                    isSelected
-                      ? 'bg-indigo-600/15 border-indigo-500 text-white'
-                      : 'bg-zinc-900/60 border-zinc-800/80 text-zinc-300 hover:border-zinc-700 hover:bg-zinc-900'
-                  }`}
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <span
-                        className="text-xs font-semibold"
-                        style={{ fontFamily: f.name }}
-                      >
-                        {f.label}
-                      </span>
-                      <span className="text-[9px] px-1.5 py-0.2 rounded bg-zinc-800 text-zinc-400">
-                        {f.category}
-                      </span>
-                    </div>
-                    <div
-                      className="text-[10px] text-zinc-400 truncate mt-0.5"
-                      style={{ fontFamily: f.name }}
-                    >
-                      {f.sample}
-                    </div>
-                  </div>
-                  {isSelected && (
-                    <Check className="w-3.5 h-3.5 text-indigo-400 flex-shrink-0 ml-2" />
-                  )}
-                </button>
-              );
-            })}
-          </div>
         </div>
 
         {/* Placeholder (for text fields) */}
