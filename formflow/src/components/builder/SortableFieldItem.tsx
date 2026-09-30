@@ -79,18 +79,17 @@ export const SortableFieldItem: React.FC<SortableFieldItemProps> = ({
           </div>
         );
       case 'rating':
-        const maxStars = field.maxRating || 5;
         return (
           <div className="flex items-center gap-2 mt-2">
-            {Array.from({ length: maxStars }).map((_, i) => (
+            {[1, 2, 3, 4, 5].map((i) => (
               <div
                 key={i}
-                className="p-2 rounded-lg bg-zinc-950/50 border border-zinc-800 text-amber-400/80 flex items-center justify-center"
+                className="p-2 rounded-lg bg-zinc-950/50 border border-zinc-800 text-amber-400 flex items-center justify-center"
               >
                 <Star className="w-5 h-5 fill-amber-400/20" />
               </div>
             ))}
-            <span className="text-xs text-zinc-500 ml-2">1 to {maxStars} scale</span>
+            <span className="text-xs text-zinc-500 ml-2">1 to 5 stars</span>
           </div>
         );
       case 'file_upload':

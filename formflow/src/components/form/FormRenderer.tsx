@@ -284,29 +284,49 @@ export default function FormRenderer({ schema, onSubmit, readOnly = false }: For
         )}
 
         {field.type === 'rating' && (
-          <div style={{ display: 'flex', gap: 4 }}>
-            {Array.from({ length: field.maxStars || 5 }).map((_, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => !readOnly && updateAnswer(field.id, i + 1)}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  cursor: readOnly ? 'default' : 'pointer',
-                  padding: 2,
-                  transition: 'transform 0.15s ease',
-                }}
-                onMouseEnter={(e) => { if (!readOnly) (e.currentTarget as HTMLElement).style.transform = 'scale(1.2)'; }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.transform = 'scale(1)'; }}
-              >
-                <Star
-                  size={28}
-                  fill={i < (value as number || 0) ? '#F5A623' : 'none'}
-                  stroke={i < (value as number || 0) ? '#F5A623' : '#B8CECF'}
-                />
-              </button>
-            ))}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+              {[1, 2, 3, 4, 5].map((score) => {
+                const isFilled = score <= ((value as number) || 0);
+                return (
+                  <button
+                    key={score}
+                    type="button"
+                    onClick={() => !readOnly && updateAnswer(field.id, score)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      cursor: readOnly ? 'default' : 'pointer',
+                      padding: 4,
+                      transition: 'transform 0.15s ease',
+                      borderRadius: 8,
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!readOnly) (e.currentTarget as HTMLElement).style.transform = 'scale(1.25)';
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.currentTarget as HTMLElement).style.transform = 'scale(1)';
+                    }}
+                    title={`Rate ${score} of 5 stars`}
+                  >
+                    <Star
+                      size={32}
+                      fill={isFilled ? '#F59E0B' : 'none'}
+                      stroke={isFilled ? '#F59E0B' : '#B8CECF'}
+                    />
+                  </button>
+                );
+              })}
+            </div>
+            {(value as number) ? (
+              <span style={{ fontSize: 13, fontWeight: 600, color: '#F59E0B' }}>
+                ⭐ {value as number} of 5 stars selected
+              </span>
+            ) : (
+              <span style={{ fontSize: 12, color: '#52796F' }}>
+                Tap a star to rate (1 to 5)
+              </span>
+            )}
           </div>
         )}
 

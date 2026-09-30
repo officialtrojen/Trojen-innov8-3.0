@@ -233,12 +233,12 @@ export const RespondentForm: React.FC<RespondentFormProps> = ({ form }) => {
         );
 
       case 'rating':
-        const maxStars = field.maxRating || 5;
+        const maxStars = 5;
         const currentRating = Number(val) || 0;
         return (
           <div className="space-y-3">
             <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-              {Array.from({ length: maxStars }).map((_, i) => {
+              {Array.from({ length: 5 }).map((_, i) => {
                 const starVal = i + 1;
                 const isFilled = starVal <= currentRating;
                 return (
@@ -268,7 +268,7 @@ export const RespondentForm: React.FC<RespondentFormProps> = ({ form }) => {
               })}
             </div>
             <div className="text-xs text-zinc-400">
-              {currentRating > 0 ? `Selected: ${currentRating} of ${maxStars} stars` : 'Click to rate'}
+              {currentRating > 0 ? `Selected: ${currentRating} of 5 stars` : 'Click to rate'}
             </div>
           </div>
         );

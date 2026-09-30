@@ -227,19 +227,23 @@ export default function PropertiesPanel({ field, onUpdate }: PropertiesPanelProp
         </>
       )}
 
-      {/* Rating Stars */}
+      {/* Rating Stars - Standard 5-Star Rating */}
       {field.type === 'rating' && (
-        <div style={{ marginBottom: 16 }}>
-          <label className="label">Number of Stars</label>
-          <select
-            className="select"
-            value={field.maxStars || 5}
-            onChange={(e) => onUpdate({ maxStars: parseInt(e.target.value) })}
-          >
-            {[3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
-              <option key={n} value={n}>{n} stars</option>
-            ))}
-          </select>
+        <div
+          style={{
+            marginBottom: 16,
+            padding: '12px 14px',
+            borderRadius: 10,
+            background: '#EAF4F4',
+            border: '1.5px solid #B8CECF',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#263B3B', fontWeight: 700, fontSize: 13, marginBottom: 4 }}>
+            <span>⭐ Standard 5-Star Rating</span>
+          </div>
+          <p style={{ margin: 0, fontSize: 12, color: '#365F5D', lineHeight: 1.5 }}>
+            Fixed to standard 5 stars. Respondents tap directly on any of the 5 interactive stars to submit their rating.
+          </p>
         </div>
       )}
 

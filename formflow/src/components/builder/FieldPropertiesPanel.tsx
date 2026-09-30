@@ -174,25 +174,13 @@ export const FieldPropertiesPanel: React.FC<FieldPropertiesPanelProps> = ({
 
         {/* Rating Stars Configuration */}
         {field.type === 'rating' && (
-          <div className="p-3 rounded-xl bg-zinc-950/60 border border-zinc-800 space-y-2">
-            <label className="text-[11px] font-medium text-zinc-400 block">
-              Max Rating Scale
-            </label>
-            <div className="grid grid-cols-4 gap-2">
-              {[3, 5, 7, 10].map((scale) => (
-                <button
-                  key={scale}
-                  onClick={() => onUpdateField({ ...field, maxRating: scale })}
-                  className={`py-1.5 rounded-lg border text-xs font-medium transition-all ${
-                    (field.maxRating || 5) === scale
-                      ? 'border-indigo-500 bg-indigo-500/20 text-white'
-                      : 'border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-zinc-200'
-                  }`}
-                >
-                  {scale} Stars
-                </button>
-              ))}
-            </div>
+          <div className="p-3 rounded-xl bg-zinc-950/60 border border-zinc-800 space-y-1">
+            <span className="text-[11px] font-semibold text-zinc-300 block">
+              ⭐ Standard 5-Star Rating
+            </span>
+            <p className="text-[11px] text-zinc-400">
+              Users tap directly on the 5 stars to submit their rating.
+            </p>
           </div>
         )}
 
