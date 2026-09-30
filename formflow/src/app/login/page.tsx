@@ -127,11 +127,11 @@ export default function LoginPage() {
             width: '100%',
             maxWidth: 440,
             padding: 36,
-            background: 'rgba(15, 23, 42, 0.95)',
-            backdropFilter: 'blur(16px)',
-            borderRadius: 24,
-            boxShadow: '0 24px 60px rgba(0,0,0,0.8), 0 0 30px rgba(139, 92, 246, 0.2)',
-            border: '1px solid rgba(139, 92, 246, 0.35)',
+            background: 'rgba(8, 12, 20, 0.72)',
+            backdropFilter: 'blur(20px)',
+            borderRadius: 20,
+            boxShadow: '0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.06)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
             color: '#FFFFFF',
           }}
         >
@@ -148,22 +148,20 @@ export default function LoginPage() {
           >
             <div
               style={{
-                width: 38,
-                height: 38,
-                borderRadius: 12,
-                background: 'linear-gradient(135deg, #8B5CF6, #7C3AED)',
+                width: 34,
+                height: 34,
+                borderRadius: 9,
+                background: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: 'white',
-                fontWeight: 800,
-                fontSize: 18,
-                boxShadow: '0 4px 14px rgba(139, 92, 246, 0.5)',
+                color: '#E2E8F0',
               }}
             >
-              F
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
             </div>
-            <span style={{ fontWeight: 800, fontSize: 20, color: '#FFFFFF' }}>FormFlow</span>
+            <span style={{ fontWeight: 700, fontSize: 16, letterSpacing: '-0.02em', color: '#FFFFFF' }}>FormFlow</span>
           </Link>
 
           <h1 style={{ fontSize: 24, fontWeight: 800, color: '#FFFFFF', marginBottom: 6 }}>
