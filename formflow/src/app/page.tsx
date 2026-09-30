@@ -18,8 +18,6 @@ import {
   X,
 } from 'lucide-react';
 import LiveBackground from '@/components/LiveBackground';
-import Unified3DCanvas from '@/components/Unified3DCanvas';
-import Scroll3DCard from '@/components/Scroll3DCard';
 
 /* ── Navigation ── */
 function Navbar() {
@@ -54,14 +52,14 @@ function Navbar() {
               width: 36,
               height: 36,
               borderRadius: 10,
-              background: 'linear-gradient(135deg, #F59E0B, #D97706)',
+              background: 'linear-gradient(135deg, #8B5CF6 0%, #F59E0B 100%)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: '#05070D',
+              color: '#FFFFFF',
               fontWeight: 800,
               fontSize: 18,
-              boxShadow: '0 0 12px rgba(245, 158, 11, 0.4)',
+              boxShadow: '0 0 16px rgba(139, 92, 246, 0.4)',
             }}
           >
             F
@@ -71,7 +69,7 @@ function Navbar() {
 
         {/* Desktop nav */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 24 }} className="hidden-mobile">
-          <Link href="/builder" style={{ color: '#FBBF24', textDecoration: 'none', fontSize: 14, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}>
+          <Link href="/builder" style={{ color: '#C084FC', textDecoration: 'none', fontSize: 14, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}>
             ⚡ Form Builder
           </Link>
           <a href="#features" style={{ color: '#FFFFFF', textDecoration: 'none', fontSize: 14, fontWeight: 500 }}>Features</a>
@@ -104,7 +102,7 @@ function Navbar() {
             borderTop: '1px solid rgba(255, 255, 255, 0.1)',
           }}
         >
-          <Link href="/builder" style={{ color: '#FBBF24', fontWeight: 700, textDecoration: 'none' }} onClick={() => setOpen(false)}>⚡ Start Building (Drag & Drop)</Link>
+          <Link href="/builder" style={{ color: '#C084FC', fontWeight: 700, textDecoration: 'none' }} onClick={() => setOpen(false)}>⚡ Start Building (Drag & Drop)</Link>
           <a href="#features" style={{ color: '#FFFFFF', textDecoration: 'none' }} onClick={() => setOpen(false)}>Features</a>
           <a href="#builder-features" style={{ color: '#FFFFFF', textDecoration: 'none' }} onClick={() => setOpen(false)}>Posters & Themes</a>
           <a href="#how-it-works" style={{ color: '#FFFFFF', textDecoration: 'none' }} onClick={() => setOpen(false)}>How It Works</a>
@@ -143,9 +141,9 @@ function Hero() {
           display: 'inline-block',
           padding: '6px 16px',
           borderRadius: 999,
-          background: 'rgba(245, 158, 11, 0.15)',
-          color: '#FBBF24',
-          border: '1px solid rgba(245, 158, 11, 0.35)',
+          background: 'rgba(139, 92, 246, 0.15)',
+          color: '#C084FC',
+          border: '1px solid rgba(139, 92, 246, 0.35)',
           fontSize: 13,
           fontWeight: 700,
           marginBottom: 24,
@@ -165,7 +163,7 @@ function Hero() {
         }}
       >
         Build Smarter Forms.{' '}
-        <span style={{ background: 'linear-gradient(135deg, #FBBF24, #F59E0B)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+        <span style={{ background: 'linear-gradient(135deg, #FBBF24 0%, #C084FC 50%, #8B5CF6 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
           Automate Every Response.
         </span>
       </h1>
@@ -190,159 +188,33 @@ function Hero() {
             fontSize: 16,
             borderRadius: 12,
             padding: '14px 28px',
-            background: 'linear-gradient(135deg, #F59E0B, #D97706)',
-            boxShadow: '0 8px 24px rgba(245, 158, 11, 0.35)',
+            background: 'linear-gradient(135deg, #8B5CF6 0%, #F59E0B 100%)',
+            boxShadow: '0 8px 24px rgba(139, 92, 246, 0.35)',
             display: 'flex',
             alignItems: 'center',
             gap: 10,
-            color: '#05070D',
+            color: '#FFFFFF',
             fontWeight: 800,
           }}
         >
           ⚡ Start Building Form (Drag & Drop) <ArrowRight size={18} />
         </Link>
-        <Link href="#builder-features" className="btn btn-secondary btn-lg" style={{ fontSize: 16, borderRadius: 12, padding: '14px 24px', background: '#0F172A', color: '#FFFFFF', border: '1px solid rgba(245, 158, 11, 0.35)' }}>
+        <Link href="#builder-features" className="btn btn-secondary btn-lg" style={{ fontSize: 16, borderRadius: 12, padding: '14px 24px', background: '#0F172A', color: '#FFFFFF', border: '1px solid rgba(139, 92, 246, 0.35)' }}>
           🎨 Custom Backgrounds & Posters
         </Link>
       </div>
 
       <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 40 }}>
-        <span style={{ fontSize: 12, padding: '6px 14px', background: '#0F172A', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: 20, color: '#FBBF24', fontWeight: 600 }}>
+        <span style={{ fontSize: 12, padding: '6px 14px', background: '#0F172A', border: '1px solid rgba(139, 92, 246, 0.3)', borderRadius: 20, color: '#C084FC', fontWeight: 600 }}>
           ✨ Drag & Drop Builder (dnd-kit)
         </span>
         <span style={{ fontSize: 12, padding: '6px 14px', background: '#0F172A', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: 20, color: '#FBBF24', fontWeight: 600 }}>
           🎨 Solid, Gradients & Patterns
         </span>
-        <span style={{ fontSize: 12, padding: '6px 14px', background: '#0F172A', border: '1px solid rgba(245, 158, 11, 0.3)', borderRadius: 20, color: '#FBBF24', fontWeight: 600 }}>
+        <span style={{ fontSize: 12, padding: '6px 14px', background: '#0F172A', border: '1px solid rgba(139, 92, 246, 0.3)', borderRadius: 20, color: '#C084FC', fontWeight: 600 }}>
           🖼️ Custom Form Posters & Banners
         </span>
       </div>
-
-      {/* Product Preview */}
-      <div
-        style={{
-          marginTop: 60,
-          borderRadius: 20,
-          overflow: 'hidden',
-          boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 0 30px rgba(99,102,241,0.15)',
-          border: '1px solid rgba(255,255,255,0.12)',
-          background: 'rgba(17, 24, 39, 0.85)',
-          backdropFilter: 'blur(16px)',
-        }}
-      >
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '180px 1fr 200px',
-            minHeight: 320,
-            fontSize: 13,
-          }}
-        >
-          {/* Left panel */}
-          <div style={{ borderRight: '1px solid rgba(255,255,255,0.12)', padding: 16 }}>
-            <div style={{ fontWeight: 700, marginBottom: 16, color: '#FBBF24', fontSize: 12, textTransform: 'uppercase', letterSpacing: 1.2 }}>Field Types</div>
-            {['Short Text', 'Paragraph', 'Multiple Choice', 'Rating Stars', 'File Upload', 'Date Picker'].map((t, i) => (
-              <div
-                key={i}
-                style={{
-                  padding: '8px 12px',
-                  borderRadius: 8,
-                  marginBottom: 4,
-                  background: i === 0 ? 'rgba(245, 158, 11, 0.25)' : 'transparent',
-                  color: i === 0 ? '#FFFFFF' : '#F8FAFC',
-                  cursor: 'pointer',
-                  fontSize: 13,
-                  fontWeight: i === 0 ? 700 : 500,
-                  border: i === 0 ? '1px solid rgba(245, 158, 11, 0.5)' : '1px solid transparent',
-                }}
-              >
-                {t}
-              </div>
-            ))}
-          </div>
-
-          {/* Center canvas with Poster Preview */}
-          <div style={{ padding: 0, overflow: 'hidden' }}>
-            {/* Poster Header */}
-            <div style={{ position: 'relative', height: 90, overflow: 'hidden', background: '#0F172A' }}>
-              <img
-                src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80"
-                alt="Form Poster"
-                style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.85 }}
-              />
-              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(5,7,13,0.8), transparent)', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '8px 16px', color: 'white' }}>
-                <span style={{ fontSize: 10, background: 'rgba(245, 158, 11, 0.3)', padding: '2px 8px', borderRadius: 10, width: 'fit-content', fontWeight: 600, marginBottom: 2, color: '#FBBF24' }}>Poster Header</span>
-                <span style={{ fontSize: 13, fontWeight: 700 }}>Innov8 Hackathon 2026</span>
-              </div>
-            </div>
-
-            <div style={{ padding: 20 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                <span style={{ fontWeight: 700, fontSize: 15, color: '#FFFFFF' }}>Participant Registration</span>
-                <Link href="/builder" style={{ fontSize: 12, color: '#FBBF24', fontWeight: 700, textDecoration: 'none' }}>Open Live Builder →</Link>
-              </div>
-              {[
-                { label: 'Full Name', type: 'Short Text' },
-                { label: 'Are you a student?', type: 'Multiple Choice' },
-                { label: 'Rate your experience', type: 'Rating' },
-              ].map((q, i) => (
-                <div
-                  key={i}
-                  className="card"
-                  style={{
-                    padding: '10px 14px',
-                    marginBottom: 8,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    cursor: 'grab',
-                    background: 'rgba(15, 23, 42, 0.9)',
-                    borderColor: 'rgba(245, 158, 11, 0.25)',
-                  }}
-                >
-                  <div>
-                    <span style={{ fontWeight: 600, fontSize: 13, color: '#FFFFFF' }}>{q.label}</span>
-                    <span style={{ color: '#FBBF24', fontSize: 11, marginLeft: 8, fontWeight: 600 }}>{q.type}</span>
-                  </div>
-                  <span style={{ color: '#F8FAFC' }}>⋮⋮</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Right panel */}
-          <div style={{ borderLeft: '1px solid rgba(255,255,255,0.12)', padding: 16 }}>
-            <div style={{ fontWeight: 700, marginBottom: 16, color: '#FBBF24', fontSize: 12, textTransform: 'uppercase', letterSpacing: 1.2 }}>Properties</div>
-            <div style={{ marginBottom: 12 }}>
-              <div style={{ fontSize: 12, color: '#F8FAFC', marginBottom: 4, fontWeight: 600 }}>Question</div>
-              <div style={{ padding: '6px 10px', border: '1px solid rgba(245,158,11,0.3)', borderRadius: 6, fontSize: 13, background: 'rgba(15, 23, 42, 0.9)', color: '#FFFFFF', fontWeight: 600 }}>Full Name</div>
-            </div>
-            <div style={{ marginBottom: 12 }}>
-              <div style={{ fontSize: 12, color: '#F8FAFC', marginBottom: 4, fontWeight: 600 }}>Required</div>
-              <div style={{ width: 36, height: 20, borderRadius: 10, background: '#F59E0B', position: 'relative' }}>
-                <div style={{ width: 16, height: 16, borderRadius: 8, background: '#05070D', position: 'absolute', top: 2, right: 2 }} />
-              </div>
-            </div>
-            <div>
-              <div style={{ fontSize: 12, color: '#F8FAFC', marginBottom: 4, fontWeight: 600 }}>Placeholder</div>
-              <div style={{ padding: '6px 10px', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 6, fontSize: 13, color: '#F8FAFC', background: 'rgba(15, 23, 42, 0.9)' }}>Enter name...</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <style>{`
-        @media (max-width: 768px) {
-          section > div:last-child > div {
-            grid-template-columns: 1fr !important;
-            min-height: auto !important;
-          }
-          section > div:last-child > div > div:first-child,
-          section > div:last-child > div > div:last-child {
-            display: none !important;
-          }
-        }
-      `}</style>
     </section>
   );
 }
@@ -549,28 +421,26 @@ function Features() {
         }}
       >
         {features.map((f, i) => (
-          <Scroll3DCard key={i}>
-            <div className="card" style={{ padding: 32, background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(245, 158, 11, 0.25)' }}>
-              <div
-                style={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: 12,
-                  background: 'rgba(245, 158, 11, 0.15)',
-                  border: '1px solid rgba(245, 158, 11, 0.3)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginBottom: 20,
-                  color: '#FBBF24',
-                }}
-              >
-                <f.icon size={24} />
-              </div>
-              <h3 style={{ fontSize: 18, fontWeight: 700, color: '#FFFFFF', marginBottom: 8 }}>{f.title}</h3>
-              <p style={{ color: '#F8FAFC', fontSize: 14, lineHeight: 1.7 }}>{f.desc}</p>
+          <div key={i} className="card" style={{ padding: 32, background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(245, 158, 11, 0.25)' }}>
+            <div
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: 12,
+                background: 'rgba(245, 158, 11, 0.15)',
+                border: '1px solid rgba(245, 158, 11, 0.3)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: 20,
+                color: '#FBBF24',
+              }}
+            >
+              <f.icon size={24} />
             </div>
-          </Scroll3DCard>
+            <h3 style={{ fontSize: 18, fontWeight: 700, color: '#FFFFFF', marginBottom: 8 }}>{f.title}</h3>
+            <p style={{ color: '#F8FAFC', fontSize: 14, lineHeight: 1.7 }}>{f.desc}</p>
+          </div>
         ))}
       </div>
     </section>
@@ -595,59 +465,58 @@ function HowItWorks() {
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
         {steps.map((s, i) => (
-          <Scroll3DCard key={i}>
-            <div
-              style={{
-                display: 'flex',
-                gap: 24,
-                alignItems: 'flex-start',
-                position: 'relative',
-                paddingBottom: i < steps.length - 1 ? 48 : 0,
-              }}
-            >
-              {/* Line */}
-              {i < steps.length - 1 && (
-                <div
-                  style={{
-                    position: 'absolute',
-                    left: 23,
-                    top: 48,
-                    bottom: 0,
-                    width: 2,
-                    background: 'linear-gradient(to bottom, #F59E0B, rgba(245,158,11,0.2))',
-                  }}
-                />
-              )}
-
+          <div
+            key={i}
+            style={{
+              display: 'flex',
+              gap: 24,
+              alignItems: 'flex-start',
+              position: 'relative',
+              paddingBottom: i < steps.length - 1 ? 48 : 0,
+            }}
+          >
+            {/* Line */}
+            {i < steps.length - 1 && (
               <div
                 style={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: 14,
-                  background: 'linear-gradient(135deg, #F59E0B, #D97706)',
-                  color: '#05070D',
-                  fontWeight: 800,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                  position: 'relative',
-                  zIndex: 1,
-                  boxShadow: '0 0 15px rgba(245,158,11,0.4)',
+                  position: 'absolute',
+                  left: 23,
+                  top: 48,
+                  bottom: 0,
+                  width: 2,
+                  background: 'linear-gradient(to bottom, #F59E0B, rgba(245,158,11,0.2))',
                 }}
-              >
-                <s.icon size={22} />
-              </div>
+              />
+            )}
 
-              <div style={{ paddingTop: 4 }}>
-                <h3 style={{ fontSize: 18, fontWeight: 700, color: '#FFFFFF', marginBottom: 6 }}>
-                  <span style={{ color: '#FBBF24', marginRight: 8 }}>0{i + 1}</span>
-                  {s.title}
-                </h3>
-                <p style={{ color: '#F8FAFC', fontSize: 14, lineHeight: 1.7 }}>{s.desc}</p>
-              </div>
+            <div
+              style={{
+                width: 48,
+                height: 48,
+                borderRadius: 14,
+                background: 'linear-gradient(135deg, #F59E0B, #D97706)',
+                color: '#05070D',
+                fontWeight: 800,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+                position: 'relative',
+                zIndex: 1,
+                boxShadow: '0 0 15px rgba(245,158,11,0.4)',
+              }}
+            >
+              <s.icon size={22} />
             </div>
-          </Scroll3DCard>
+
+            <div style={{ paddingTop: 4 }}>
+              <h3 style={{ fontSize: 18, fontWeight: 700, color: '#FFFFFF', marginBottom: 6 }}>
+                <span style={{ color: '#FBBF24', marginRight: 8 }}>0{i + 1}</span>
+                {s.title}
+              </h3>
+              <p style={{ color: '#F8FAFC', fontSize: 14, lineHeight: 1.7 }}>{s.desc}</p>
+            </div>
+          </div>
         ))}
       </div>
     </section>
@@ -667,38 +536,36 @@ function LogicDemo() {
         </p>
       </div>
 
-      <Scroll3DCard>
-        <div className="card" style={{ padding: 32, maxWidth: 600, margin: '0 auto', background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(245, 158, 11, 0.3)' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <span style={{ background: '#F59E0B', color: '#05070D', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 800 }}>IF</span>
-              <div style={{ flex: 1, padding: '8px 14px', border: '1px solid rgba(245,158,11,0.25)', borderRadius: 8, fontSize: 14, color: '#FFFFFF', background: '#0F172A' }}>
-                &quot;Are you a student?&quot;
-              </div>
+      <div className="card" style={{ padding: 32, maxWidth: 600, margin: '0 auto', background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(245, 158, 11, 0.3)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <span style={{ background: '#F59E0B', color: '#05070D', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 800 }}>IF</span>
+            <div style={{ flex: 1, padding: '8px 14px', border: '1px solid rgba(245,158,11,0.25)', borderRadius: 8, fontSize: 14, color: '#FFFFFF', background: '#0F172A' }}>
+              &quot;Are you a student?&quot;
             </div>
+          </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <span style={{ background: 'rgba(245, 158, 11, 0.2)', color: '#FBBF24', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 700, border: '1px solid rgba(245,158,11,0.35)' }}>EQUALS</span>
-              <div style={{ flex: 1, padding: '8px 14px', border: '1px solid rgba(245,158,11,0.25)', borderRadius: 8, fontSize: 14, color: '#FFFFFF', background: '#0F172A' }}>
-                &quot;Yes&quot;
-              </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <span style={{ background: 'rgba(245, 158, 11, 0.2)', color: '#FBBF24', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 700, border: '1px solid rgba(245,158,11,0.35)' }}>EQUALS</span>
+            <div style={{ flex: 1, padding: '8px 14px', border: '1px solid rgba(245,158,11,0.25)', borderRadius: 8, fontSize: 14, color: '#FFFFFF', background: '#0F172A' }}>
+              &quot;Yes&quot;
             </div>
+          </div>
 
-            <div style={{ borderTop: '1px dashed rgba(245,158,11,0.3)', paddingTop: 16 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-                <span style={{ background: 'rgba(245, 158, 11, 0.2)', color: '#FBBF24', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 700, border: '1px solid rgba(245,158,11,0.35)' }}>THEN</span>
-                <span style={{ fontSize: 14, color: '#FFFFFF' }}>Show &quot;College Name&quot;</span>
-                <CheckCircle2 size={16} style={{ color: '#F59E0B' }} />
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <span style={{ background: 'rgba(245, 158, 11, 0.2)', color: '#FBBF24', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 700, border: '1px solid rgba(245,158,11,0.35)' }}>AND</span>
-                <span style={{ fontSize: 14, color: '#FFFFFF' }}>Show &quot;Year of Study&quot;</span>
-                <CheckCircle2 size={16} style={{ color: '#F59E0B' }} />
-              </div>
+          <div style={{ borderTop: '1px dashed rgba(245,158,11,0.3)', paddingTop: 16 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+              <span style={{ background: 'rgba(245, 158, 11, 0.2)', color: '#FBBF24', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 700, border: '1px solid rgba(245,158,11,0.35)' }}>THEN</span>
+              <span style={{ fontSize: 14, color: '#FFFFFF' }}>Show &quot;College Name&quot;</span>
+              <CheckCircle2 size={16} style={{ color: '#F59E0B' }} />
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <span style={{ background: 'rgba(245, 158, 11, 0.2)', color: '#FBBF24', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 700, border: '1px solid rgba(245,158,11,0.35)' }}>AND</span>
+              <span style={{ fontSize: 14, color: '#FFFFFF' }}>Show &quot;Year of Study&quot;</span>
+              <CheckCircle2 size={16} style={{ color: '#F59E0B' }} />
             </div>
           </div>
         </div>
-      </Scroll3DCard>
+      </div>
     </section>
   );
 }
@@ -723,13 +590,11 @@ function AnalyticsDemo() {
           { label: 'Avg. Rating', value: '4.6 ★', change: '+0.2' },
           { label: 'Today', value: '34', change: '+8' },
         ].map((s, i) => (
-          <Scroll3DCard key={i}>
-            <div className="card" style={{ padding: 24, textAlign: 'center', background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(245, 158, 11, 0.25)' }}>
-              <div style={{ fontSize: 28, fontWeight: 700, color: '#FFFFFF', marginBottom: 4 }}>{s.value}</div>
-              <div style={{ fontSize: 13, color: '#F8FAFC', marginBottom: 6 }}>{s.label}</div>
-              <span style={{ fontSize: 12, color: '#FBBF24', fontWeight: 600 }}>{s.change}</span>
-            </div>
-          </Scroll3DCard>
+          <div key={i} className="card" style={{ padding: 24, textAlign: 'center', background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(245, 158, 11, 0.25)' }}>
+            <div style={{ fontSize: 28, fontWeight: 700, color: '#FFFFFF', marginBottom: 4 }}>{s.value}</div>
+            <div style={{ fontSize: 13, color: '#F8FAFC', marginBottom: 6 }}>{s.label}</div>
+            <span style={{ fontSize: 12, color: '#FBBF24', fontWeight: 600 }}>{s.change}</span>
+          </div>
         ))}
       </div>
     </section>
@@ -747,21 +612,19 @@ function Integrations() {
         Trigger webhooks on every form submission. Integrate with Slack, Discord, Zapier, and any custom endpoint.
       </p>
 
-      <Scroll3DCard>
-        <div className="card" style={{ padding: 32, maxWidth: 500, margin: '0 auto', textAlign: 'left', background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(245, 158, 11, 0.3)' }}>
-          <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, color: '#FFFFFF' }}>Webhook Configuration</div>
-          <div style={{ marginBottom: 12 }}>
-            <div style={{ fontSize: 12, color: '#F8FAFC', marginBottom: 4 }}>Webhook URL</div>
-            <div style={{ padding: '8px 14px', border: '1px solid rgba(245,158,11,0.25)', borderRadius: 8, fontSize: 13, color: '#F8FAFC', background: '#0F172A' }}>
-              https://hooks.slack.com/services/...
-            </div>
-          </div>
-          <div style={{ display: 'flex', gap: 12 }}>
-            <div className="btn btn-primary btn-sm">Save Webhook</div>
-            <div className="btn btn-secondary btn-sm" style={{ background: '#0F172A', color: '#FFFFFF', border: '1px solid rgba(245,158,11,0.3)' }}>Test Webhook</div>
+      <div className="card" style={{ padding: 32, maxWidth: 500, margin: '0 auto', textAlign: 'left', background: 'rgba(15, 23, 42, 0.85)', border: '1px solid rgba(245, 158, 11, 0.3)' }}>
+        <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, color: '#FFFFFF' }}>Webhook Configuration</div>
+        <div style={{ marginBottom: 12 }}>
+          <div style={{ fontSize: 12, color: '#F8FAFC', marginBottom: 4 }}>Webhook URL</div>
+          <div style={{ padding: '8px 14px', border: '1px solid rgba(245,158,11,0.25)', borderRadius: 8, fontSize: 13, color: '#F8FAFC', background: '#0F172A' }}>
+            https://hooks.slack.com/services/...
           </div>
         </div>
-      </Scroll3DCard>
+        <div style={{ display: 'flex', gap: 12 }}>
+          <div className="btn btn-primary btn-sm">Save Webhook</div>
+          <div className="btn btn-secondary btn-sm" style={{ background: '#0F172A', color: '#FFFFFF', border: '1px solid rgba(245,158,11,0.3)' }}>Test Webhook</div>
+        </div>
+      </div>
     </section>
   );
 }
@@ -777,29 +640,27 @@ function CTA() {
         zIndex: 1,
       }}
     >
-      <Scroll3DCard>
-        <div
-          className="card"
-          style={{
-            maxWidth: 700,
-            margin: '0 auto',
-            padding: '60px 40px',
-            background: 'linear-gradient(135deg, #0F172A, #1E293B)',
-            border: '1px solid rgba(245, 158, 11, 0.35)',
-            boxShadow: '0 0 40px rgba(245,158,11,0.2)',
-          }}
-        >
-          <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2rem)', fontWeight: 800, color: '#FFFFFF', marginBottom: 12 }}>
-            Ready to build smarter forms?
-          </h2>
-          <p style={{ color: '#F8FAFC', marginBottom: 32, fontSize: 16 }}>
-            Start creating in minutes. No credit card required.
-          </p>
-          <Link href="/builder" className="btn btn-primary btn-lg" style={{ fontSize: 16, borderRadius: 12, background: 'linear-gradient(135deg, #F59E0B, #D97706)', color: '#05070D', fontWeight: 800 }}>
-            Get Started for Free <ArrowRight size={18} />
-          </Link>
-        </div>
-      </Scroll3DCard>
+      <div
+        className="card"
+        style={{
+          maxWidth: 700,
+          margin: '0 auto',
+          padding: '60px 40px',
+          background: 'linear-gradient(135deg, #0F172A, #1E293B)',
+          border: '1px solid rgba(245, 158, 11, 0.35)',
+          boxShadow: '0 0 40px rgba(245,158,11,0.2)',
+        }}
+      >
+        <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2rem)', fontWeight: 800, color: '#FFFFFF', marginBottom: 12 }}>
+          Ready to build smarter forms?
+        </h2>
+        <p style={{ color: '#F8FAFC', marginBottom: 32, fontSize: 16 }}>
+          Start creating in minutes. No credit card required.
+        </p>
+        <Link href="/builder" className="btn btn-primary btn-lg" style={{ fontSize: 16, borderRadius: 12, background: 'linear-gradient(135deg, #F59E0B, #D97706)', color: '#05070D', fontWeight: 800 }}>
+          Get Started for Free <ArrowRight size={18} />
+        </Link>
+      </div>
     </section>
   );
 }
@@ -847,7 +708,6 @@ export default function LandingPage() {
   return (
     <>
       <LiveBackground />
-      <Unified3DCanvas />
       <Navbar />
       <main>
         <Hero />

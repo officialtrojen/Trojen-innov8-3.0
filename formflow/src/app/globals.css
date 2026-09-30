@@ -6,11 +6,14 @@
 
 /* ---------- Design Tokens (Aesthetic Obsidian & Cyber Indigo) ---------- */
 :root {
-  /* Strict Palette: Black, Navy Blue, Ochre Yellow, White */
+  /* Palette: Black, Navy Blue, Ochre Yellow, Electric Purple, White */
   --page-bg: #05070D;
   --card-bg: rgba(15, 23, 42, 0.85);
   --primary: #F59E0B;
   --primary-hover: #D97706;
+  --purple-primary: #8B5CF6;
+  --purple-accent: #A855F7;
+  --purple-glow: rgba(139, 92, 246, 0.25);
   --input-border: rgba(245, 158, 11, 0.3);
   --text-main: #FFFFFF;
   --text-muted: #F8FAFC;
@@ -32,7 +35,7 @@
   /* Shadows & Glows */
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
   --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 15px rgba(245, 158, 11, 0.15);
-  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.8), 0 0 30px rgba(245, 158, 11, 0.25);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.8), 0 0 30px rgba(139, 92, 246, 0.25);
 
   /* Typography */
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -124,10 +127,11 @@ body {
 .live-bg__blob--3 {
   width: 450px;
   height: 450px;
-  background: #0F172A;
+  background: #8B5CF6;
   bottom: -10%;
   left: 20%;
   animation: blob-drift-3 28s ease-in-out infinite;
+  opacity: 0.2;
 }
 
 .live-bg__blob--4 {
@@ -141,12 +145,13 @@ body {
 }
 
 .live-bg__blob--5 {
-  width: 350px;
-  height: 350px;
-  background: #1E293B;
+  width: 380px;
+  height: 380px;
+  background: #A855F7;
   bottom: 15%;
   right: 15%;
   animation: blob-drift-5 32s ease-in-out infinite;
+  opacity: 0.18;
 }
 
 @keyframes blob-drift-1 {
@@ -190,6 +195,7 @@ body {
   }
 }
 
+<<<<<<< HEAD
 /* ---------- Card & Clean Elevation ---------- */
 .card {
   background: #FFFEF9;
@@ -206,6 +212,24 @@ body {
 }
 
 /* ---------- Button Variants ---------- */
+=======
+/* ---------- Card & Glassmorphism (Navy Blue & Ochre) ---------- */
+.card {
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(16px);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: rgba(245, 158, 11, 0.4);
+}
+
+/* ---------- Button Variants (Ochre Yellow Primary) ---------- */
+>>>>>>> c242365 (add_purple_accents_and_streamline_landing)
 .btn {
   display: inline-flex;
   align-items: center;
@@ -215,8 +239,8 @@ body {
   border: none;
   border-radius: var(--radius-sm);
   font-family: var(--font-sans);
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 14px;
+  font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
   text-decoration: none;
@@ -224,17 +248,16 @@ body {
 }
 
 .btn-primary {
-  background: #4F7C7A;
-  color: #FFFEF9;
-  box-shadow: 0 2px 8px rgba(79, 124, 122, 0.25);
-  border: 1px solid #365F5D;
+  background: linear-gradient(135deg, #8B5CF6 0%, #F59E0B 100%);
+  color: #FFFFFF;
+  box-shadow: 0 4px 14px rgba(139, 92, 246, 0.35);
 }
 
 .btn-primary:hover {
-  background: #365F5D;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(79, 124, 122, 0.35);
-  color: #FFFEF9;
+  background: linear-gradient(135deg, #A855F7 0%, #FBBF24 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
+  color: #FFFFFF;
 }
 
 .btn-primary:active {
@@ -242,25 +265,36 @@ body {
 }
 
 .btn-secondary {
-  background: #EAF4F4;
-  color: #263B3B;
-  border: 1.5px solid #B8CECF;
+  background: rgba(15, 23, 42, 0.9);
+  color: #FFFFFF;
+  border: 1px solid rgba(139, 92, 246, 0.35);
+  backdrop-filter: blur(8px);
 }
 
 .btn-secondary:hover {
-  background: #CFE5E3;
-  border-color: #4F7C7A;
-  color: #263B3B;
+  background: rgba(139, 92, 246, 0.15);
+  border-color: #8B5CF6;
+  color: #C084FC;
 }
 
 .btn-ghost {
   background: transparent;
-  color: #365F5D;
+  color: #FFFFFF;
 }
 
 .btn-ghost:hover {
-  background: #EAF4F4;
-  color: #263B3B;
+  background: rgba(139, 92, 246, 0.15);
+  color: #C084FC;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: #FFFFFF;
+}
+
+.btn-ghost:hover {
+  background: rgba(245, 158, 11, 0.15);
+  color: #FBBF24;
 }
 
 .btn-danger {
