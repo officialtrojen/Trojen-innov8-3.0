@@ -14,11 +14,14 @@ import {
   BarChart3,
   Copy,
   Trash2,
+  Sparkles,
+  Share2,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/components/AuthProvider';
 import { DBForm, DashboardStats } from '@/lib/types';
 import { formatDate, truncate } from '@/lib/utils';
+import ShareModal from '@/components/builder/ShareModal';
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -26,6 +29,7 @@ export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats>({ totalForms: 0, publishedForms: 0, totalResponses: 0, avgResponseRate: 0 });
   const [forms, setForms] = useState<DBForm[]>([]);
   const [loading, setLoading] = useState(true);
+  const [shareModalForm, setShareModalForm] = useState<DBForm | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -182,7 +186,20 @@ export default function DashboardPage() {
                         <Link href={`/dashboard/forms/${form.id}/responses`} className="btn btn-ghost btn-sm" title="Responses">
                           <MessageSquare size={15} />
                         </Link>
-                        <Link href={`/dashboard/forms/${form.id}/analytics`} className="btn btn-ghost btn-sm" title="Analytics">
+                        <button
+                          onClick={() => setShareModalForm(form)}
+                          className="btn btn-ghost btn-sm"
+                          title="Share / Get Public Submission Link"
+                          style={{ color: '#38BDF8' }}
+                        >
+                          <Share2 size={15} />
+                        </button>
+                        <Link
+                          href={`/dashboard/forms/${form.id}/analytics`}
+                          className="btn btn-ghost btn-sm"
+                          title="View Analytics"
+                          style={{ color: '#94A3B8' }}
+                        >
                           <BarChart3 size={15} />
                         </Link>
                         <button onClick={() => handleDuplicate(form)} className="btn btn-ghost btn-sm" title="Duplicate">
@@ -200,6 +217,15 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
+
+      {/* Share Modal Dialog */}
+      <ShareModal
+        isOpen={!!shareModalForm}
+        onClose={() => setShareModalForm(null)}
+        formTitle={shareModalForm?.title || ''}
+        publicSlug={shareModalForm?.public_slug || ''}
+        formId={shareModalForm?.id}
+      />
     </div>
   );
 }

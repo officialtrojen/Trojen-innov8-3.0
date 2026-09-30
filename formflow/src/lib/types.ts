@@ -85,6 +85,12 @@ export interface FormTheme {
   backgroundPattern?: 'dots' | 'grid' | 'mesh' | 'stripes' | 'none';
   backgroundImage?: string;
   backgroundBlur?: number;
+  backgroundOverlay?: number;
+  // Form Page / Card customization options
+  cardBackground?: string;
+  cardOpacity?: number; // 0-100
+  cardBorderRadius?: number; // px
+  cardShadow?: 'none' | 'subtle' | 'elevated' | 'glow';
   // Poster in form options
   posterUrl?: string;
   posterStyle?: 'banner' | 'card-top' | 'floating' | 'background';
@@ -96,6 +102,10 @@ export interface FormTheme {
 
 export const DEFAULT_THEME: FormTheme = {
   background: '#EAF4F4',
+  cardBackground: '#FFFFFF',
+  cardOpacity: 100,
+  cardBorderRadius: 20,
+  cardShadow: 'elevated',
   primary: '#4F7C7A',
   secondary: '#CFE5E3',
   text: '#263B3B',

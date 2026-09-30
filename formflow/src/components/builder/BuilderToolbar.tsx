@@ -1,14 +1,15 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { Save, Globe, Eye, GitBranch, Palette, Link as LinkIcon, Check } from 'lucide-react';
+import { Save, Globe, Eye, GitBranch, Palette, Share2, Check } from 'lucide-react';
+import ShareModal from '@/components/builder/ShareModal';
 
 interface BuilderToolbarProps {
   title: string;
   onTitleChange: (title: string) => void;
   onSave: () => void;
-  onPublish: () => void;
+  onPublish: () => void | Promise<void>;
   saving: boolean;
   formStatus: string;
   publicSlug: string;
@@ -29,100 +30,156 @@ export default function BuilderToolbar({
   activePanel,
   onPanelChange,
 }: BuilderToolbarProps) {
-  const [copied, setCopied] = React.useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [publishing, setPublishing] = useState(false);
 
-  const handleCopyLink = () => {
-    const url = `${window.location.origin}/f/${publicSlug}`;
-    navigator.clipboard.writeText(url);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const handlePublishClick = async () => {
+    setPublishing(true);
+    try {
+      await onPublish();
+      // Open share modal immediately upon publishing so creator gets the public submission URL
+      setIsShareModalOpen(true);
+    } finally {
+      setPublishing(false);
+    }
   };
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '10px 20px',
-        background: '#FFFEF9',
-        borderBottom: '1px solid #B8CECF',
-        gap: 12,
-        flexWrap: 'wrap',
-      }}
-    >
-      {/* Left: Title */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, minWidth: 200 }}>
-        <input
-          value={title}
-          onChange={(e) => onTitleChange(e.target.value)}
-          style={{
-            border: 'none',
-            background: 'transparent',
-            fontSize: 16,
-            fontWeight: 600,
-            color: '#263B3B',
-            width: '100%',
-            maxWidth: 300,
-            padding: '4px 0',
-            outline: 'none',
-          }}
-          placeholder="Form Title"
-        />
-        <span className={`badge badge-${formStatus}`} style={{ flexShrink: 0 }}>
-          {formStatus.charAt(0).toUpperCase() + formStatus.slice(1)}
-        </span>
-      </div>
-
-      {/* Center: Panel toggles */}
-      <div style={{ display: 'flex', gap: 4, background: 'var(--accent)', borderRadius: 8, padding: 3 }}>
-        {([
-          { key: 'properties', label: 'Fields', icon: null },
-          { key: 'logic', label: 'Logic', icon: GitBranch },
-          { key: 'theme', label: 'Theme & Poster', icon: Palette },
-        ] as const).map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => onPanelChange(tab.key)}
-            className="btn btn-sm"
+    <>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '10px 20px',
+          background: '#FCFBF7',
+          borderBottom: '1px solid rgba(122, 139, 153, 0.25)',
+          gap: 12,
+          flexWrap: 'wrap',
+        }}
+      >
+        {/* Left: Title */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, minWidth: 200 }}>
+          <input
+            value={title}
+            onChange={(e) => onTitleChange(e.target.value)}
             style={{
-              background: activePanel === tab.key ? 'white' : 'transparent',
-              color: activePanel === tab.key ? 'var(--primary)' : '#52796F',
-              boxShadow: activePanel === tab.key ? 'var(--shadow-sm)' : 'none',
-              borderRadius: 6,
-              fontSize: 12,
-              fontWeight: 500,
               border: 'none',
+              background: 'transparent',
+              fontSize: 16,
+              fontWeight: 600,
+              color: '#2A2E33',
+              width: '100%',
+              maxWidth: 300,
+              padding: '4px 0',
+              outline: 'none',
+            }}
+            placeholder="Form Title"
+          />
+          <span className={`badge badge-${formStatus}`} style={{ flexShrink: 0 }}>
+            {formStatus.charAt(0).toUpperCase() + formStatus.slice(1)}
+          </span>
+        </div>
+
+        {/* Center: Panel toggles */}
+        <div style={{ display: 'flex', gap: 4, background: '#F2EFE9', borderRadius: 8, padding: 3 }}>
+          {([
+            { key: 'properties', label: 'Fields', icon: null },
+            { key: 'logic', label: 'Logic', icon: GitBranch },
+            { key: 'theme', label: 'Theme & Poster', icon: Palette },
+          ] as const).map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => onPanelChange(tab.key)}
+              className="btn btn-sm"
+              style={{
+                background: activePanel === tab.key ? '#FFFFFF' : 'transparent',
+                color: activePanel === tab.key ? '#2A2E33' : '#7A8B99',
+                boxShadow: activePanel === tab.key ? '0 1px 3px rgba(42, 46, 51, 0.1)' : 'none',
+                borderRadius: 6,
+                fontSize: 12,
+                fontWeight: 600,
+                border: 'none',
+                cursor: 'pointer',
+              }}
+            >
+              {tab.icon && <tab.icon size={13} />}
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Right: Actions */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          {formStatus === 'published' && (
+            <button
+              onClick={() => setIsShareModalOpen(true)}
+              className="btn btn-ghost btn-sm"
+              title="Get Shareable Link"
+              style={{
+                color: '#2A2E33',
+                background: '#F2EFE9',
+                border: '1px solid rgba(122, 139, 153, 0.25)',
+                fontWeight: 600,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+              }}
+            >
+              <Share2 size={14} style={{ color: '#2A2E33' }} />
+              Share Link
+            </button>
+          )}
+
+          <Link
+            href={`/dashboard/forms/${formId}/preview`}
+            className="btn btn-ghost btn-sm"
+            style={{ color: '#2A2E33', fontWeight: 600 }}
+          >
+            <Eye size={15} /> Preview
+          </Link>
+
+          <button
+            onClick={onSave}
+            className="btn btn-secondary btn-sm"
+            disabled={saving}
+            style={{
+              background: '#FFFFFF',
+              color: '#2A2E33',
+              border: '1px solid #D8D2C7',
+              fontWeight: 600,
             }}
           >
-            {tab.icon && <tab.icon size={13} />}
-            {tab.label}
+            {saving ? <span className="spinner" /> : <Save size={15} />}
+            Save
           </button>
-        ))}
+
+          <button
+            onClick={handlePublishClick}
+            className="btn btn-primary btn-sm"
+            disabled={publishing}
+            style={{
+              background: '#2A2E33',
+              color: '#FCFBF7',
+              fontWeight: 600,
+              border: 'none',
+              boxShadow: '0 2px 6px rgba(42, 46, 51, 0.18)',
+            }}
+          >
+            {publishing ? <span className="spinner" /> : <Globe size={15} />}
+            {formStatus === 'published' ? 'Publish Changes' : 'Publish'}
+          </button>
+        </div>
       </div>
 
-      {/* Right: Actions */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        {formStatus === 'published' && (
-          <button onClick={handleCopyLink} className="btn btn-ghost btn-sm" title="Copy public link">
-            {copied ? <Check size={15} style={{ color: '#28a745' }} /> : <LinkIcon size={15} />}
-            {copied ? 'Copied!' : 'Share'}
-          </button>
-        )}
-
-        <Link href={`/dashboard/forms/${formId}/preview`} className="btn btn-ghost btn-sm">
-          <Eye size={15} /> Preview
-        </Link>
-
-        <button onClick={onSave} className="btn btn-secondary btn-sm" disabled={saving}>
-          {saving ? <span className="spinner" /> : <Save size={15} />}
-          Save
-        </button>
-
-        <button onClick={onPublish} className="btn btn-primary btn-sm">
-          <Globe size={15} /> Publish
-        </button>
-      </div>
-    </div>
+      {/* Share Modal Dialog */}
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        formTitle={title}
+        publicSlug={publicSlug}
+        formId={formId}
+      />
+    </>
   );
 }

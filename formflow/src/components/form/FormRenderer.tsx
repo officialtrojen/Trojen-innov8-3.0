@@ -4,7 +4,7 @@ import React, { useState, useCallback } from 'react';
 import { FormSchema, FormField } from '@/lib/types';
 import { getVisibleFields, getNextQuestion } from '@/lib/logic-engine';
 import { Star, Upload, CheckCircle2, Image as ImageIcon } from 'lucide-react';
-import { getBackgroundStyle } from '@/lib/theme-presets';
+import { getBackgroundStyle, getCardStyle, isDarkColor } from '@/lib/theme-presets';
 import TypeformRenderer from './TypeformRenderer';
 
 interface FormRendererProps {
@@ -403,6 +403,9 @@ export default function FormRenderer({ schema, onSubmit, readOnly = false }: For
   const currentPoster = schema.theme.posterUrl || schema.theme.bannerUrl;
   const posterHeight = schema.theme.posterHeight || 180;
   const overlayOpacity = (schema.theme.posterOverlay ?? 20) / 100;
+  const isDarkCard = isDarkColor(schema.theme.cardBackground);
+  const cardStyle = getCardStyle(schema.theme);
+
   // ---------- Single Page Layout ----------
   return (
     <div
@@ -416,13 +419,10 @@ export default function FormRenderer({ schema, onSubmit, readOnly = false }: For
       <form onSubmit={handleSubmit} style={{ maxWidth: 700, margin: '0 auto', width: '100%' }}>
         <div
           style={{
-            background: 'white',
-            borderRadius: 20,
             overflow: 'hidden',
-            boxShadow: '0 24px 64px rgba(38, 59, 59, 0.15), 0 8px 24px rgba(38, 59, 59, 0.08), 0 1px 3px rgba(38, 59, 59, 0.05)',
             marginBottom: 48,
-            border: '1px solid rgba(184,206,207,0.5)',
             transition: 'box-shadow 0.3s ease',
+            ...cardStyle,
           }}
         >
           {/* POSTER DISPLAY */}
@@ -479,7 +479,7 @@ export default function FormRenderer({ schema, onSubmit, readOnly = false }: For
               {schema.title}
             </h1>
             {schema.description && (
-              <p style={{ color: '#52796F', fontSize: baseFontSize - 1, marginBottom: 28, lineHeight: 1.6 }}>
+              <p style={{ color: isDarkCard ? 'rgba(255,255,255,0.75)' : '#52796F', fontSize: baseFontSize - 1, marginBottom: 28, lineHeight: 1.6 }}>
                 {schema.description}
               </p>
             )}

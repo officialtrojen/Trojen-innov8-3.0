@@ -28,8 +28,6 @@ import PropertiesPanel from '@/components/builder/PropertiesPanel';
 import LogicPanel from '@/components/builder/LogicPanel';
 import ThemePanel from '@/components/builder/ThemePanel';
 import BuilderToolbar from '@/components/builder/BuilderToolbar';
-import FormDeleteTrashBin from '@/components/builder/FormDeleteTrashBin';
-import FormCrunchAnimationOverlay from '@/components/builder/FormCrunchAnimationOverlay';
 import { getBackgroundStyle } from '@/lib/theme-presets';
 
 interface FormBuilderProps {
@@ -54,91 +52,6 @@ export default function FormBuilder({
   const [activePanel, setActivePanel] = useState<'properties' | 'logic' | 'theme'>('properties');
   const [activeId, setActiveId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-  const [isFormArmed, setIsFormArmed] = useState(false);
-  const [isDraggingArmedForm, setIsDraggingArmedForm] = useState(false);
-  const [dragPointer, setDragPointer] = useState<{ x: number; y: number } | null>(null);
-  const [isOverTrash, setIsOverTrash] = useState(false);
-  const [isCrumpling, setIsCrumpling] = useState(false);
-  const trashBinRef = useRef<HTMLDivElement | null>(null);
-
-  // Global pointer tracking when dragging armed form to trash
-  useEffect(() => {
-    if (!isDraggingArmedForm) return;
-
-    const handlePointerMove = (e: PointerEvent) => {
-      setDragPointer({ x: e.clientX, y: e.clientY });
-
-      if (trashBinRef.current) {
-        const rect = trashBinRef.current.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
-        const dist = Math.hypot(e.clientX - centerX, e.clientY - centerY);
-        setIsOverTrash(dist < 80);
-      }
-    };
-
-    const handlePointerUp = (e: PointerEvent) => {
-      setIsDraggingArmedForm(false);
-      setDragPointer(null);
-
-      if (trashBinRef.current) {
-        const rect = trashBinRef.current.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
-        const dist = Math.hypot(e.clientX - centerX, e.clientY - centerY);
-        if (dist < 80) {
-          setIsCrumpling(true);
-          return;
-        }
-      }
-      setIsOverTrash(false);
-    };
-
-    window.addEventListener('pointermove', handlePointerMove);
-    window.addEventListener('pointerup', handlePointerUp);
-    return () => {
-      window.removeEventListener('pointermove', handlePointerMove);
-      window.removeEventListener('pointerup', handlePointerUp);
-    };
-  }, [isDraggingArmedForm]);
-
-  const handleStartDragForm = useCallback((e: React.PointerEvent) => {
-    e.preventDefault();
-    setIsDraggingArmedForm(true);
-    setDragPointer({ x: e.clientX, y: e.clientY });
-  }, []);
-
-  // Form reset: creates brand-new blank form page
-  const handleNewForm = useCallback(() => {
-    const freshSchema: FormSchema = {
-      title: 'Untitled Form',
-      description: 'Start designing your questions here.',
-      fields: [
-        {
-          id: generateId('q'),
-          type: 'short_text',
-          label: 'What is your full name?',
-          required: true,
-          placeholder: 'Type your answer here...',
-        },
-      ],
-      logic: [],
-      theme: {
-        ...DEFAULT_THEME,
-        backgroundType: 'solid',
-        background: '#EAF4F4',
-        posterUrl: undefined,
-        bannerUrl: undefined,
-        posterTitle: undefined,
-        posterSubtitle: undefined,
-      },
-      settings: DEFAULT_SETTINGS,
-    };
-    setSchema(freshSchema);
-    setSelectedFieldId(freshSchema.fields[0].id);
-    setActivePanel('properties');
-    onSave(freshSchema).catch(() => {});
-  }, [onSave]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -376,29 +289,8 @@ export default function FormBuilder({
                 title={schema.title}
                 description={schema.description}
                 onOpenThemePanel={() => setActivePanel('theme')}
-                isFormArmed={isFormArmed}
-                onArmForm={setIsFormArmed}
-                onStartDragForm={handleStartDragForm}
               />
             </div>
-
-            {/* Bottom-right Delete Trash Bin Icon */}
-            <FormDeleteTrashBin
-              isFormArmed={isFormArmed}
-              onArmToggle={setIsFormArmed}
-              onCrumpleDelete={() => setIsCrumpling(true)}
-              schema={schema}
-              trashBinRef={trashBinRef}
-              isOverTrash={isOverTrash}
-              isCrumpling={isCrumpling}
-              onTrashClick={() => {
-                if (isFormArmed) {
-                  setIsCrumpling(true);
-                } else {
-                  setIsFormArmed(true);
-                }
-              }}
-            />
           </div>
 
           {/* Right: Properties / Logic / Theme */}
@@ -452,88 +344,6 @@ export default function FormBuilder({
           </div>
         )}
       </DragOverlay>
-
-      {/* Floating Drag Ghost when armed form is dragged */}
-      {isDraggingArmedForm && dragPointer && (
-        <div
-          style={{
-            position: 'fixed',
-            left: dragPointer.x,
-            top: dragPointer.y,
-            transform: `translate(-50%, -50%) rotate(${isOverTrash ? 18 : -6}deg) scale(${isOverTrash ? 0.35 : 0.75})`,
-            width: 280,
-            height: 340,
-            borderRadius: 14,
-            background: '#FFFEF9',
-            border: `2.5px dashed ${isOverTrash ? '#F87171' : '#4F7C7A'}`,
-            boxShadow: '0 20px 50px rgba(38, 59, 59, 0.35)',
-            pointerEvents: 'none',
-            zIndex: 9990,
-            overflow: 'hidden',
-            transition: 'transform 0.15s ease, border-color 0.15s ease',
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-        >
-          <div
-            style={{
-              height: 48,
-              background: '#4F7C7A',
-              padding: '10px 14px',
-              color: '#FFFEF9',
-              fontWeight: 800,
-              fontSize: 13,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}
-          >
-            <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 160 }}>
-              {schema.title || 'Untitled Form'}
-            </span>
-            <span
-              style={{
-                fontSize: 10,
-                background: 'rgba(255,254,249,0.25)',
-                padding: '2px 6px',
-                borderRadius: 4,
-              }}
-            >
-              📄 Form Sheet
-            </span>
-          </div>
-          <div style={{ padding: 14, flex: 1, background: '#F8FBFA', display: 'flex', flexDirection: 'column', gap: 8 }}>
-            <div style={{ height: 10, width: '60%', background: '#CFE5E3', borderRadius: 5 }} />
-            <div style={{ height: 10, width: '85%', background: '#EAF4F4', borderRadius: 5 }} />
-            <div style={{ height: 32, background: '#FFFEF9', border: '1px solid #B8CECF', borderRadius: 8, marginTop: 10 }} />
-            <div style={{ height: 32, background: '#FFFEF9', border: '1px solid #B8CECF', borderRadius: 8 }} />
-          </div>
-          <div
-            style={{
-              padding: '10px 12px',
-              background: isOverTrash ? '#FEF2F2' : '#EAF4F4',
-              textAlign: 'center',
-              fontSize: 12,
-              fontWeight: 800,
-              color: isOverTrash ? '#DC2626' : '#365F5D',
-            }}
-          >
-            {isOverTrash ? '🔥 Release to Crumple & Delete!' : 'Dragging to Delete Icon ↘️'}
-          </div>
-        </div>
-      )}
-
-      {/* 3D Paper Crumple Crunch Animation Overlay */}
-      <FormCrunchAnimationOverlay
-        isOpen={isCrumpling}
-        schema={schema}
-        onComplete={() => {
-          setIsCrumpling(false);
-          setIsFormArmed(false);
-          setIsOverTrash(false);
-          handleNewForm();
-        }}
-      />
 
       <style>{`
         @media (max-width: 1024px) {

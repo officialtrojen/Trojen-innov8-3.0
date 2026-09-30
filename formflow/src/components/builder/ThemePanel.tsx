@@ -13,11 +13,15 @@ import {
   Layout,
   Type,
   Check,
+  Square,
 } from 'lucide-react';
 import {
   POSTER_PRESETS,
   GRADIENT_PRESETS,
   PATTERN_PRESETS,
+  BACKGROUND_IMAGE_PRESETS,
+  PAGE_COLOR_PRESETS,
+  isDarkColor,
 } from '@/lib/theme-presets';
 
 interface ThemePanelProps {
@@ -33,7 +37,7 @@ const sizeOptions: { value: 'small' | 'medium' | 'large'; label: string }[] = [
 ];
 
 export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
-  const [activeTab, setActiveTab] = useState<'background' | 'poster' | 'colors'>('background');
+  const [activeTab, setActiveTab] = useState<'background' | 'page' | 'poster' | 'colors'>('background');
   const posterFileInputRef = useRef<HTMLInputElement>(null);
   const bgFileInputRef = useRef<HTMLInputElement>(null);
 
@@ -106,11 +110,12 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
       {/* Navigation Sub-Tabs */}
       <div
         style={{
-          display: 'flex',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(4, 1fr)',
           background: 'rgba(207,229,227,0.35)',
           borderRadius: 10,
           padding: 3,
-          marginBottom: 20,
+          marginBottom: 18,
           gap: 2,
         }}
       >
@@ -118,49 +123,86 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
           type="button"
           onClick={() => setActiveTab('background')}
           style={{
-            flex: 1,
-            padding: '8px 4px',
-            fontSize: 12,
+            padding: '8px 2px',
+            fontSize: 11,
             fontWeight: 600,
-            borderRadius: 8,
+            borderRadius: 7,
             border: 'none',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 6,
+            gap: 4,
             background: activeTab === 'background' ? 'white' : 'transparent',
             color: activeTab === 'background' ? '#263B3B' : '#52796F',
             boxShadow: activeTab === 'background' ? '0 2px 5px rgba(0,0,0,0.06)' : 'none',
             transition: 'all 0.15s ease',
           }}
+          title="Backdrop wallpaper & background"
         >
-          <Layers size={13} />
-          Background
+          <Layers size={12} />
+          Backdrop
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('page')}
+          style={{
+            padding: '8px 2px',
+            fontSize: 11,
+            fontWeight: 600,
+            borderRadius: 7,
+            border: 'none',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 4,
+            background: activeTab === 'page' ? 'white' : 'transparent',
+            color: activeTab === 'page' ? '#263B3B' : '#52796F',
+            boxShadow: activeTab === 'page' ? '0 2px 5px rgba(0,0,0,0.06)' : 'none',
+            transition: 'all 0.15s ease',
+            position: 'relative',
+          }}
+          title="Form Page / Sheet surface color"
+        >
+          <Square size={12} />
+          Page Color
+          {theme.cardBackground && theme.cardBackground !== '#FFFFFF' && (
+            <span
+              style={{
+                width: 6,
+                height: 6,
+                borderRadius: '50%',
+                background: theme.cardBackground,
+                border: '1px solid rgba(0,0,0,0.25)',
+                display: 'inline-block',
+              }}
+            />
+          )}
         </button>
 
         <button
           type="button"
           onClick={() => setActiveTab('poster')}
           style={{
-            flex: 1,
-            padding: '8px 4px',
-            fontSize: 12,
+            padding: '8px 2px',
+            fontSize: 11,
             fontWeight: 600,
-            borderRadius: 8,
+            borderRadius: 7,
             border: 'none',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 6,
+            gap: 4,
             background: activeTab === 'poster' ? 'white' : 'transparent',
             color: activeTab === 'poster' ? '#263B3B' : '#52796F',
             boxShadow: activeTab === 'poster' ? '0 2px 5px rgba(0,0,0,0.06)' : 'none',
             transition: 'all 0.15s ease',
           }}
         >
-          <ImageIcon size={13} />
+          <ImageIcon size={12} />
           Poster
           {currentPoster && (
             <span
@@ -178,25 +220,24 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
           type="button"
           onClick={() => setActiveTab('colors')}
           style={{
-            flex: 1,
-            padding: '8px 4px',
-            fontSize: 12,
+            padding: '8px 2px',
+            fontSize: 11,
             fontWeight: 600,
-            borderRadius: 8,
+            borderRadius: 7,
             border: 'none',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            gap: 6,
+            gap: 4,
             background: activeTab === 'colors' ? 'white' : 'transparent',
             color: activeTab === 'colors' ? '#263B3B' : '#52796F',
             boxShadow: activeTab === 'colors' ? '0 2px 5px rgba(0,0,0,0.06)' : 'none',
             transition: 'all 0.15s ease',
           }}
         >
-          <Sliders size={13} />
-          Colors & Text
+          <Sliders size={12} />
+          Colors
         </button>
       </div>
 
@@ -205,6 +246,135 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
       {/* ======================================================== */}
       {activeTab === 'background' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+          {/* Quick Form Page Surface Color Quick Access */}
+          <div
+            style={{
+              padding: '12px 14px',
+              borderRadius: 10,
+              background: 'rgba(207,229,227,0.3)',
+              border: '1px solid rgba(184,206,207,0.6)',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: 8,
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: '#263B3B',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                }}
+              >
+                <Square size={13} color="#4F7C7A" />
+                Form Page / Sheet Color
+              </div>
+              <button
+                type="button"
+                onClick={() => setActiveTab('page')}
+                style={{
+                  fontSize: 11,
+                  color: '#4F7C7A',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontWeight: 600,
+                  padding: 0,
+                  textDecoration: 'underline',
+                }}
+              >
+                All Options →
+              </button>
+            </div>
+
+            {/* Quick Swatches Row */}
+            <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+              <input
+                type="color"
+                value={theme.cardBackground || '#FFFFFF'}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  const updates: Partial<FormTheme> = { cardBackground: val };
+                  if (isDarkColor(val) && (!theme.text || theme.text === '#263B3B')) {
+                    updates.text = '#F8FAFC';
+                  }
+                  onUpdate(updates);
+                }}
+                style={{
+                  width: 28,
+                  height: 28,
+                  borderRadius: 6,
+                  border: '1px solid var(--input-border)',
+                  cursor: 'pointer',
+                  padding: 1,
+                  flexShrink: 0,
+                }}
+                title="Custom Color Picker"
+              />
+              <div style={{ display: 'flex', gap: 5, flex: 1, overflowX: 'auto', paddingBottom: 2 }}>
+                {[
+                  { color: '#FFFFFF', label: 'Clean White' },
+                  { color: '#FCFBF7', label: 'Soft Cream' },
+                  { color: '#F2EFE9', label: 'Light Pebble' },
+                  { color: '#F0FDF4', label: 'Ice Mint' },
+                  { color: '#FFFBEB', label: 'Warm Amber' },
+                  { color: '#2A2E33', label: 'Slate Gray', text: '#F8FAFC' },
+                  { color: '#0F172A', label: 'Midnight', text: '#F8FAFC' },
+                ].map((swatch) => {
+                  const isCurrent =
+                    (theme.cardBackground || '#FFFFFF').toLowerCase() === swatch.color.toLowerCase();
+                  return (
+                    <button
+                      key={swatch.color}
+                      type="button"
+                      onClick={() => {
+                        const updates: Partial<FormTheme> = { cardBackground: swatch.color };
+                        if (swatch.text && (!theme.text || theme.text === '#263B3B')) {
+                          updates.text = swatch.text;
+                        } else if (!swatch.text && theme.text === '#F8FAFC') {
+                          updates.text = '#263B3B';
+                        }
+                        onUpdate(updates);
+                      }}
+                      title={swatch.label}
+                      style={{
+                        width: 26,
+                        height: 26,
+                        borderRadius: 6,
+                        background: swatch.color,
+                        border: isCurrent ? '2px solid #4F7C7A' : '1px solid rgba(0,0,0,0.15)',
+                        boxShadow: isCurrent ? '0 0 0 1.5px #4F7C7A' : 'none',
+                        cursor: 'pointer',
+                        flexShrink: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      {isCurrent && (
+                        <Check
+                          size={12}
+                          color={
+                            swatch.color === '#2A2E33' || swatch.color === '#0F172A'
+                              ? 'white'
+                              : '#4F7C7A'
+                          }
+                        />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
           {/* Background Type Selector */}
           <div>
             <label className="label" style={{ fontSize: 12, fontWeight: 600, marginBottom: 8 }}>
@@ -376,14 +546,169 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
                 value={theme.background || '#EAF4F4'}
                 onChange={(v) => onUpdate({ background: v })}
               />
+
+              {/* Add Background Image Option directly inside this Pattern section */}
+              <div
+                style={{
+                  marginTop: 18,
+                  paddingTop: 16,
+                  borderTop: '1.5px solid rgba(184,206,207,0.4)',
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                  <label className="label" style={{ fontSize: 12, fontWeight: 600, margin: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <ImageIcon size={14} /> Background Image
+                  </label>
+                  {theme.backgroundImage && (
+                    <button
+                      type="button"
+                      onClick={() => onUpdate({ backgroundImage: undefined })}
+                      style={{
+                        background: 'transparent',
+                        border: 'none',
+                        color: '#f87171',
+                        fontSize: 11,
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      Remove Image
+                    </button>
+                  )}
+                </div>
+
+                {theme.backgroundImage ? (
+                  <div style={{ borderRadius: 10, overflow: 'hidden', border: '1px solid rgba(184,206,207,0.6)', background: 'white' }}>
+                    <div style={{ position: 'relative', height: 95 }}>
+                      <img
+                        src={theme.backgroundImage}
+                        alt="Background"
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+                      <div
+                        style={{
+                          position: 'absolute',
+                          inset: 0,
+                          background: 'rgba(0,0,0,0.3)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: 8,
+                        }}
+                      >
+                        <button
+                          type="button"
+                          onClick={() => bgFileInputRef.current?.click()}
+                          style={{
+                            background: 'white',
+                            color: '#263B3B',
+                            border: 'none',
+                            borderRadius: 6,
+                            padding: '6px 12px',
+                            fontSize: 11,
+                            fontWeight: 600,
+                            cursor: 'pointer',
+                          }}
+                        >
+                          Change Image
+                        </button>
+                      </div>
+                    </div>
+                    <div style={{ padding: '8px 12px', fontSize: 11, color: '#52796F', background: '#F8FAFC' }}>
+                      ✨ The selected pattern overlays seamlessly on top of this background image
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <button
+                      type="button"
+                      onClick={() => bgFileInputRef.current?.click()}
+                      className="btn btn-secondary"
+                      style={{
+                        width: '100%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 8,
+                        marginBottom: 12,
+                        fontSize: 12,
+                        padding: '9px 14px',
+                      }}
+                    >
+                      <Upload size={14} />
+                      + Upload Background Image
+                    </button>
+
+                    <div style={{ fontSize: 11, color: '#52796F', marginBottom: 6, fontWeight: 600 }}>
+                      Or choose curated wallpaper:
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6, marginBottom: 12 }}>
+                      {BACKGROUND_IMAGE_PRESETS.slice(0, 3).map((bg) => (
+                        <button
+                          key={bg.id}
+                          type="button"
+                          onClick={() => onUpdate({ backgroundImage: bg.url })}
+                          style={{
+                            position: 'relative',
+                            height: 48,
+                            borderRadius: 6,
+                            overflow: 'hidden',
+                            border: '1px solid rgba(184,206,207,0.6)',
+                            cursor: 'pointer',
+                            padding: 0,
+                          }}
+                          title={bg.name}
+                        >
+                          <img
+                            src={bg.url}
+                            alt={bg.name}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          />
+                        </button>
+                      ))}
+                    </div>
+
+                    <div>
+                      <span style={{ fontSize: 11, color: '#52796F', display: 'block', marginBottom: 4 }}>
+                        Or paste image URL
+                      </span>
+                      <input
+                        className="input"
+                        value={theme.backgroundImage || ''}
+                        onChange={(e) => onUpdate({ backgroundImage: e.target.value })}
+                        placeholder="https://images.unsplash.com/..."
+                        style={{ fontSize: 12 }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
           {theme.backgroundType === 'image' && (
             <div>
-              <label className="label" style={{ fontSize: 12, fontWeight: 600, marginBottom: 8 }}>
-                Custom Background Image
-              </label>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                <label className="label" style={{ fontSize: 12, fontWeight: 600, margin: 0 }}>
+                  Custom Background Image
+                </label>
+                {theme.backgroundImage && (
+                  <button
+                    type="button"
+                    onClick={() => onUpdate({ backgroundImage: undefined })}
+                    style={{
+                      border: 'none',
+                      background: 'transparent',
+                      color: '#f87171',
+                      fontSize: 11,
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Remove
+                  </button>
+                )}
+              </div>
 
               {/* Upload trigger */}
               <input
@@ -404,15 +729,55 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: 8,
-                  marginBottom: 10,
+                  marginBottom: 14,
                   fontSize: 12,
+                  padding: '10px 14px',
                 }}
               >
                 <Upload size={14} />
                 Upload Background Image
               </button>
 
-              <div style={{ marginBottom: 10 }}>
+              {/* Curated Presets Grid */}
+              <div style={{ marginBottom: 16 }}>
+                <span style={{ fontSize: 11, color: '#52796F', display: 'block', marginBottom: 8, fontWeight: 600 }}>
+                  Curated Image Presets
+                </span>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
+                  {BACKGROUND_IMAGE_PRESETS.map((preset) => {
+                    const isSelected = theme.backgroundImage === preset.url;
+                    return (
+                      <button
+                        key={preset.id}
+                        type="button"
+                        onClick={() => onUpdate({ backgroundImage: preset.url })}
+                        style={{
+                          borderRadius: 8,
+                          overflow: 'hidden',
+                          border: `2px solid ${isSelected ? 'var(--primary)' : 'rgba(184,206,207,0.5)'}`,
+                          cursor: 'pointer',
+                          padding: 0,
+                          background: 'white',
+                          textAlign: 'left',
+                          display: 'flex',
+                          flexDirection: 'column',
+                        }}
+                      >
+                        <img
+                          src={preset.url}
+                          alt={preset.name}
+                          style={{ width: '100%', height: 48, objectFit: 'cover' }}
+                        />
+                        <div style={{ padding: '4px 6px', fontSize: 10.5, fontWeight: 600, color: '#263B3B' }}>
+                          {preset.name}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div style={{ marginBottom: 14 }}>
                 <span style={{ fontSize: 11, color: '#52796F', display: 'block', marginBottom: 4 }}>
                   Or paste image URL
                 </span>
@@ -425,34 +790,251 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
                 />
               </div>
 
+              {/* Dimmer / Overlay slider */}
               {theme.backgroundImage && (
-                <div style={{ position: 'relative', marginTop: 10, borderRadius: 8, overflow: 'hidden' }}>
-                  <img
-                    src={theme.backgroundImage}
-                    alt="Background preview"
-                    style={{ width: '100%', height: 90, objectFit: 'cover' }}
+                <div style={{ marginTop: 12, padding: 12, background: 'rgba(207,229,227,0.25)', borderRadius: 10 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                    <span style={{ fontSize: 11, fontWeight: 600, color: '#263B3B' }}>Dark Dimmer Overlay</span>
+                    <span style={{ fontSize: 11, color: '#52796F', fontWeight: 600 }}>{theme.backgroundOverlay ?? 0}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="80"
+                    step="5"
+                    value={theme.backgroundOverlay ?? 0}
+                    onChange={(e) => onUpdate({ backgroundOverlay: Number(e.target.value) })}
+                    style={{ width: '100%', accentColor: 'var(--primary)' }}
                   />
-                  <button
-                    type="button"
-                    onClick={() => onUpdate({ backgroundImage: '' })}
-                    style={{
-                      position: 'absolute',
-                      top: 6,
-                      right: 6,
-                      background: 'rgba(0,0,0,0.65)',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: 6,
-                      padding: 4,
-                      cursor: 'pointer',
-                    }}
-                  >
-                    <Trash2 size={13} />
-                  </button>
+                  <div style={{ fontSize: 10, color: '#52796F', marginTop: 4 }}>
+                    Darkens background photo so form questions and fields pop with high contrast.
+                  </div>
                 </div>
               )}
             </div>
           )}
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* TAB: FORM PAGE / SHEET COLOR & STYLING                  */}
+      {/* ======================================================== */}
+      {activeTab === 'page' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+          {/* Main Color Picker */}
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <label className="label" style={{ fontSize: 12, fontWeight: 600, margin: 0 }}>
+                Form Page Surface Color
+              </label>
+              {theme.cardBackground && theme.cardBackground !== '#FFFFFF' && (
+                <button
+                  type="button"
+                  onClick={() => onUpdate({ cardBackground: '#FFFFFF', text: '#263B3B' })}
+                  style={{
+                    background: 'none',
+                    border: 'none',
+                    color: '#52796F',
+                    fontSize: 11,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    textDecoration: 'underline',
+                  }}
+                >
+                  Reset to White
+                </button>
+              )}
+            </div>
+            <ColorPicker
+              label="Form Sheet Background Color"
+              value={theme.cardBackground || '#FFFFFF'}
+              onChange={(v) => {
+                const updates: Partial<FormTheme> = { cardBackground: v };
+                if (isDarkColor(v) && (!theme.text || theme.text === '#263B3B')) {
+                  updates.text = '#F8FAFC';
+                }
+                onUpdate(updates);
+              }}
+            />
+          </div>
+
+          {/* Curated Page Color Presets */}
+          <div>
+            <label
+              className="label"
+              style={{
+                fontSize: 12,
+                fontWeight: 600,
+                marginBottom: 10,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+              }}
+            >
+              <Sparkles size={13} color="#4F7C7A" />
+              Curated Page Color Presets
+            </label>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+              {PAGE_COLOR_PRESETS.map((preset) => {
+                const isSelected =
+                  (theme.cardBackground || '#FFFFFF').toLowerCase() === preset.color.toLowerCase();
+                const isPresetDark = isDarkColor(preset.color);
+
+                return (
+                  <button
+                    key={preset.id}
+                    type="button"
+                    onClick={() => {
+                      const updates: Partial<FormTheme> = { cardBackground: preset.color };
+                      if (preset.textColor) {
+                        updates.text = preset.textColor;
+                      }
+                      onUpdate(updates);
+                    }}
+                    style={{
+                      padding: '10px 12px',
+                      borderRadius: 10,
+                      border: isSelected
+                        ? '2px solid #4F7C7A'
+                        : '1px solid rgba(184,206,207,0.6)',
+                      background: preset.color,
+                      color: preset.textColor || (isPresetDark ? '#F8FAFC' : '#263B3B'),
+                      cursor: 'pointer',
+                      textAlign: 'left',
+                      boxShadow: isSelected
+                        ? '0 4px 12px rgba(79, 124, 122, 0.25)'
+                        : '0 1px 3px rgba(0,0,0,0.04)',
+                      transition: 'all 0.15s ease',
+                      position: 'relative',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2 }}>
+                      <span style={{ fontSize: 12, fontWeight: 700 }}>{preset.name}</span>
+                      {isSelected && <Check size={13} color={isPresetDark ? '#38BDF8' : '#4F7C7A'} />}
+                    </div>
+                    <div style={{ fontSize: 10, opacity: 0.8, lineHeight: 1.3 }}>
+                      {preset.description}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Form Page Opacity & Glassmorphism */}
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
+              <label className="label" style={{ fontSize: 12, fontWeight: 600, margin: 0 }}>
+                Page Opacity & Glassmorphism
+              </label>
+              <span style={{ fontSize: 11, fontWeight: 600, color: '#52796F' }}>
+                {theme.cardOpacity ?? 100}%
+              </span>
+            </div>
+            <input
+              type="range"
+              min="50"
+              max="100"
+              step="5"
+              value={theme.cardOpacity ?? 100}
+              onChange={(e) => onUpdate({ cardOpacity: Number(e.target.value) })}
+              style={{ width: '100%', accentColor: '#4F7C7A', cursor: 'pointer' }}
+            />
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 10, color: '#94A3B8', marginTop: 4 }}>
+              <span>Frosted Glass (50%)</span>
+              <span>Subtle Tint (85%)</span>
+              <span>Solid Opaque (100%)</span>
+            </div>
+            {(theme.cardOpacity ?? 100) < 100 && (
+              <div
+                style={{
+                  marginTop: 8,
+                  padding: '6px 10px',
+                  borderRadius: 6,
+                  background: 'rgba(79, 124, 122, 0.1)',
+                  fontSize: 11,
+                  color: '#4F7C7A',
+                  lineHeight: 1.4,
+                }}
+              >
+                ✨ Glassmorphism enabled! Canvas background imagery and patterns subtly glow through the form sheet.
+              </div>
+            )}
+          </div>
+
+          {/* Corner Curvature */}
+          <div>
+            <label className="label" style={{ fontSize: 12, fontWeight: 600, marginBottom: 8 }}>
+              Page Corner Radius
+            </label>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
+              {[
+                { radius: 8, label: 'Sharp' },
+                { radius: 14, label: 'Medium' },
+                { radius: 20, label: 'Rounded' },
+                { radius: 28, label: 'Pill' },
+              ].map((r) => {
+                const isSelected = (theme.cardBorderRadius ?? 20) === r.radius;
+                return (
+                  <button
+                    key={r.radius}
+                    type="button"
+                    onClick={() => onUpdate({ cardBorderRadius: r.radius })}
+                    style={{
+                      padding: '7px 4px',
+                      fontSize: 11,
+                      fontWeight: 600,
+                      borderRadius: 8,
+                      border: `1.5px solid ${isSelected ? 'var(--primary)' : 'rgba(184,206,207,0.6)'}`,
+                      background: isSelected ? 'var(--accent)' : 'transparent',
+                      color: isSelected ? 'var(--primary)' : '#263B3B',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease',
+                    }}
+                  >
+                    {r.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Form Page Shadow / Elevation */}
+          <div>
+            <label className="label" style={{ fontSize: 12, fontWeight: 600, marginBottom: 8 }}>
+              Page Shadow & Elevation
+            </label>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6 }}>
+              {[
+                { id: 'none', label: 'Flat' },
+                { id: 'subtle', label: 'Subtle' },
+                { id: 'elevated', label: 'Elevated' },
+                { id: 'glow', label: 'Glow' },
+              ].map((s) => {
+                const isSelected = (theme.cardShadow ?? 'elevated') === s.id;
+                return (
+                  <button
+                    key={s.id}
+                    type="button"
+                    onClick={() => onUpdate({ cardShadow: s.id as FormTheme['cardShadow'] })}
+                    style={{
+                      padding: '7px 4px',
+                      fontSize: 11,
+                      fontWeight: 600,
+                      borderRadius: 8,
+                      border: `1.5px solid ${isSelected ? 'var(--primary)' : 'rgba(184,206,207,0.6)'}`,
+                      background: isSelected ? 'var(--accent)' : 'transparent',
+                      color: isSelected ? 'var(--primary)' : '#263B3B',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease',
+                    }}
+                  >
+                    {s.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
         </div>
       )}
 
@@ -726,6 +1308,17 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
           <div>
             <label className="label" style={{ fontSize: 12, fontWeight: 600, marginBottom: 10 }}>Theme Accent Colors</label>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <ColorPicker
+                label="Form Page Surface Color"
+                value={theme.cardBackground || '#FFFFFF'}
+                onChange={(v) => {
+                  const updates: Partial<FormTheme> = { cardBackground: v };
+                  if (isDarkColor(v) && (!theme.text || theme.text === '#263B3B')) {
+                    updates.text = '#F8FAFC';
+                  }
+                  onUpdate(updates);
+                }}
+              />
               <ColorPicker label="Primary Brand Color" value={theme.primary} onChange={(v) => onUpdate({ primary: v })} />
               <ColorPicker label="Secondary Accent" value={theme.secondary} onChange={(v) => onUpdate({ secondary: v })} />
               <ColorPicker label="Text Color" value={theme.text} onChange={(v) => onUpdate({ text: v })} />
