@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ArrowLeft, Save, Globe, Eye, GitBranch, Palette, Link as LinkIcon, Check, Sparkles, Share2 } from 'lucide-react';
 import ShareModal from '@/components/builder/ShareModal';
 
@@ -34,6 +35,7 @@ export default function BuilderToolbar({
   onToggleAi,
   isAiOpen,
 }: BuilderToolbarProps) {
+  const router = useRouter();
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [publishing, setPublishing] = useState(false);
 
@@ -64,9 +66,16 @@ export default function BuilderToolbar({
       >
         {/* Left: Title */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, minWidth: 200 }}>
-          <Link
-            href="/dashboard"
-            title="Back to Dashboard"
+          <button
+            type="button"
+            onClick={() => {
+              if (typeof window !== 'undefined' && window.history.length > 1) {
+                router.back();
+              } else {
+                router.push('/dashboard');
+              }
+            }}
+            title="Back to previous window"
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -93,8 +102,8 @@ export default function BuilderToolbar({
             }}
           >
             <ArrowLeft size={15} color="#1E293B" />
-            <span>Home</span>
-          </Link>
+            <span>Back</span>
+          </button>
 
           <div style={{ width: 1, height: 20, background: '#CBD5E1' }} />
 

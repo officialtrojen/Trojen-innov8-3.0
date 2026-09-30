@@ -512,8 +512,16 @@ export default function StandaloneBuilderPage() {
         >
           {/* Brand & Title */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-            <Link
-              href="/"
+            <button
+              type="button"
+              onClick={() => {
+                if (typeof window !== 'undefined' && window.history.length > 1) {
+                  router.back();
+                } else {
+                  router.push('/dashboard');
+                }
+              }}
+              title="Back to previous window"
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -539,9 +547,8 @@ export default function StandaloneBuilderPage() {
               }}
             >
               <ArrowLeft size={16} color="#1E293B" />
-              <span>Home</span>
-
-            </Link>
+              <span>Back</span>
+            </button>
 
             <div style={{ width: 1, height: 24, background: 'rgba(184,206,207,0.5)' }} />
 
