@@ -3,23 +3,6 @@
 // ============================================================
 
 import { nanoid } from 'nanoid';
-import { FormSchema } from './types';
-
-/**
- * Convert FormSchema fields to CSV.
- */
-export function formSchemaToCSV(schema: FormSchema): string {
-  const headers = ['Order', 'Field ID', 'Type', 'Label', 'Required', 'Placeholder / Options'];
-  const rows = schema.fields.map((f, i) => {
-    let extra = f.placeholder || '';
-    if (f.options) extra = f.options.join('; ');
-    if (f.type === 'rating') extra = `Rating (1 - 5 stars)`;
-    return [i + 1, f.id, f.type, f.label, f.required ? 'Yes' : 'No', extra]
-      .map((c) => `"${String(c).replace(/"/g, '""')}"`)
-      .join(',');
-  });
-  return [headers.join(','), ...rows].join('\n');
-}
 
 /**
  * Generate a unique ID for fields, rules, etc.
@@ -91,6 +74,20 @@ export function responsesToCSV(
   });
 
   return [headers.map((h) => `"${h}"`).join(','), ...rows].join('\n');
+}
+
+/**
+ * Convert a form schema's fields to CSV text.
+ */
+export function formSchemaToCSV(schema: { title: string; fields: { id: string; type: string; label: string; required?: boolean }[] }): string {
+  const headers = ['Field ID', 'Type', 'Label', 'Required'];
+  const rows = (schema.fields || []).map((f) => [
+    f.id,
+    f.type,
+    `"${(f.label || '').replace(/"/g, '""')}"`,
+    f.required ? 'Yes' : 'No',
+  ].join(','));
+  return [headers.join(','), ...rows].join('\n');
 }
 
 /**

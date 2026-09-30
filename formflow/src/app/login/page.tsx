@@ -46,7 +46,7 @@ export default function LoginPage() {
       setError(err);
       setLoading(false);
     } else {
-      router.push('/dashboard');
+      window.location.href = '/dashboard';
     }
   };
 
@@ -62,20 +62,16 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      // 1. Try sending via backend official.trojen@gmail.com transporter
-      const res = await fetch('/api/auth/send-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-      await res.json();
-
-      // 2. Also trigger Supabase OTP
-      await sendOtp(email);
+      // Single call: Supabase sends the OTP email directly (no SMTP delay)
+      const { error: otpErr } = await sendOtp(email);
+      if (otpErr) {
+        setError(otpErr);
+        return;
+      }
 
       setOtpSent(true);
       setResendTimer(30);
-      setSuccessMsg(`6-digit OTP code sent from official.trojen@gmail.com!`);
+      setSuccessMsg(`OTP code sent to ${email}! Check your inbox.`);
     } catch (err: any) {
       setError(err.message || 'Failed to send OTP code');
     } finally {
@@ -99,7 +95,7 @@ export default function LoginPage() {
       setError(err);
       setLoading(false);
     } else {
-      router.push('/dashboard');
+      window.location.href = '/dashboard';
     }
   };
 
@@ -111,7 +107,7 @@ export default function LoginPage() {
       setError(err);
       setGoogleLoading(false);
     } else {
-      router.push('/dashboard');
+      window.location.href = '/dashboard';
     }
   };
 

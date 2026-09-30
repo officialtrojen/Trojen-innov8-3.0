@@ -145,15 +145,12 @@ export default function ParallaxDeepSpaceLandingPage() {
     };
   }, [scrollY, mousePos]);
 
-  // Computed Space Depth in Astronomical Units
-  const depthAU = Math.round(120 + scrollY * 4.2);
-
   return (
     <div
       style={{
         background: '#020306',
         color: '#E2E8F0',
-        minHeight: '480vh',
+
         position: 'relative',
         overflowX: 'hidden',
         fontFamily:
@@ -972,48 +969,6 @@ export default function ParallaxDeepSpaceLandingPage() {
         </footer>
       </div>
 
-      {/* ========================================================================= */}
-      {/* FLOATING TELEMETRY HUD (Depth & Active Layer Indicator)                   */}
-      {/* ========================================================================= */}
-      <div
-        style={{
-          position: 'fixed',
-          bottom: 24,
-          right: 28,
-          zIndex: 90,
-          background: 'rgba(2, 4, 8, 0.75)',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
-          borderRadius: 12,
-          padding: '10px 16px',
-          backdropFilter: 'blur(12px)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 14,
-          fontSize: 12,
-          color: '#94A3B8',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4)',
-          pointerEvents: 'none',
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <span
-            style={{
-              width: 6,
-              height: 6,
-              borderRadius: '50%',
-              background: '#38BDF8',
-              boxShadow: '0 0 6px #38BDF8',
-            }}
-          />
-          <span style={{ color: '#CBD5E1', fontWeight: 600 }}>Parallax Active</span>
-        </div>
-        <div style={{ width: 1, height: 16, background: 'rgba(255, 255, 255, 0.1)' }} />
-        <div>
-          Depth: <span style={{ color: '#FFFFFF', fontWeight: 700 }}>{depthAU.toLocaleString()} AU</span>
-        </div>
-        <div style={{ width: 1, height: 16, background: 'rgba(255, 255, 255, 0.1)' }} />
-        <div style={{ textTransform: 'capitalize' }}>{activeSection.replace('-', ' ')}</div>
-      </div>
 
       <style>{`
         @keyframes bounce {
