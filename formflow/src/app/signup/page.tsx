@@ -545,26 +545,26 @@ export default function SignupPage() {
               <form onSubmit={handleVerifyOtp} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
                 <div>
                   <label htmlFor="otp-signup" style={{ display: 'block', fontSize: 12.5, fontWeight: 600, color: '#334155', marginBottom: 8 }}>
-                    6-Digit Security OTP
+                    Security OTP Code
                   </label>
                   <input
                     id="otp-signup"
                     type="text"
                     inputMode="numeric"
                     autoComplete="one-time-code"
-                    maxLength={6}
+                    maxLength={8}
                     value={otpCode}
-                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                    placeholder="&bull;&bull;&bull;&bull;&bull;&bull;"
+                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 8))}
+                    placeholder="••••••"
                     autoFocus
                     style={{
                       width: '100%',
                       padding: '14px',
                       borderRadius: 14,
                       border: '2px solid #4F7C7A',
-                      fontSize: 26,
+                      fontSize: otpCode.length > 6 ? 22 : 26,
                       fontWeight: 800,
-                      letterSpacing: 10,
+                      letterSpacing: otpCode.length > 6 ? 6 : 10,
                       textAlign: 'center',
                       fontFamily: 'monospace',
                       outline: 'none',
@@ -600,17 +600,17 @@ export default function SignupPage() {
                     width: '100%',
                     padding: '13px',
                     borderRadius: 12,
-                    background: otpCode.length === 6 ? '#4F7C7A' : '#94A3B8',
+                    background: otpCode.length >= 6 ? '#4F7C7A' : '#94A3B8',
                     color: '#ffffff',
                     fontSize: 14,
                     fontWeight: 700,
                     border: 'none',
-                    cursor: otpCode.length === 6 && !loading ? 'pointer' : 'not-allowed',
+                    cursor: otpCode.length >= 6 && !loading ? 'pointer' : 'not-allowed',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     gap: 8,
-                    boxShadow: otpCode.length === 6 ? '0 4px 12px rgba(79,124,122,0.3)' : 'none',
+                    boxShadow: otpCode.length >= 6 ? '0 4px 12px rgba(79,124,122,0.3)' : 'none',
                     transition: 'all 0.2s',
                   }}
                 >
