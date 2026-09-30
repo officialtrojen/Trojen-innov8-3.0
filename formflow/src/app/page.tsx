@@ -350,7 +350,7 @@ export default function ParallaxDeepSpaceLandingPage() {
                 color: '#FFFFFF',
               }}
             >
-              FormFlow <span style={{ color: '#64748B', fontWeight: 400 }}>Cosmic</span>
+              FormFlow
             </span>
           </div>
 
