@@ -33,8 +33,17 @@ export const ShareAndWebhooks: React.FC<ShareAndWebhooksProps> = ({
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
   const [newWebhookName, setNewWebhookName] = useState('');
   const [newWebhookUrl, setNewWebhookUrl] = useState('');
-  const [testingWebhookId, setTestingWebhookId] = useState<string | null>(null);
-  const [testResult, setTestResult] = useState<{ id: string; success: boolean; msg: string } | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingUrl, setEditingUrl] = useState('');
+
+  const handleSaveEdit = (id: string) => {
+    if (!editingUrl) return;
+    onUpdateWebhooks(
+      (form.webhooks || []).map((w) => (w.id === id ? { ...w, url: editingUrl } : w))
+    );
+    setEditingId(null);
+    setEditingUrl('');
+  };
 
   // Form public URL
   const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
@@ -270,10 +279,23 @@ export const ShareAndWebhooks: React.FC<ShareAndWebhooksProps> = ({
                       </div>
                       <div className="flex items-center gap-1.5">
                         <button
+                          onClick={() => {
+                            if (editingId === wh.id) {
+                              setEditingId(null);
+                            } else {
+                              setEditingId(wh.id);
+                              setEditingUrl(wh.url);
+                            }
+                          }}
+                          className="text-[10px] text-zinc-400 hover:text-white px-2 py-0.5 rounded bg-zinc-800"
+                        >
+                          {editingId === wh.id ? 'Cancel' : 'Edit URL'}
+                        </button>
+                        <button
                           onClick={() => handleToggleWebhook(wh.id)}
                           className="text-[10px] text-zinc-400 hover:text-white px-2 py-0.5 rounded bg-zinc-800"
                         >
-                          {wh.enabled ? 'Turn Off' : 'Turn On'}
+                          {wh.enabled ? 'Disable' : 'Enable'}
                         </button>
                         <button
                           onClick={() => handleDeleteWebhook(wh.id)}
@@ -285,9 +307,26 @@ export const ShareAndWebhooks: React.FC<ShareAndWebhooksProps> = ({
                       </div>
                     </div>
 
-                    <div className="text-[11px] font-mono text-zinc-400 truncate bg-zinc-900/60 px-2 py-1 rounded">
-                      {wh.url}
-                    </div>
+                    {editingId === wh.id ? (
+                      <div className="flex items-center gap-2 pt-1">
+                        <input
+                          type="url"
+                          value={editingUrl}
+                          onChange={(e) => setEditingUrl(e.target.value)}
+                          className="flex-1 bg-zinc-950 border border-zinc-700 rounded px-2 py-1 text-[11px] font-mono text-white focus:outline-none"
+                        />
+                        <button
+                          onClick={() => handleSaveEdit(wh.id)}
+                          className="px-2 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] font-medium"
+                        >
+                          Save
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="text-[11px] font-mono text-zinc-400 truncate bg-zinc-900/60 px-2 py-1 rounded">
+                        {wh.url}
+                      </div>
+                    )}
 
                     {/* Test Button & Result */}
                     <div className="flex items-center justify-between pt-1">
