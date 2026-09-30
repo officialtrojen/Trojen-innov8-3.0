@@ -67,13 +67,34 @@ export default function GlobalResponsesPage() {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 100 }}>
-        <motion.div 
-          animate={{ rotate: 360 }} 
-          transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-          style={{ width: 40, height: 40, border: '3px solid rgba(99, 102, 241, 0.2)', borderTopColor: '#6366F1', borderRadius: '50%' }}
-        />
-      </div>
+      <motion.div 
+        initial={{ opacity: 0, x: -35, y: -35 }}
+        animate={{ opacity: 1, x: 0, y: 0 }}
+        transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+        style={{ paddingBottom: 60 }}
+      >
+        <div style={{ marginBottom: 32 }}>
+          <div style={{ width: 180, height: 38, background: 'rgba(255,255,255,0.06)', borderRadius: 10, marginBottom: 10 }} />
+          <div style={{ width: 340, height: 18, background: 'rgba(255,255,255,0.03)', borderRadius: 6 }} />
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 20, marginBottom: 40 }}>
+          {[0, 1, 2, 3].map((i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, x: -25, y: -25 }}
+              animate={{ opacity: 1, x: 0, y: 0 }}
+              transition={{ duration: 0.35, delay: i * 0.06, ease: [0.16, 1, 0.3, 1] }}
+              style={{
+                height: 125,
+                background: 'rgba(15, 23, 42, 0.6)',
+                backdropFilter: 'blur(20px)',
+                border: '1px solid rgba(99, 102, 241, 0.15)',
+                borderRadius: '16px',
+              }}
+            />
+          ))}
+        </div>
+      </motion.div>
     );
   }
 
@@ -81,12 +102,12 @@ export default function GlobalResponsesPage() {
   const activeForms = forms.filter(f => f.status === 'published').length;
   const hasData = forms.length > 0 && totalResponses > 0;
 
-  // Render Stats Card
-  const StatCard = ({ title, value, icon: Icon, delay }: any) => (
+  // Render Stats Card with Top-Left to Bottom-Right entrance
+  const StatCard = ({ title, value, icon: Icon, index = 0 }: any) => (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay }}
+      initial={{ opacity: 0, x: -30, y: -30 }}
+      animate={{ opacity: 1, x: 0, y: 0 }}
+      transition={{ duration: 0.45, delay: 0.08 + index * 0.07, ease: [0.16, 1, 0.3, 1] }}
       className="stat-card"
       style={{
         background: 'rgba(15, 23, 42, 0.6)',
@@ -113,16 +134,22 @@ export default function GlobalResponsesPage() {
   );
 
   return (
-    <div style={{ paddingBottom: 60 }}>
+    <motion.div 
+      initial={{ opacity: 0, x: -35, y: -35 }}
+      animate={{ opacity: 1, x: 0, y: 0 }}
+      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+      style={{ paddingBottom: 60 }}
+    >
       {/* Header */}
       <motion.div 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0, x: -25, y: -25 }}
+        animate={{ opacity: 1, x: 0, y: 0 }}
+        transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
         style={{ marginBottom: 32, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 16 }}
       >
         <div>
-          <h1 style={{ fontSize: 32, fontWeight: 800, color: '#F8FAFC', marginBottom: 8, letterSpacing: '-0.02em' }}>Analytics & Responses</h1>
-          <p style={{ color: '#94A3B8', fontSize: 16 }}>Track submissions, analyze data, and uncover insights.</p>
+          <h1 style={{ fontSize: 32, fontWeight: 800, color: '#F8FAFC', marginBottom: 8, letterSpacing: '-0.02em' }}>Responses</h1>
+          <p style={{ color: '#94A3B8', fontSize: 16 }}>Track submissions, review responses, and monitor live feedback.</p>
         </div>
         
         {hasData && (
@@ -136,10 +163,10 @@ export default function GlobalResponsesPage() {
 
       {/* Top Stats Row */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 20, marginBottom: 40 }}>
-        <StatCard title="Total Responses" value={totalResponses} icon={MessageSquare} delay={0.1} />
-        <StatCard title="Completion Rate" value={hasData ? "68%" : "0%"} icon={Activity} delay={0.2} />
-        <StatCard title="Active Forms" value={activeForms} icon={FileText} delay={0.3} />
-        <StatCard title="Avg. Rating" value={hasData ? "4.8/5" : "N/A"} icon={Users} delay={0.4} />
+        <StatCard title="Total Responses" value={totalResponses} icon={MessageSquare} index={0} />
+        <StatCard title="Completion Rate" value={hasData ? "68%" : "0%"} icon={Activity} index={1} />
+        <StatCard title="Active Forms" value={activeForms} icon={FileText} index={2} />
+        <StatCard title="Avg. Rating" value={hasData ? "4.8/5" : "N/A"} icon={Users} index={3} />
       </div>
 
       {!hasData ? (
@@ -156,9 +183,9 @@ export default function GlobalResponsesPage() {
             zIndex: 10
           }}>
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              initial={{ opacity: 0, x: -40, y: -40 }}
+              animate={{ opacity: 1, x: 0, y: 0 }}
+              transition={{ duration: 0.55, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
               style={{
                 background: '#1e293b', // Matches mockup perfectly
                 border: '1px solid rgba(255, 255, 255, 0.05)',
@@ -220,7 +247,7 @@ export default function GlobalResponsesPage() {
                 
                 <h2 style={{ fontSize: 22, fontWeight: 700, color: '#F8FAFC', marginBottom: 12 }}>No Responses Yet</h2>
                 <p style={{ fontSize: 14, color: '#94A3B8', maxWidth: 360, margin: '0 auto', lineHeight: 1.6 }}>
-                  Share your form to start collecting valuable insights. As responses roll in, this dashboard will come alive with real-time analytics.
+                  Share your form to start collecting valuable insights. As responses roll in, this dashboard will come alive with real-time feedback.
                 </p>
               </div>
             </motion.div>
@@ -232,9 +259,9 @@ export default function GlobalResponsesPage() {
           {forms.map((form, i) => (
             <motion.div 
               key={form.id} 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 * i, duration: 0.4 }}
+              initial={{ opacity: 0, x: -25, y: -25 }}
+              animate={{ opacity: 1, x: 0, y: 0 }}
+              transition={{ delay: 0.06 * i, duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
               style={{
                 background: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(20px)',
                 border: '1px solid rgba(148, 163, 184, 0.1)', borderRadius: '16px',
@@ -289,6 +316,6 @@ export default function GlobalResponsesPage() {
           ))}
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }
