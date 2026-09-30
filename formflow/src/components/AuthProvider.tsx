@@ -11,7 +11,7 @@ interface AuthContextType {
   signUp: (email: string, password: string, name: string) => Promise<{ error: string | null }>;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
   signInWithGoogle: (redirectTo?: string) => Promise<{ error: string | null }>;
-  sendOtp: (email: string) => Promise<{ error: string | null }>;
+  sendOtp: (email: string, shouldCreateUser?: boolean) => Promise<{ error: string | null }>;
   verifyOtp: (email: string, token: string) => Promise<{ error: string | null }>;
   verifyOtpAndSetPassword: (
     email: string,
@@ -110,15 +110,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const sendOtp = async (email: string) => {
+  const sendOtp = async (email: string, shouldCreateUser: boolean = false) => {
     try {
       const { error } = await supabase.auth.signInWithOtp({
         email: email.trim(),
         options: {
-          shouldCreateUser: true,
+          shouldCreateUser,
         },
       });
-      return { error: error?.message ?? null };
+      if (error) {
+        if (
+          error.message?.includes('Signups not allowed') ||
+          error.message?.includes('User not found') ||
+          error.message?.includes('signup')
+        ) {
+          return { error: 'No account found with this email. Please sign up first.' };
+        }
+        return { error: error.message };
+      }
+      return { error: null };
     } catch (e: any) {
       return { error: e.message || 'Failed to send OTP' };
     }
@@ -229,19 +239,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         options: { data: { name }, emailRedirectTo: undefined },
       });
       if (error) {
+        if (
+          error.message?.includes('already registered') ||
+          error.message?.includes('already in use') ||
+          error.message?.includes('already exists')
+        ) {
+          return { error: 'An account with this email already exists. Please sign in instead.' };
+        }
         const msg = error.message?.includes('Database error saving new user')
           ? 'Database trigger error in Supabase. Please run the SQL script in scripts/fix-database-error.sql in your Supabase Dashboard SQL Editor.'
           : error.message;
         return { error: msg };
       }
 
-      // Step 2: If user already existed (identities empty), fall back to signInWithOtp
+      // Step 2: If user already existed (identities empty), do NOT sign in, inform user they exist
       if (data.user && (!data.user.identities || data.user.identities.length === 0)) {
-        const { error: otpErr } = await supabase.auth.signInWithOtp({
-          email: email.trim(),
-          options: { shouldCreateUser: false },
-        });
-        return { error: otpErr?.message ?? null };
+        return { error: 'An account with this email already exists. Please sign in instead.' };
       }
 
       return { error: null };

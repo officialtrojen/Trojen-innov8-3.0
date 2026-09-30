@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/AuthProvider';
+import { createClient } from '@/lib/supabase/client';
 import LiveBackground from '@/components/LiveBackground';
 import {
   Mail,
@@ -72,7 +73,7 @@ export default function SignUpPage() {
     }
   }, []);
 
-  // Handle Step 1: Start Registration & Send OTP — optimistic: show OTP screen instantly
+  // Handle Step 1: Start Registration & Send OTP — verify if user already exists
   const handleStartSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) { setError('Please enter your full name.'); return; }
@@ -80,21 +81,35 @@ export default function SignUpPage() {
     if (!password || password.length < 6) { setError('Password must be at least 6 characters long.'); return; }
 
     setError('');
-    // Switch to OTP step IMMEDIATELY — no waiting for API
+    setLoading(true);
+
+    // 1. Check if user already exists in Supabase profiles
+    const supabase = createClient();
+    const { data: existingProfile } = await supabase
+      .from('profiles')
+      .select('id, email')
+      .ilike('email', email.trim())
+      .maybeSingle();
+
+    if (existingProfile) {
+      setError('An account with this email already exists. Please sign in instead.');
+      setLoading(false);
+      return;
+    }
+
+    // 2. Fire Supabase signup
+    const { error: signUpError } = await signUpWithPasswordAndSendOtp(name, email, password);
+    if (signUpError) {
+      setError(signUpError);
+      setLoading(false);
+      return;
+    }
+
+    // 3. Switch to OTP screen only after verifying user is new and signup OTP dispatched
+    setLoading(false);
     setStep('otp');
     setResendTimer(30);
-    setSuccessMsg(`OTP sent to ${email}! Check your inbox.`);
-
-    // Fire Supabase signup in background
-    signUpWithPasswordAndSendOtp(name, email, password).then(({ error: signUpError }) => {
-      if (signUpError) {
-        // Revert to form if signup actually failed
-        setStep('form');
-        setResendTimer(0);
-        setSuccessMsg('');
-        setError(signUpError);
-      }
-    });
+    setSuccessMsg(`Verification code sent to ${email}! Check your inbox.`);
   };
 
   // Handle Step 2: Verify OTP and finalize signup
@@ -127,8 +142,7 @@ export default function SignUpPage() {
     setLoading(true);
 
     try {
-      // Single Supabase call to resend
-      const { error: otpErr } = await sendOtp(email);
+      const { error: otpErr } = await sendOtp(email, true);
       if (otpErr) {
         setError(otpErr);
         return;
@@ -250,14 +264,24 @@ export default function SignUpPage() {
                 background: 'rgba(239, 68, 68, 0.15)',
                 border: '1px solid rgba(239, 68, 68, 0.4)',
                 color: '#FCA5A5',
-                padding: '10px 14px',
+                padding: '12px 14px',
                 borderRadius: 12,
                 fontSize: 13,
                 marginBottom: 16,
-                lineHeight: 1.4,
+                lineHeight: 1.5,
               }}
             >
-              {error}
+              <div>{error}</div>
+              {(error.includes('sign in') || error.includes('already exists')) && (
+                <div style={{ marginTop: 8 }}>
+                  <Link
+                    href={redirectUrl !== '/dashboard' ? `/login?redirect=${encodeURIComponent(redirectUrl)}` : '/login'}
+                    style={{ color: '#C084FC', fontWeight: 700, textDecoration: 'underline' }}
+                  >
+                    Click here to sign in with this email →
+                  </Link>
+                </div>
+              )}
             </div>
           )}
 

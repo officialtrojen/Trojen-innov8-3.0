@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/AuthProvider';
+import { createClient } from '@/lib/supabase/client';
 import LiveBackground from '@/components/LiveBackground';
 import { Mail, KeyRound, ShieldCheck, ArrowRight, RotateCcw } from 'lucide-react';
 
@@ -65,16 +66,33 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
 
+    const supabase = createClient();
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('id')
+      .ilike('email', email.trim())
+      .maybeSingle();
+
+    if (!profile) {
+      setError('No account found with this email. Please sign up first.');
+      setLoading(false);
+      return;
+    }
+
     const { error: err } = await signIn(email, password);
     if (err) {
-      setError(err);
+      if (err.includes('Invalid login credentials')) {
+        setError('Incorrect password. Please try again or sign in with Email OTP.');
+      } else {
+        setError(err);
+      }
       setLoading(false);
     } else {
       window.location.href = redirectUrl;
     }
   };
 
-  // Handle Send OTP — optimistic: switch to OTP screen instantly, send in background
+  // Handle Send OTP — verify user exists in Supabase first, only send if registered
   const handleSendOtp = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!email || !email.includes('@')) {
@@ -83,21 +101,37 @@ export default function LoginPage() {
     }
 
     setError('');
-    // Switch to OTP screen IMMEDIATELY — no waiting for API
+    setLoading(true);
+
+    const supabase = createClient();
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('id, email')
+      .ilike('email', email.trim())
+      .maybeSingle();
+
+    if (!profile) {
+      // Verify with Supabase auth (shouldCreateUser: false)
+      const { error: otpErr } = await sendOtp(email, false);
+      if (otpErr) {
+        setError('No account found with this email. Please sign up first.');
+        setLoading(false);
+        return;
+      }
+    } else {
+      const { error: otpErr } = await sendOtp(email, false);
+      if (otpErr) {
+        setError(otpErr);
+        setLoading(false);
+        return;
+      }
+    }
+
+    // Only switch to OTP input screen after verifying user exists and OTP was dispatched
+    setLoading(false);
     setOtpSent(true);
     setResendTimer(30);
     setSuccessMsg(`OTP sent to ${email}! Check your inbox.`);
-
-    // Fire API in background
-    sendOtp(email).then(({ error: otpErr }) => {
-      if (otpErr) {
-        // Revert if API actually failed
-        setOtpSent(false);
-        setResendTimer(0);
-        setSuccessMsg('');
-        setError(otpErr);
-      }
-    });
   };
 
   // Handle Verify OTP — show loading instantly, verify then navigate
@@ -224,13 +258,24 @@ export default function LoginPage() {
                 background: 'rgba(239, 68, 68, 0.15)',
                 border: '1px solid rgba(239, 68, 68, 0.4)',
                 color: '#FCA5A5',
-                padding: '10px 14px',
+                padding: '12px 14px',
                 borderRadius: 12,
                 fontSize: 13,
                 marginBottom: 16,
+                lineHeight: 1.5,
               }}
             >
-              {error}
+              <div>{error}</div>
+              {error.includes('sign up') && (
+                <div style={{ marginTop: 8 }}>
+                  <Link
+                    href={redirectUrl !== '/dashboard' ? `/signup?redirect=${encodeURIComponent(redirectUrl)}` : '/signup'}
+                    style={{ color: '#C084FC', fontWeight: 700, textDecoration: 'underline' }}
+                  >
+                    Click here to create a new account →
+                  </Link>
+                </div>
+              )}
             </div>
           )}
 
