@@ -19,6 +19,11 @@ interface AuthContextType {
     password?: string,
     name?: string
   ) => Promise<{ error: string | null }>;
+  signUpWithPasswordAndSendOtp: (
+    name: string,
+    email: string,
+    password: string
+  ) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -200,6 +205,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  // Register user in Supabase (password stored) + send OTP via Supabase — single call, no SMTP delay
+  const signUpWithPasswordAndSendOtp = async (name: string, email: string, password: string) => {
+    try {
+      // Step 1: Create user with password (Supabase will send confirmation OTP email automatically)
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
+        options: { data: { name }, emailRedirectTo: undefined },
+      });
+      if (error) return { error: error.message };
+
+      // Step 2: If user already existed (identities empty), fall back to signInWithOtp
+      if (data.user && (!data.user.identities || data.user.identities.length === 0)) {
+        const { error: otpErr } = await supabase.auth.signInWithOtp({
+          email: email.trim(),
+          options: { shouldCreateUser: false },
+        });
+        return { error: otpErr?.message ?? null };
+      }
+
+      return { error: null };
+    } catch (e: any) {
+      return { error: e.message || 'Signup failed' };
+    }
+  };
+
   const signOut = async () => {
     await supabase.auth.signOut();
     setUser(null);
@@ -219,6 +250,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         sendOtp,
         verifyOtp,
         verifyOtpAndSetPassword,
+        signUpWithPasswordAndSendOtp,
         signOut,
       }}
     >

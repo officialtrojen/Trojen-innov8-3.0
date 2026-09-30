@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 
 export default function SignUpPage() {
-  const { signUpWithPasswordAndSendOtp, verifyOtp, signInWithGoogle } = useAuth();
+  const { signUpWithPasswordAndSendOtp, verifyOtp, signInWithGoogle, sendOtp } = useAuth();
   const router = useRouter();
 
   // Wizard Step: 'form' (enter name, email, pass) -> 'otp' (verify 6-digit code)
@@ -68,19 +68,10 @@ export default function SignUpPage() {
     setLoading(true);
 
     try {
-      // 1. Try sending via backend official.trojen@gmail.com transporter
-      const res = await fetch('/api/auth/send-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-      await res.json();
-
-      // 2. Also register in Supabase / Local storage with password & trigger Supabase OTP
+      // Single Supabase call: registers user with password + sends OTP email automatically
       const { error: signUpError } = await signUpWithPasswordAndSendOtp(name, email, password);
       if (signUpError) {
         setError(signUpError);
-        setLoading(false);
         return;
       }
 
@@ -124,11 +115,12 @@ export default function SignUpPage() {
     setLoading(true);
 
     try {
-      await fetch('/api/auth/send-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
+      // Single Supabase call to resend
+      const { error: otpErr } = await sendOtp(email);
+      if (otpErr) {
+        setError(otpErr);
+        return;
+      }
       setResendTimer(30);
       setSuccessMsg(`A new 6-digit code has been sent to ${email}`);
     } catch (err: any) {
