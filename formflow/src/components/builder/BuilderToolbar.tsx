@@ -190,6 +190,7 @@ export default function BuilderToolbar({
             {saving ? <span className="spinner" /> : <Save size={15} />}
             Save
           </button>
+
           {onToggleAi && (
             <button
               type="button"
