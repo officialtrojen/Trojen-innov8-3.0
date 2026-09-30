@@ -24,7 +24,7 @@ interface AuthContextType {
     email: string,
     password: string
   ) => Promise<{ error: string | null }>;
-  signOut: () => Promise<void>;
+  signOut: (targetPath?: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -263,13 +263,43 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signOut = async () => {
-    // Clear local state immediately for instant UI feedback
+  const signOut = async (targetPath: string = '/login') => {
+    // 1. Immediately wipe React state
     setUser(null);
     setSession(null);
-    // Navigate away at once, sign out in background
-    window.location.href = '/';
-    supabase.auth.signOut().catch(() => {});
+
+    // 2. Synchronously wipe all auth tokens and cookies
+    if (typeof window !== 'undefined') {
+      try {
+        const keysToRemove: string[] = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (k && (k.startsWith('sb-') || k.includes('supabase') || k.includes('auth'))) {
+            keysToRemove.push(k);
+          }
+        }
+        keysToRemove.forEach((k) => localStorage.removeItem(k));
+
+        // Instantly expire all cookies
+        document.cookie.split(';').forEach((cookie) => {
+          const name = cookie.split('=')[0]?.trim();
+          if (name) {
+            document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0`;
+            document.cookie = `${name}=; path=/; domain=${window.location.hostname}; expires=Thu, 01 Jan 1970 00:00:00 GMT; max-age=0`;
+          }
+        });
+      } catch (err) {
+        console.warn('Storage wipe error:', err);
+      }
+    }
+
+    // 3. Clear Supabase client local session instantly without waiting for remote server round-trip
+    supabase.auth.signOut({ scope: 'local' }).catch(() => {});
+
+    // 4. Instant navigation without delay
+    if (typeof window !== 'undefined') {
+      window.location.replace(targetPath);
+    }
   };
 
   return (

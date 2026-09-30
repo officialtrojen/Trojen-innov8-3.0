@@ -107,7 +107,7 @@ function Sidebar() {
 
   const handleSignOut = () => {
     setSigningOut(true);
-    signOut();
+    signOut('/login');
   };
 
   const handleModalSubmit = async (e: React.FormEvent) => {
