@@ -490,24 +490,33 @@ export default function StandaloneBuilderPage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             <Link
               href="/"
-              className="btn btn-ghost btn-sm"
               style={{
-                display: 'inline-flex',
+                display: 'flex',
                 alignItems: 'center',
                 gap: 6,
                 padding: '6px 14px',
-                fontSize: 12,
-                fontWeight: 600,
-                color: '#334155',
-                background: '#F8FAFC',
-                border: '1px solid #CBD5E1',
-                borderRadius: 8,
-                boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
+                fontSize: 13,
+                fontWeight: 700,
+                color: '#1E293B',
+                background: '#F1F5F9',
+                borderRadius: 10,
+                border: '1.5px solid #CBD5E1',
                 textDecoration: 'none',
-                transition: 'all 0.15s ease',
+                transition: 'all 0.2s',
+                cursor: 'pointer',
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.backgroundColor = '#E2E8F0';
+                e.currentTarget.style.borderColor = '#94A3B8';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.backgroundColor = '#F1F5F9';
+                e.currentTarget.style.borderColor = '#CBD5E1';
               }}
             >
-              <ArrowLeft size={15} style={{ color: '#475569' }} /> Home
+              <ArrowLeft size={16} color="#1E293B" />
+              <span>Home</span>
+
             </Link>
 
             <div style={{ width: 1, height: 24, background: 'rgba(184,206,207,0.5)' }} />
