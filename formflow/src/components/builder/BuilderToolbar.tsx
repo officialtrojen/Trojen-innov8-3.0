@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Save, Globe, Eye, GitBranch, Palette, Link as LinkIcon, Check, Sparkles } from 'lucide-react';
+import { ArrowLeft, Save, Globe, Eye, GitBranch, Palette, Link as LinkIcon, Check, Sparkles, Share2 } from 'lucide-react';
 
 interface BuilderToolbarProps {
   title: string;
@@ -63,6 +63,40 @@ export default function BuilderToolbar({
       >
         {/* Left: Title */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, minWidth: 200 }}>
+          <Link
+            href="/dashboard"
+            title="Back to Dashboard"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '6px 12px',
+              fontSize: 13,
+              fontWeight: 700,
+              color: '#1E293B',
+              background: '#F1F5F9',
+              borderRadius: 8,
+              border: '1.5px solid #CBD5E1',
+              textDecoration: 'none',
+              flexShrink: 0,
+              transition: 'all 0.2s',
+              cursor: 'pointer',
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.backgroundColor = '#E2E8F0';
+              e.currentTarget.style.borderColor = '#94A3B8';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.backgroundColor = '#F1F5F9';
+              e.currentTarget.style.borderColor = '#CBD5E1';
+            }}
+          >
+            <ArrowLeft size={15} color="#1E293B" />
+            <span>Home</span>
+          </Link>
+
+          <div style={{ width: 1, height: 20, background: '#CBD5E1' }} />
+
           <input
             value={title}
             onChange={(e) => onTitleChange(e.target.value)}
