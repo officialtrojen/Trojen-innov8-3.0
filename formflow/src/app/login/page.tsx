@@ -68,7 +68,7 @@ export default function LoginPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       });
-      const data = await res.json();
+      await res.json();
 
       // 2. Also trigger Supabase OTP
       await sendOtp(email);
@@ -130,15 +130,16 @@ export default function LoginPage() {
         }}
       >
         <div
-          className="card"
           style={{
             width: '100%',
             maxWidth: 440,
             padding: 36,
-            background: '#ffffff',
+            background: 'rgba(15, 23, 42, 0.95)',
+            backdropFilter: 'blur(16px)',
             borderRadius: 24,
-            boxShadow: '0 24px 48px rgba(0,0,0,0.1)',
-            border: '1px solid #E2E8F0',
+            boxShadow: '0 24px 60px rgba(0,0,0,0.8), 0 0 30px rgba(139, 92, 246, 0.2)',
+            border: '1px solid rgba(139, 92, 246, 0.35)',
+            color: '#FFFFFF',
           }}
         >
           {/* Logo */}
@@ -157,25 +158,25 @@ export default function LoginPage() {
                 width: 38,
                 height: 38,
                 borderRadius: 12,
-                background: 'linear-gradient(135deg, #4F7C7A, #52796F)',
+                background: 'linear-gradient(135deg, #8B5CF6, #7C3AED)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 color: 'white',
                 fontWeight: 800,
                 fontSize: 18,
-                boxShadow: '0 4px 10px rgba(79,124,122,0.3)',
+                boxShadow: '0 4px 14px rgba(139, 92, 246, 0.5)',
               }}
             >
               F
             </div>
-            <span style={{ fontWeight: 800, fontSize: 20, color: '#263B3B' }}>FormFlow</span>
+            <span style={{ fontWeight: 800, fontSize: 20, color: '#FFFFFF' }}>FormFlow</span>
           </Link>
 
-          <h1 style={{ fontSize: 22, fontWeight: 800, color: '#263B3B', marginBottom: 4 }}>
+          <h1 style={{ fontSize: 24, fontWeight: 800, color: '#FFFFFF', marginBottom: 6 }}>
             Welcome to FormFlow
           </h1>
-          <p style={{ color: '#52796F', fontSize: 13, marginBottom: 20 }}>
+          <p style={{ color: '#94A3B8', fontSize: 14, marginBottom: 24 }}>
             Sign in to access your forms and workflow analytics.
           </p>
 
@@ -183,9 +184,9 @@ export default function LoginPage() {
           {error && (
             <div
               style={{
-                background: '#FEF2F2',
-                border: '1px solid #FCA5A5',
-                color: '#991B1B',
+                background: 'rgba(239, 68, 68, 0.15)',
+                border: '1px solid rgba(239, 68, 68, 0.4)',
+                color: '#FCA5A5',
                 padding: '10px 14px',
                 borderRadius: 12,
                 fontSize: 13,
@@ -199,9 +200,9 @@ export default function LoginPage() {
           {successMsg && (
             <div
               style={{
-                background: '#F0FDF4',
-                border: '1px solid #86EFAC',
-                color: '#166534',
+                background: 'rgba(16, 185, 129, 0.15)',
+                border: '1px solid rgba(16, 185, 129, 0.4)',
+                color: '#6EE7B7',
                 padding: '10px 14px',
                 borderRadius: 12,
                 fontSize: 13,
@@ -225,14 +226,14 @@ export default function LoginPage() {
               gap: 12,
               padding: '12px 16px',
               borderRadius: 12,
-              border: '1.5px solid #E2E8F0',
+              border: '1.5px solid rgba(255, 255, 255, 0.2)',
               background: '#FFFFFF',
-              color: '#1E293B',
+              color: '#0F172A',
               fontSize: 14,
-              fontWeight: 600,
+              fontWeight: 700,
               cursor: 'pointer',
               transition: 'all 0.2s ease',
-              marginBottom: 16,
+              marginBottom: 20,
             }}
             onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#F8FAFC')}
             onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#FFFFFF')}
@@ -262,11 +263,12 @@ export default function LoginPage() {
           <div
             style={{
               display: 'flex',
-              background: '#F1F5F9',
+              background: '#0B0F19',
               padding: 4,
               borderRadius: 12,
               marginBottom: 20,
               gap: 4,
+              border: '1px solid rgba(255, 255, 255, 0.1)',
             }}
           >
             <button
@@ -277,9 +279,9 @@ export default function LoginPage() {
               }}
               style={{
                 flex: 1,
-                padding: '8px 12px',
+                padding: '9px 12px',
                 borderRadius: 10,
-                fontSize: 12,
+                fontSize: 13,
                 fontWeight: 600,
                 border: 'none',
                 cursor: 'pointer',
@@ -288,12 +290,12 @@ export default function LoginPage() {
                 justifyContent: 'center',
                 gap: 6,
                 transition: 'all 0.2s',
-                background: authMode === 'otp' ? '#FFFFFF' : 'transparent',
-                color: authMode === 'otp' ? '#4F7C7A' : '#64748B',
-                boxShadow: authMode === 'otp' ? '0 2px 4px rgba(0,0,0,0.05)' : 'none',
+                background: authMode === 'otp' ? '#8B5CF6' : 'transparent',
+                color: authMode === 'otp' ? '#FFFFFF' : '#94A3B8',
+                boxShadow: authMode === 'otp' ? '0 2px 8px rgba(139, 92, 246, 0.4)' : 'none',
               }}
             >
-              <ShieldCheck size={14} />
+              <ShieldCheck size={15} />
               Email OTP Code
             </button>
 
@@ -305,9 +307,9 @@ export default function LoginPage() {
               }}
               style={{
                 flex: 1,
-                padding: '8px 12px',
+                padding: '9px 12px',
                 borderRadius: 10,
-                fontSize: 12,
+                fontSize: 13,
                 fontWeight: 600,
                 border: 'none',
                 cursor: 'pointer',
@@ -316,12 +318,12 @@ export default function LoginPage() {
                 justifyContent: 'center',
                 gap: 6,
                 transition: 'all 0.2s',
-                background: authMode === 'password' ? '#FFFFFF' : 'transparent',
-                color: authMode === 'password' ? '#4F7C7A' : '#64748B',
-                boxShadow: authMode === 'password' ? '0 2px 4px rgba(0,0,0,0.05)' : 'none',
+                background: authMode === 'password' ? '#8B5CF6' : 'transparent',
+                color: authMode === 'password' ? '#FFFFFF' : '#94A3B8',
+                boxShadow: authMode === 'password' ? '0 2px 8px rgba(139, 92, 246, 0.4)' : 'none',
               }}
             >
-              <KeyRound size={14} />
+              <KeyRound size={15} />
               Password
             </button>
           </div>
@@ -337,8 +339,8 @@ export default function LoginPage() {
                       style={{
                         display: 'block',
                         fontSize: 13,
-                        fontWeight: 600,
-                        color: '#334155',
+                        fontWeight: 700,
+                        color: '#FFFFFF',
                         marginBottom: 6,
                       }}
                     >
@@ -354,37 +356,31 @@ export default function LoginPage() {
                         width: '100%',
                         padding: '12px 14px',
                         borderRadius: 12,
-                        border: '1.5px solid #CBD5E1',
+                        border: '1.5px solid rgba(139, 92, 246, 0.4)',
                         fontSize: 14,
-                        color: '#1E293B',
-                        backgroundColor: '#FFFFFF',
-                        caretColor: '#4F7C7A',
+                        color: '#FFFFFF',
+                        backgroundColor: '#0F172A',
+                        caretColor: '#A855F7',
                         outline: 'none',
                         cursor: 'text',
                       }}
                     />
-                    <div style={{ fontSize: 11, color: '#64748B', marginTop: 6 }}>
-                      📩 OTP will be sent from <strong>official.trojen@gmail.com</strong>
+                    <div style={{ fontSize: 12, color: '#94A3B8', marginTop: 6 }}>
+                      📩 OTP will be sent from <strong style={{ color: '#C084FC' }}>official.trojen@gmail.com</strong>
                     </div>
                   </div>
 
                   <button
                     type="submit"
                     disabled={loading}
+                    className="btn btn-primary"
                     style={{
                       width: '100%',
-                      padding: '12px',
+                      padding: '13px',
                       borderRadius: 12,
-                      background: '#4F7C7A',
-                      color: '#ffffff',
-                      fontSize: 14,
+                      fontSize: 15,
                       fontWeight: 700,
-                      border: 'none',
                       cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: 8,
                     }}
                   >
                     {loading ? 'Sending OTP Code...' : 'Send 6-Digit OTP Code →'}
@@ -395,13 +391,13 @@ export default function LoginPage() {
                 <form onSubmit={handleVerifyOtp}>
                   <div style={{ marginBottom: 20 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                      <label style={{ fontSize: 13, fontWeight: 600, color: '#334155' }}>
+                      <label style={{ fontSize: 13, fontWeight: 700, color: '#FFFFFF' }}>
                         Enter 6-Digit Code
                       </label>
                       <button
                         type="button"
                         onClick={() => setOtpSent(false)}
-                        style={{ background: 'none', border: 'none', fontSize: 11, color: '#4F7C7A', cursor: 'pointer', fontWeight: 600 }}
+                        style={{ background: 'none', border: 'none', fontSize: 12, color: '#C084FC', cursor: 'pointer', fontWeight: 600 }}
                       >
                         Change Email
                       </button>
@@ -419,20 +415,21 @@ export default function LoginPage() {
                         width: '100%',
                         padding: '12px',
                         borderRadius: 12,
-                        border: '2px solid #4F7C7A',
+                        border: '2px solid #8B5CF6',
                         fontSize: otpCode.length > 6 ? 20 : 24,
                         fontWeight: 800,
                         letterSpacing: otpCode.length > 6 ? 5 : 8,
                         textAlign: 'center',
-                        color: '#263B3B',
+                        color: '#FFFFFF',
+                        backgroundColor: '#0F172A',
                         fontFamily: 'monospace',
                         outline: 'none',
                       }}
                     />
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 }}>
-                      <span style={{ fontSize: 11, color: '#64748B' }}>
-                        Sent to: <strong>{email}</strong>
+                      <span style={{ fontSize: 12, color: '#94A3B8' }}>
+                        Sent to: <strong style={{ color: '#FFFFFF' }}>{email}</strong>
                       </span>
                       <button
                         type="button"
@@ -442,7 +439,7 @@ export default function LoginPage() {
                           background: 'none',
                           border: 'none',
                           fontSize: 12,
-                          color: resendTimer > 0 ? '#94A3B8' : '#4F7C7A',
+                          color: resendTimer > 0 ? '#64748B' : '#C084FC',
                           cursor: resendTimer > 0 ? 'default' : 'pointer',
                           fontWeight: 600,
                         }}
@@ -455,15 +452,13 @@ export default function LoginPage() {
                   <button
                     type="submit"
                     disabled={loading || otpCode.length < 6}
+                    className="btn btn-primary"
                     style={{
                       width: '100%',
-                      padding: '12px',
+                      padding: '13px',
                       borderRadius: 12,
-                      background: '#4F7C7A',
-                      color: '#ffffff',
-                      fontSize: 14,
+                      fontSize: 15,
                       fontWeight: 700,
-                      border: 'none',
                       cursor: otpCode.length >= 6 && !loading ? 'pointer' : 'not-allowed',
                       opacity: otpCode.length >= 6 ? 1 : 0.6,
                     }}
@@ -478,8 +473,8 @@ export default function LoginPage() {
           {/* MODE 2: PASSWORD AUTHENTICATION */}
           {authMode === 'password' && (
             <form onSubmit={handlePasswordSubmit}>
-              <div style={{ marginBottom: 14 }}>
-                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#334155', marginBottom: 6 }}>
+              <div style={{ marginBottom: 16 }}>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#FFFFFF', marginBottom: 6 }}>
                   Email
                 </label>
                 <input
@@ -490,20 +485,21 @@ export default function LoginPage() {
                   required
                   style={{
                     width: '100%',
-                    padding: '10px 14px',
-                    borderRadius: 10,
-                    border: '1.5px solid #CBD5E1',
+                    padding: '12px 14px',
+                    borderRadius: 12,
+                    border: '1.5px solid rgba(139, 92, 246, 0.4)',
                     fontSize: 14,
-                    color: '#1E293B',
-                    backgroundColor: '#FFFFFF',
-                    caretColor: '#4F7C7A',
+                    color: '#FFFFFF',
+                    backgroundColor: '#0F172A',
+                    caretColor: '#A855F7',
+                    outline: 'none',
                     cursor: 'text',
                   }}
                 />
               </div>
 
-              <div style={{ marginBottom: 20 }}>
-                <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#334155', marginBottom: 6 }}>
+              <div style={{ marginBottom: 22 }}>
+                <label style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#FFFFFF', marginBottom: 6 }}>
                   Password
                 </label>
                 <input
@@ -514,13 +510,14 @@ export default function LoginPage() {
                   required
                   style={{
                     width: '100%',
-                    padding: '10px 14px',
-                    borderRadius: 10,
-                    border: '1.5px solid #CBD5E1',
+                    padding: '12px 14px',
+                    borderRadius: 12,
+                    border: '1.5px solid rgba(139, 92, 246, 0.4)',
                     fontSize: 14,
-                    color: '#1E293B',
-                    backgroundColor: '#FFFFFF',
-                    caretColor: '#4F7C7A',
+                    color: '#FFFFFF',
+                    backgroundColor: '#0F172A',
+                    caretColor: '#A855F7',
+                    outline: 'none',
                     cursor: 'text',
                   }}
                 />
@@ -529,15 +526,13 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={loading}
+                className="btn btn-primary"
                 style={{
                   width: '100%',
-                  padding: '12px',
+                  padding: '13px',
                   borderRadius: 12,
-                  background: '#4F7C7A',
-                  color: '#ffffff',
-                  fontSize: 14,
-                  fontWeight: 600,
-                  border: 'none',
+                  fontSize: 15,
+                  fontWeight: 700,
                   cursor: 'pointer',
                 }}
               >
@@ -546,9 +541,9 @@ export default function LoginPage() {
             </form>
           )}
 
-          <p style={{ textAlign: 'center', marginTop: 24, fontSize: 13, color: '#52796F' }}>
+          <p style={{ textAlign: 'center', marginTop: 24, fontSize: 14, color: '#94A3B8' }}>
             Don&apos;t have an account?{' '}
-            <Link href="/signup" style={{ color: '#4F7C7A', fontWeight: 700, textDecoration: 'none' }}>
+            <Link href="/signup" style={{ color: '#C084FC', fontWeight: 700, textDecoration: 'none' }}>
               Sign up
             </Link>
           </p>

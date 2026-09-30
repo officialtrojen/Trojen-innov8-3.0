@@ -10,21 +10,20 @@ import {
   Lock,
   User as UserIcon,
   ShieldCheck,
+  CheckCircle2,
   ArrowRight,
   ArrowLeft,
   RotateCcw,
-  CheckCircle2,
+  Sparkles,
   Eye,
   EyeOff,
-  Sparkles,
 } from 'lucide-react';
-import confetti from 'canvas-confetti';
 
-export default function SignupPage() {
-  const { signUp, signInWithGoogle, sendOtp, verifyOtpAndSetPassword } = useAuth();
+export default function SignUpPage() {
+  const { signUpWithPasswordAndSendOtp, verifyOtp, signInWithGoogle } = useAuth();
   const router = useRouter();
 
-  // Steps: 'form' | 'otp'
+  // Wizard Step: 'form' (enter name, email, pass) -> 'otp' (verify 6-digit code)
   const [step, setStep] = useState<'form' | 'otp'>('form');
 
   // Form Fields
@@ -34,14 +33,13 @@ export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [otpCode, setOtpCode] = useState('');
 
-  // UI States
+  // UI state
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
 
-  // Timer countdown for resending OTP
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (resendTimer > 0) {
@@ -50,11 +48,9 @@ export default function SignupPage() {
     return () => clearInterval(interval);
   }, [resendTimer]);
 
-  // Step 1: Submit Form to initiate Signup + Send OTP
+  // Handle Step 1: Start Registration & Send OTP
   const handleStartSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-
     if (!name.trim()) {
       setError('Please enter your full name.');
       return;
@@ -63,59 +59,45 @@ export default function SignupPage() {
       setError('Please enter a valid email address.');
       return;
     }
-    if (password.length < 6) {
+    if (!password || password.length < 6) {
       setError('Password must be at least 6 characters long.');
       return;
     }
 
+    setError('');
     setLoading(true);
 
     try {
-      // 1. Try initial Supabase signup
-      const { session, error: err } = await signUp(email, password, name);
+      // 1. Try sending via backend official.trojen@gmail.com transporter
+      const res = await fetch('/api/auth/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      await res.json();
 
-      if (err) {
-        // If user already exists in Supabase
-        if (err.toLowerCase().includes('already registered')) {
-          setError('An account with this email already exists. Please log in or use OTP login.');
-          setLoading(false);
-          return;
-        }
-        // If standard signup failed due to email provider settings, trigger OTP fallback
-        await sendOtp(email);
-      }
-
-      // If Supabase immediately issued a session (email confirmation turned off in project)
-      if (session) {
-        confetti({ particleCount: 60, spread: 70, origin: { y: 0.6 } });
-        router.push('/dashboard');
+      // 2. Also register in Supabase / Local storage with password & trigger Supabase OTP
+      const { error: signUpError } = await signUpWithPasswordAndSendOtp(name, email, password);
+      if (signUpError) {
+        setError(signUpError);
+        setLoading(false);
         return;
       }
 
-      // 2. Also trigger official.trojen@gmail.com notifier if available
-      try {
-        fetch('/api/auth/send-otp', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email }),
-        }).catch(() => {});
-      } catch (_) {}
-
-      // Transition to OTP verification step
       setStep('otp');
       setResendTimer(30);
-      setSuccessMsg(`We sent a 6-digit verification code to ${email}`);
-    } catch (exc: any) {
-      setError(exc.message || 'Failed to start signup process');
+      setSuccessMsg(`We sent a 6-digit OTP code to ${email}!`);
+    } catch (err: any) {
+      setError(err.message || 'Failed to start registration.');
     } finally {
       setLoading(false);
     }
   };
 
-  // Step 2: Verify OTP & Activate Password
+  // Handle Step 2: Verify OTP and finalize signup
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!otpCode || otpCode.trim().length < 6) {
+    if (!otpCode || otpCode.length < 6) {
       setError('Please enter the full 6-digit verification code.');
       return;
     }
@@ -123,54 +105,40 @@ export default function SignupPage() {
     setError('');
     setLoading(true);
 
-    const { error: verifyErr } = await verifyOtpAndSetPassword(
-      email,
-      otpCode.trim(),
-      password,
-      name
-    );
-
-    if (verifyErr) {
-      setError(verifyErr);
+    const { error: err } = await verifyOtp(email, otpCode);
+    if (err) {
+      setError(err);
       setLoading(false);
     } else {
-      setSuccessMsg('Account verified! Welcome to FormFlow.');
-      try {
-        confetti({ particleCount: 90, spread: 80, origin: { y: 0.6 } });
-      } catch (_) {}
-
+      setSuccessMsg('Account created successfully!');
       setTimeout(() => {
         router.push('/dashboard');
-      }, 700);
+      }, 500);
     }
   };
 
-  // Resend OTP handler
+  // Resend OTP
   const handleResendOtp = async () => {
     if (resendTimer > 0) return;
     setError('');
     setLoading(true);
 
     try {
-      await sendOtp(email);
-      try {
-        await fetch('/api/auth/send-otp', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email }),
-        });
-      } catch (_) {}
-
+      await fetch('/api/auth/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
       setResendTimer(30);
       setSuccessMsg(`A new 6-digit code has been sent to ${email}`);
     } catch (err: any) {
-      setError(err.message || 'Failed to resend verification code');
+      setError('Failed to resend OTP code.');
     } finally {
       setLoading(false);
     }
   };
 
-  // Google OAuth Signup
+  // Google OAuth
   const handleGoogleSignUp = async () => {
     setError('');
     setGoogleLoading(true);
@@ -198,15 +166,16 @@ export default function SignupPage() {
         }}
       >
         <div
-          className="card"
           style={{
             width: '100%',
             maxWidth: 460,
             padding: 38,
-            background: '#ffffff',
+            background: 'rgba(15, 23, 42, 0.95)',
+            backdropFilter: 'blur(16px)',
             borderRadius: 24,
-            boxShadow: '0 24px 48px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.04)',
-            border: '1px solid #E2E8F0',
+            boxShadow: '0 24px 60px rgba(0,0,0,0.8), 0 0 30px rgba(139, 92, 246, 0.2)',
+            border: '1px solid rgba(139, 92, 246, 0.35)',
+            color: '#FFFFFF',
           }}
         >
           {/* Header Brand */}
@@ -217,34 +186,35 @@ export default function SignupPage() {
                   width: 38,
                   height: 38,
                   borderRadius: 12,
-                  background: 'linear-gradient(135deg, #4F7C7A, #52796F)',
+                  background: 'linear-gradient(135deg, #8B5CF6, #7C3AED)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   color: 'white',
                   fontWeight: 800,
                   fontSize: 18,
-                  boxShadow: '0 4px 10px rgba(79,124,122,0.3)',
+                  boxShadow: '0 4px 14px rgba(139, 92, 246, 0.5)',
                 }}
               >
                 F
               </div>
-              <span style={{ fontWeight: 800, fontSize: 20, color: '#263B3B' }}>FormFlow</span>
+              <span style={{ fontWeight: 800, fontSize: 20, color: '#FFFFFF' }}>FormFlow</span>
             </Link>
 
             <span
               style={{
                 fontSize: 11,
                 fontWeight: 700,
-                color: '#4F7C7A',
-                background: '#E8F3F1',
+                color: '#C084FC',
+                background: 'rgba(139, 92, 246, 0.2)',
+                border: '1px solid rgba(139, 92, 246, 0.4)',
                 padding: '4px 10px',
                 borderRadius: 20,
                 textTransform: 'uppercase',
                 letterSpacing: 0.6,
               }}
             >
-              Option 2 &bull; OTP + Pass
+              OTP + Password
             </span>
           </div>
 
@@ -252,9 +222,9 @@ export default function SignupPage() {
           {error && (
             <div
               style={{
-                background: '#FEF2F2',
-                border: '1px solid #FCA5A5',
-                color: '#991B1B',
+                background: 'rgba(239, 68, 68, 0.15)',
+                border: '1px solid rgba(239, 68, 68, 0.4)',
+                color: '#FCA5A5',
                 padding: '10px 14px',
                 borderRadius: 12,
                 fontSize: 13,
@@ -269,9 +239,9 @@ export default function SignupPage() {
           {successMsg && (
             <div
               style={{
-                background: '#F0FDF4',
-                border: '1px solid #86EFAC',
-                color: '#166534',
+                background: 'rgba(16, 185, 129, 0.15)',
+                border: '1px solid rgba(16, 185, 129, 0.4)',
+                color: '#6EE7B7',
                 padding: '10px 14px',
                 borderRadius: 12,
                 fontSize: 13,
@@ -281,21 +251,19 @@ export default function SignupPage() {
                 gap: 8,
               }}
             >
-              <CheckCircle2 size={16} color="#166534" />
+              <CheckCircle2 size={16} color="#6EE7B7" />
               <span>{successMsg}</span>
             </div>
           )}
 
-          {/* ========================================================================= */}
-          {/* STEP 1: Registration Form with Name, Email & Password                     */}
-          {/* ========================================================================= */}
+          {/* STEP 1: Registration Form */}
           {step === 'form' && (
             <div>
-              <h1 style={{ fontSize: 22, fontWeight: 800, color: '#263B3B', marginBottom: 4 }}>
+              <h1 style={{ fontSize: 24, fontWeight: 800, color: '#FFFFFF', marginBottom: 6 }}>
                 Create your account
               </h1>
-              <p style={{ color: '#52796F', fontSize: 13, marginBottom: 20 }}>
-                Sign up with email OTP verification. Set your password now so you can login with either in the future!
+              <p style={{ color: '#94A3B8', fontSize: 14, marginBottom: 20 }}>
+                Sign up with email OTP verification & password.
               </p>
 
               {/* Google OAuth Button */}
@@ -309,13 +277,13 @@ export default function SignupPage() {
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: 12,
-                  padding: '11px 16px',
+                  padding: '12px 16px',
                   borderRadius: 12,
-                  border: '1.5px solid #E2E8F0',
+                  border: '1.5px solid rgba(255, 255, 255, 0.2)',
                   background: '#FFFFFF',
-                  color: '#1E293B',
-                  fontSize: 13.5,
-                  fontWeight: 600,
+                  color: '#0F172A',
+                  fontSize: 14,
+                  fontWeight: 700,
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
                   marginBottom: 16,
@@ -346,18 +314,18 @@ export default function SignupPage() {
 
               {/* Divider */}
               <div style={{ display: 'flex', alignItems: 'center', margin: '18px 0', gap: 12 }}>
-                <div style={{ flex: 1, height: 1, background: '#E2E8F0' }} />
+                <div style={{ flex: 1, height: 1, background: 'rgba(255, 255, 255, 0.15)' }} />
                 <span style={{ fontSize: 11, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: 0.5, fontWeight: 600 }}>
                   or create with email
                 </span>
-                <div style={{ flex: 1, height: 1, background: '#E2E8F0' }} />
+                <div style={{ flex: 1, height: 1, background: 'rgba(255, 255, 255, 0.15)' }} />
               </div>
 
               {/* Input Form */}
               <form onSubmit={handleStartSignup} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
                 {/* Full Name */}
                 <div>
-                  <label htmlFor="name" style={{ display: 'block', fontSize: 12.5, fontWeight: 600, color: '#334155', marginBottom: 6 }}>
+                  <label htmlFor="name" style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#FFFFFF', marginBottom: 6 }}>
                     Full Name
                   </label>
                   <div style={{ position: 'relative' }}>
@@ -375,26 +343,23 @@ export default function SignupPage() {
                       required
                       style={{
                         width: '100%',
-                        padding: '11px 14px 11px 40px',
+                        padding: '12px 14px 12px 40px',
                         borderRadius: 12,
-                        border: '1.5px solid #CBD5E1',
+                        border: '1.5px solid rgba(139, 92, 246, 0.4)',
                         fontSize: 14,
-                        color: '#1E293B',
-                        backgroundColor: '#FFFFFF',
-                        caretColor: '#4F7C7A',
+                        color: '#FFFFFF',
+                        backgroundColor: '#0F172A',
+                        caretColor: '#A855F7',
                         outline: 'none',
-                        transition: 'border 0.2s',
                         cursor: 'text',
                       }}
-                      onFocus={(e) => (e.target.style.borderColor = '#4F7C7A')}
-                      onBlur={(e) => (e.target.style.borderColor = '#CBD5E1')}
                     />
                   </div>
                 </div>
 
                 {/* Email Address */}
                 <div>
-                  <label htmlFor="email" style={{ display: 'block', fontSize: 12.5, fontWeight: 600, color: '#334155', marginBottom: 6 }}>
+                  <label htmlFor="email" style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#FFFFFF', marginBottom: 6 }}>
                     Email Address
                   </label>
                   <div style={{ position: 'relative' }}>
@@ -412,26 +377,23 @@ export default function SignupPage() {
                       required
                       style={{
                         width: '100%',
-                        padding: '11px 14px 11px 40px',
+                        padding: '12px 14px 12px 40px',
                         borderRadius: 12,
-                        border: '1.5px solid #CBD5E1',
+                        border: '1.5px solid rgba(139, 92, 246, 0.4)',
                         fontSize: 14,
-                        color: '#1E293B',
-                        backgroundColor: '#FFFFFF',
-                        caretColor: '#4F7C7A',
+                        color: '#FFFFFF',
+                        backgroundColor: '#0F172A',
+                        caretColor: '#A855F7',
                         outline: 'none',
-                        transition: 'border 0.2s',
                         cursor: 'text',
                       }}
-                      onFocus={(e) => (e.target.style.borderColor = '#4F7C7A')}
-                      onBlur={(e) => (e.target.style.borderColor = '#CBD5E1')}
                     />
                   </div>
                 </div>
 
                 {/* Password Input */}
                 <div>
-                  <label htmlFor="password" style={{ display: 'block', fontSize: 12.5, fontWeight: 600, color: '#334155', marginBottom: 6 }}>
+                  <label htmlFor="password" style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#FFFFFF', marginBottom: 6 }}>
                     Set Password
                   </label>
                   <div style={{ position: 'relative' }}>
@@ -450,19 +412,16 @@ export default function SignupPage() {
                       minLength={6}
                       style={{
                         width: '100%',
-                        padding: '11px 40px 11px 40px',
+                        padding: '12px 40px 12px 40px',
                         borderRadius: 12,
-                        border: '1.5px solid #CBD5E1',
+                        border: '1.5px solid rgba(139, 92, 246, 0.4)',
                         fontSize: 14,
-                        color: '#1E293B',
-                        backgroundColor: '#FFFFFF',
-                        caretColor: '#4F7C7A',
+                        color: '#FFFFFF',
+                        backgroundColor: '#0F172A',
+                        caretColor: '#A855F7',
                         outline: 'none',
-                        transition: 'border 0.2s',
                         cursor: 'text',
                       }}
-                      onFocus={(e) => (e.target.style.borderColor = '#4F7C7A')}
-                      onBlur={(e) => (e.target.style.borderColor = '#CBD5E1')}
                     />
                     <button
                       type="button"
@@ -482,7 +441,7 @@ export default function SignupPage() {
                       {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
                   </div>
-                  <span style={{ fontSize: 11.5, color: '#64748B', marginTop: 4, display: 'block' }}>
+                  <span style={{ fontSize: 12, color: '#94A3B8', marginTop: 4, display: 'block' }}>
                     You can log in with this password OR via OTP anytime!
                   </span>
                 </div>
@@ -491,26 +450,16 @@ export default function SignupPage() {
                 <button
                   type="submit"
                   disabled={loading}
+                  className="btn btn-primary"
                   style={{
                     marginTop: 8,
                     width: '100%',
-                    padding: '12px',
+                    padding: '13px',
                     borderRadius: 12,
-                    background: '#4F7C7A',
-                    color: '#ffffff',
-                    fontSize: 14,
+                    fontSize: 15,
                     fontWeight: 700,
-                    border: 'none',
                     cursor: loading ? 'not-allowed' : 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 8,
-                    boxShadow: '0 4px 12px rgba(79,124,122,0.3)',
-                    transition: 'all 0.2s',
                   }}
-                  onMouseOver={(e) => !loading && (e.currentTarget.style.backgroundColor = '#3D6160')}
-                  onMouseOut={(e) => !loading && (e.currentTarget.style.backgroundColor = '#4F7C7A')}
                 >
                   {loading ? (
                     <span className="spinner" />
@@ -525,9 +474,7 @@ export default function SignupPage() {
             </div>
           )}
 
-          {/* ========================================================================= */}
-          {/* STEP 2: Enter 6-digit OTP to complete registration & set password         */}
-          {/* ========================================================================= */}
+          {/* STEP 2: Enter 6-digit OTP */}
           {step === 'otp' && (
             <div>
               <div
@@ -535,28 +482,29 @@ export default function SignupPage() {
                   width: 48,
                   height: 48,
                   borderRadius: 14,
-                  background: '#E8F3F1',
-                  color: '#4F7C7A',
+                  background: 'rgba(139, 92, 246, 0.2)',
+                  color: '#C084FC',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   marginBottom: 16,
+                  border: '1px solid rgba(139, 92, 246, 0.4)',
                 }}
               >
                 <ShieldCheck size={26} />
               </div>
 
-              <h1 style={{ fontSize: 22, fontWeight: 800, color: '#263B3B', marginBottom: 6 }}>
+              <h1 style={{ fontSize: 24, fontWeight: 800, color: '#FFFFFF', marginBottom: 6 }}>
                 Enter verification code
               </h1>
-              <p style={{ color: '#52796F', fontSize: 13, marginBottom: 20, lineHeight: 1.5 }}>
-                We sent a 6-digit OTP code to <strong style={{ color: '#263B3B' }}>{email}</strong> from{' '}
-                <strong style={{ color: '#4F7C7A' }}>official.trojen@gmail.com</strong>.
+              <p style={{ color: '#94A3B8', fontSize: 14, marginBottom: 20, lineHeight: 1.5 }}>
+                We sent a 6-digit OTP code to <strong style={{ color: '#FFFFFF' }}>{email}</strong> from{' '}
+                <strong style={{ color: '#C084FC' }}>official.trojen@gmail.com</strong>.
               </p>
 
               <form onSubmit={handleVerifyOtp} style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
                 <div>
-                  <label htmlFor="otp-signup" style={{ display: 'block', fontSize: 12.5, fontWeight: 600, color: '#334155', marginBottom: 8 }}>
+                  <label htmlFor="otp-signup" style={{ display: 'block', fontSize: 13, fontWeight: 700, color: '#FFFFFF', marginBottom: 8 }}>
                     Security OTP Code
                   </label>
                   <input
@@ -573,57 +521,48 @@ export default function SignupPage() {
                       width: '100%',
                       padding: '14px',
                       borderRadius: 14,
-                      border: '2px solid #4F7C7A',
+                      border: '2px solid #8B5CF6',
                       fontSize: otpCode.length > 6 ? 22 : 26,
                       fontWeight: 800,
                       letterSpacing: otpCode.length > 6 ? 6 : 10,
                       textAlign: 'center',
                       fontFamily: 'monospace',
                       outline: 'none',
-                      background: '#F8FAFC',
-                      color: '#263B3B',
+                      background: '#0F172A',
+                      color: '#FFFFFF',
                     }}
                   />
                 </div>
 
-                {/* Password confirmation reminder */}
                 <div
                   style={{
-                    background: '#F0FDF4',
-                    border: '1px solid #BBF7D0',
+                    background: 'rgba(16, 185, 129, 0.15)',
+                    border: '1px solid rgba(16, 185, 129, 0.3)',
                     borderRadius: 12,
                     padding: '10px 14px',
-                    fontSize: 12,
-                    color: '#15803D',
+                    fontSize: 12.5,
+                    color: '#6EE7B7',
                     display: 'flex',
                     alignItems: 'center',
                     gap: 8,
                   }}
                 >
                   <Sparkles size={16} />
-                  <span>Your password is primed and will be saved as soon as OTP is confirmed!</span>
+                  <span>Your password is set and will be activated once OTP is verified!</span>
                 </div>
 
-                {/* Submit OTP */}
                 <button
                   type="submit"
                   disabled={loading || otpCode.length < 6}
+                  className="btn btn-primary"
                   style={{
                     width: '100%',
                     padding: '13px',
                     borderRadius: 12,
-                    background: otpCode.length >= 6 ? '#4F7C7A' : '#94A3B8',
-                    color: '#ffffff',
-                    fontSize: 14,
+                    fontSize: 15,
                     fontWeight: 700,
-                    border: 'none',
                     cursor: otpCode.length >= 6 && !loading ? 'pointer' : 'not-allowed',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 8,
-                    boxShadow: otpCode.length >= 6 ? '0 4px 12px rgba(79,124,122,0.3)' : 'none',
-                    transition: 'all 0.2s',
+                    opacity: otpCode.length >= 6 ? 1 : 0.6,
                   }}
                 >
                   {loading ? (
@@ -636,7 +575,6 @@ export default function SignupPage() {
                   )}
                 </button>
 
-                {/* Resend & Back buttons */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: 6 }}>
                   <button
                     type="button"
@@ -648,8 +586,8 @@ export default function SignupPage() {
                     style={{
                       background: 'none',
                       border: 'none',
-                      color: '#64748B',
-                      fontSize: 12.5,
+                      color: '#94A3B8',
+                      fontSize: 13,
                       fontWeight: 600,
                       cursor: 'pointer',
                       display: 'flex',
@@ -658,7 +596,7 @@ export default function SignupPage() {
                     }}
                   >
                     <ArrowLeft size={14} />
-                    <span>Edit email / password</span>
+                    <span>Edit details</span>
                   </button>
 
                   <button
@@ -668,8 +606,8 @@ export default function SignupPage() {
                     style={{
                       background: 'none',
                       border: 'none',
-                      color: resendTimer > 0 ? '#94A3B8' : '#4F7C7A',
-                      fontSize: 12.5,
+                      color: resendTimer > 0 ? '#64748B' : '#C084FC',
+                      fontSize: 13,
                       fontWeight: 600,
                       cursor: resendTimer > 0 ? 'not-allowed' : 'pointer',
                       display: 'flex',
@@ -678,7 +616,7 @@ export default function SignupPage() {
                     }}
                   >
                     <RotateCcw size={13} />
-                    <span>{resendTimer > 0 ? `Resend code (${resendTimer}s)` : 'Resend code'}</span>
+                    <span>{resendTimer > 0 ? `Resend (${resendTimer}s)` : 'Resend code'}</span>
                   </button>
                 </div>
               </form>
@@ -686,9 +624,9 @@ export default function SignupPage() {
           )}
 
           {/* Footer Link */}
-          <p style={{ textAlign: 'center', marginTop: 24, fontSize: 13.5, color: '#52796F' }}>
+          <p style={{ textAlign: 'center', marginTop: 24, fontSize: 14, color: '#94A3B8' }}>
             Already have an account?{' '}
-            <Link href="/login" style={{ color: '#4F7C7A', fontWeight: 700, textDecoration: 'none' }}>
+            <Link href="/login" style={{ color: '#C084FC', fontWeight: 700, textDecoration: 'none' }}>
               Sign in with Password or OTP
             </Link>
           </p>
