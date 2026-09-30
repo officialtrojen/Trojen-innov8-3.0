@@ -121,10 +121,14 @@ function Sidebar() {
         <button
           onClick={signOut}
           className="btn btn-ghost btn-sm"
-          style={{ width: '100%', justifyContent: 'flex-start', color: '#e74c3c' }}
+          style={{ width: '100%', justifyContent: 'flex-start', color: '#f87171' }}
         >
           <LogOut size={16} /> Sign Out
         </button>
+
+        <div style={{ marginTop: 14, textAlign: 'center', fontSize: 10, color: '#88A7A5' }}>
+          © 2026 FormFlow. Built with ❤️ by team trojen
+        </div>
       </div>
     </>
   );

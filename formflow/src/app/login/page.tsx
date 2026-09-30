@@ -356,7 +356,11 @@ export default function LoginPage() {
                         borderRadius: 12,
                         border: '1.5px solid #CBD5E1',
                         fontSize: 14,
+                        color: '#1E293B',
+                        backgroundColor: '#FFFFFF',
+                        caretColor: '#4F7C7A',
                         outline: 'none',
+                        cursor: 'text',
                       }}
                     />
                     <div style={{ fontSize: 11, color: '#64748B', marginTop: 6 }}>
@@ -405,10 +409,10 @@ export default function LoginPage() {
 
                     <input
                       type="text"
-                      maxLength={6}
+                      maxLength={8}
                       value={otpCode}
-                      onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
-                      placeholder="123456"
+                      onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 8))}
+                      placeholder="••••••"
                       autoFocus
                       required
                       style={{
@@ -416,9 +420,9 @@ export default function LoginPage() {
                         padding: '12px',
                         borderRadius: 12,
                         border: '2px solid #4F7C7A',
-                        fontSize: 24,
+                        fontSize: otpCode.length > 6 ? 20 : 24,
                         fontWeight: 800,
-                        letterSpacing: 8,
+                        letterSpacing: otpCode.length > 6 ? 5 : 8,
                         textAlign: 'center',
                         color: '#263B3B',
                         fontFamily: 'monospace',
@@ -460,8 +464,8 @@ export default function LoginPage() {
                       fontSize: 14,
                       fontWeight: 700,
                       border: 'none',
-                      cursor: 'pointer',
-                      opacity: otpCode.length === 6 ? 1 : 0.6,
+                      cursor: otpCode.length >= 6 && !loading ? 'pointer' : 'not-allowed',
+                      opacity: otpCode.length >= 6 ? 1 : 0.6,
                     }}
                   >
                     {loading ? 'Verifying...' : 'Verify Code & Sign In ✓'}
@@ -484,7 +488,17 @@ export default function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
                   required
-                  style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1.5px solid #CBD5E1', fontSize: 14 }}
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    borderRadius: 10,
+                    border: '1.5px solid #CBD5E1',
+                    fontSize: 14,
+                    color: '#1E293B',
+                    backgroundColor: '#FFFFFF',
+                    caretColor: '#4F7C7A',
+                    cursor: 'text',
+                  }}
                 />
               </div>
 
@@ -498,7 +512,17 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   required
-                  style={{ width: '100%', padding: '10px 14px', borderRadius: 10, border: '1.5px solid #CBD5E1', fontSize: 14 }}
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    borderRadius: 10,
+                    border: '1.5px solid #CBD5E1',
+                    fontSize: 14,
+                    color: '#1E293B',
+                    backgroundColor: '#FFFFFF',
+                    caretColor: '#4F7C7A',
+                    cursor: 'text',
+                  }}
                 />
               </div>
 
