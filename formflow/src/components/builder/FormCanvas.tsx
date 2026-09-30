@@ -9,8 +9,15 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { FormField, FormTheme } from '@/lib/types';
-import { GripVertical, Trash2, Copy, Star, Image as ImageIcon, Plus } from 'lucide-react';
-import { getBackgroundStyle } from '@/lib/theme-presets';
+import {
+  GripVertical,
+  Trash2,
+  Copy,
+  Star,
+  Image as ImageIcon,
+  ChevronUp,
+  ChevronDown,
+} from 'lucide-react';
 
 // ---------- Sortable Field Card ----------
 function SortableFieldCard({
@@ -19,6 +26,10 @@ function SortableFieldCard({
   onSelect,
   onDelete,
   onDuplicate,
+  onMoveUp,
+  onMoveDown,
+  isFirst,
+  isLast,
   primaryColor,
 }: {
   field: FormField;
@@ -26,11 +37,15 @@ function SortableFieldCard({
   onSelect: () => void;
   onDelete: () => void;
   onDuplicate: () => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
+  isFirst?: boolean;
+  isLast?: boolean;
   primaryColor?: string;
 }) {
   const [hoveredStar, setHoveredStar] = React.useState<number | null>(null);
   const [selectedStar, setSelectedStar] = React.useState<number>(3);
-  
+
   const {
     attributes,
     listeners,
@@ -45,6 +60,8 @@ function SortableFieldCard({
     transition,
     opacity: isDragging ? 0.35 : 1,
     marginBottom: 12,
+    position: 'relative',
+    zIndex: isDragging ? 99 : 1,
   };
 
   const fieldTypeLabel: Record<string, string> = {
@@ -58,7 +75,7 @@ function SortableFieldCard({
     date_picker: 'Date Picker',
   };
 
-  const accentColor = primaryColor || '#4F7C7A';
+  const accentColor = primaryColor || '#8B5CF6';
 
   return (
     <div
@@ -66,7 +83,6 @@ function SortableFieldCard({
       style={style}
       onClick={onSelect}
       className="card group transition-all"
-      {...attributes}
     >
       <div
         style={{
@@ -77,23 +93,33 @@ function SortableFieldCard({
           cursor: 'pointer',
           borderLeft: isSelected ? `4px solid ${accentColor}` : '4px solid transparent',
           borderRadius: 'var(--radius)',
-          background: isSelected ? '#EAF4F4' : '#FFFEF9',
-          border: isSelected ? '1.5px solid #4F7C7A' : '1px solid #B8CECF',
-          boxShadow: isSelected ? '0 4px 16px rgba(38, 59, 59, 0.08)' : '0 1px 3px rgba(38, 59, 59, 0.04)',
+          background: isSelected ? '#0F172A' : '#1E293B',
+          border: isSelected ? '1.5px solid #8B5CF6' : '1px solid rgba(255, 255, 255, 0.12)',
+          boxShadow: isSelected ? '0 4px 20px rgba(139, 92, 246, 0.25)' : '0 2px 8px rgba(0, 0, 0, 0.3)',
           transition: 'all 0.15s ease',
+          color: '#FFFFFF',
         }}
       >
-        {/* Drag handle */}
+        {/* Drag handle with explicit touch-action & grab cursor */}
         <div
+          {...attributes}
           {...listeners}
           style={{
             cursor: 'grab',
-            color: '#94A3B8',
+            color: isSelected ? '#C084FC' : '#94A3B8',
             display: 'flex',
             alignItems: 'center',
-            padding: '6px 2px',
+            justifyContent: 'center',
+            padding: '8px 4px',
+            background: 'rgba(139, 92, 246, 0.12)',
+            border: '1px solid rgba(139, 92, 246, 0.25)',
+            borderRadius: 8,
+            touchAction: 'none',
+            userSelect: 'none',
+            transition: 'all 0.15s ease',
           }}
-          title="Drag to reorder"
+          className="hover:bg-purple-500/20"
+          title="Drag to interswitch position"
         >
           <GripVertical size={18} />
         </div>
@@ -101,41 +127,41 @@ function SortableFieldCard({
         {/* Field content */}
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-            <span style={{ fontWeight: 600, fontSize: 14, color: '#263B3B' }}>
+            <span style={{ fontWeight: 700, fontSize: 15, color: '#FFFFFF' }}>
               {field.label}
             </span>
             {field.required && (
-              <span style={{ color: '#ef4444', fontSize: 13, fontWeight: 700 }}>*</span>
+              <span style={{ color: '#EF4444', fontSize: 13, fontWeight: 700 }}>*</span>
             )}
           </div>
 
           {/* Field type and preview */}
-          <div style={{ fontSize: 11, fontWeight: 500, color: '#52796F', marginBottom: 8 }}>
+          <div style={{ fontSize: 12, fontWeight: 600, color: '#C084FC', marginBottom: 10 }}>
             {fieldTypeLabel[field.type] || field.type}
           </div>
 
           {/* Mini preview */}
           <div>
             {field.type === 'welcome_screen' && (
-              <div style={{ padding: '8px 12px', background: 'rgba(56, 189, 248, 0.1)', borderRadius: 8, fontSize: 12, color: '#0284C7', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 600 }}>
+              <div style={{ padding: '8px 12px', background: 'rgba(139, 92, 246, 0.15)', border: '1px solid rgba(139, 92, 246, 0.3)', borderRadius: 8, fontSize: 12, color: '#C084FC', display: 'flex', alignItems: 'center', gap: 6, fontWeight: 600 }}>
                 ✨ {field.buttonText || 'Start Quiz'} Button
               </div>
             )}
             {field.type === 'short_text' && (
-              <div style={{ padding: '8px 12px', border: '1px solid var(--input-border)', borderRadius: 8, fontSize: 13, color: '#94A3B8', background: 'white' }}>
+              <div style={{ padding: '9px 12px', border: '1.5px solid rgba(139, 92, 246, 0.35)', borderRadius: 8, fontSize: 13, color: '#94A3B8', background: '#0F172A' }}>
                 {field.placeholder || 'Type your answer...'}
               </div>
             )}
             {field.type === 'paragraph' && (
-              <div style={{ padding: '8px 12px', border: '1px solid var(--input-border)', borderRadius: 8, fontSize: 13, color: '#94A3B8', background: 'white', minHeight: 46 }}>
+              <div style={{ padding: '9px 12px', border: '1.5px solid rgba(139, 92, 246, 0.35)', borderRadius: 8, fontSize: 13, color: '#94A3B8', background: '#0F172A', minHeight: 46 }}>
                 {field.placeholder || 'Type your detailed answer...'}
               </div>
             )}
             {field.type === 'multiple_choice' && field.options && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {field.options.slice(0, 4).map((opt, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#263B3B' }}>
-                    <div style={{ width: 15, height: 15, borderRadius: field.selectionMode === 'multiple' ? 4 : 8, border: '1.5px solid var(--input-border)' }} />
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#F8FAFC' }}>
+                    <div style={{ width: 15, height: 15, borderRadius: field.selectionMode === 'multiple' ? 4 : 8, border: '1.5px solid rgba(139, 92, 246, 0.5)', background: '#0F172A' }} />
                     <span>{opt}</span>
                   </div>
                 ))}
@@ -146,10 +172,10 @@ function SortableFieldCard({
             )}
             {field.type === 'yes_no' && (
               <div style={{ display: 'flex', gap: 8 }}>
-                <span style={{ padding: '4px 12px', borderRadius: 6, border: '1px solid var(--input-border)', fontSize: 12, fontWeight: 600, color: '#263B3B', background: 'white' }}>
+                <span style={{ padding: '5px 14px', borderRadius: 6, border: '1px solid rgba(139, 92, 246, 0.4)', fontSize: 12, fontWeight: 600, color: '#F8FAFC', background: '#0F172A' }}>
                   [Y] Yes
                 </span>
-                <span style={{ padding: '4px 12px', borderRadius: 6, border: '1px solid var(--input-border)', fontSize: 12, fontWeight: 600, color: '#263B3B', background: 'white' }}>
+                <span style={{ padding: '5px 14px', borderRadius: 6, border: '1px solid rgba(139, 92, 246, 0.4)', fontSize: 12, fontWeight: 600, color: '#F8FAFC', background: '#0F172A' }}>
                   [N] No
                 </span>
               </div>
@@ -181,8 +207,8 @@ function SortableFieldCard({
                           size={22}
                           style={{
                             color: '#F59E0B',
-                            fill: isActive ? '#F59E0B' : '#EAF4F4',
-                            stroke: isActive ? '#D97706' : '#B8CECF',
+                            fill: isActive ? '#F59E0B' : 'rgba(255, 255, 255, 0.1)',
+                            stroke: isActive ? '#D97706' : '#94A3B8',
                             transition: 'all 0.15s ease',
                           }}
                         />
@@ -190,26 +216,56 @@ function SortableFieldCard({
                     );
                   })}
                 </div>
-                <div style={{ fontSize: 11, color: '#365F5D', fontWeight: 600 }}>
+                <div style={{ fontSize: 11, color: '#94A3B8', fontWeight: 600 }}>
                   Tap on the stars to rate (1 - 5 stars)
                 </div>
               </div>
             )}
             {field.type === 'file_upload' && (
-              <div style={{ padding: '12px 14px', border: '1.5px dashed var(--input-border)', borderRadius: 8, fontSize: 12, color: '#64748B', textAlign: 'center', background: '#F8FAFC' }}>
+              <div style={{ padding: '12px 14px', border: '1.5px dashed rgba(139, 92, 246, 0.4)', borderRadius: 8, fontSize: 12, color: '#94A3B8', textAlign: 'center', background: '#0F172A' }}>
                 📎 Drag and drop file or browse
               </div>
             )}
             {field.type === 'date_picker' && (
-              <div style={{ padding: '8px 12px', border: '1px solid var(--input-border)', borderRadius: 8, fontSize: 13, color: '#94A3B8', background: 'white' }}>
+              <div style={{ padding: '9px 12px', border: '1.5px solid rgba(139, 92, 246, 0.35)', borderRadius: 8, fontSize: 13, color: '#94A3B8', background: '#0F172A' }}>
                 {'📅 mm / dd / yyyy'}
               </div>
             )}
           </div>
         </div>
 
-        {/* Actions */}
-        <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
+        {/* Action Controls & Instant Reorder Interswitch Buttons */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+          {/* Quick Interswitch Up/Down buttons */}
+          <button
+            type="button"
+            disabled={isFirst}
+            onClick={(e) => {
+              e.stopPropagation();
+              onMoveUp?.();
+            }}
+            className="btn btn-ghost btn-sm"
+            style={{ padding: 6, opacity: isFirst ? 0.3 : 1, cursor: isFirst ? 'default' : 'pointer' }}
+            title="Move question up"
+          >
+            <ChevronUp size={16} />
+          </button>
+          <button
+            type="button"
+            disabled={isLast}
+            onClick={(e) => {
+              e.stopPropagation();
+              onMoveDown?.();
+            }}
+            className="btn btn-ghost btn-sm"
+            style={{ padding: 6, opacity: isLast ? 0.3 : 1, cursor: isLast ? 'default' : 'pointer' }}
+            title="Move question down"
+          >
+            <ChevronDown size={16} />
+          </button>
+
+          <div style={{ width: 1, height: 16, background: 'rgba(255, 255, 255, 0.15)', margin: '0 2px' }} />
+
           <button
             type="button"
             onClick={(e) => { e.stopPropagation(); onDuplicate(); }}
@@ -223,7 +279,7 @@ function SortableFieldCard({
             type="button"
             onClick={(e) => { e.stopPropagation(); onDelete(); }}
             className="btn btn-ghost btn-sm"
-            style={{ padding: 6, color: '#f87171' }}
+            style={{ padding: 6, color: '#F87171' }}
             title="Delete question"
           >
             <Trash2 size={15} />
@@ -241,6 +297,7 @@ interface FormCanvasProps {
   onSelectField: (id: string | null) => void;
   onDeleteField: (id: string) => void;
   onDuplicateField: (id: string) => void;
+  onMoveField?: (id: string, direction: 'up' | 'down') => void;
   theme?: FormTheme;
   title?: string;
   description?: string;
@@ -256,6 +313,7 @@ export default function FormCanvas({
   onSelectField,
   onDeleteField,
   onDuplicateField,
+  onMoveField,
   theme,
   title,
   description,
@@ -323,19 +381,20 @@ export default function FormCanvas({
         style={{
           borderRadius: 20,
           overflow: 'hidden',
-          background: 'white',
+          background: '#0F172A',
           boxShadow: isFormArmed
             ? '0 0 0 3px #FCA5A5, 0 16px 45px rgba(248, 113, 113, 0.2)'
-            : '0 24px 64px rgba(38, 59, 59, 0.14), 0 8px 24px rgba(38, 59, 59, 0.07), 0 1px 3px rgba(38, 59, 59, 0.05)',
+            : '0 24px 64px rgba(0, 0, 0, 0.6), 0 0 30px rgba(139, 92, 246, 0.15)',
           border: isFormArmed
             ? '2px solid #F87171'
             : isOver
-            ? '2px dashed var(--primary)'
-            : '1px solid rgba(184,206,207,0.5)',
+            ? '2px dashed #8B5CF6'
+            : '1px solid rgba(255, 255, 255, 0.15)',
           cursor: isFormArmed ? 'grab' : 'default',
           transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
           transform: isFormArmed ? 'scale(0.992)' : 'none',
           position: 'relative',
+          color: '#FFFFFF',
         }}
       >
         {/* ARMED FORM BANNER FOR DRAGGING TO TRASH */}
@@ -346,8 +405,8 @@ export default function FormCanvas({
               onStartDragForm?.(e);
             }}
             style={{
-              background: 'linear-gradient(135deg, #FEF2F2 0%, #FEE2E2 100%)',
-              borderBottom: '2px solid #FCA5A5',
+              background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(185, 28, 28, 0.3) 100%)',
+              borderBottom: '2px solid #EF4444',
               padding: '10px 18px',
               display: 'flex',
               alignItems: 'center',
@@ -356,7 +415,7 @@ export default function FormCanvas({
               userSelect: 'none',
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#DC2626', fontWeight: 700, fontSize: 13 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, color: '#FCA5A5', fontWeight: 700, fontSize: 13 }}>
               <span style={{ fontSize: 18, animation: 'bounce 1s infinite' }}>🖐️</span>
               <span>Form Armed! Click & drag this sheet to the Delete Trash Icon ↘️</span>
             </div>
@@ -367,13 +426,13 @@ export default function FormCanvas({
                 onArmForm?.(false);
               }}
               style={{
-                background: 'rgba(239, 68, 68, 0.1)',
+                background: 'rgba(239, 68, 68, 0.2)',
                 border: 'none',
                 borderRadius: 6,
                 padding: '4px 10px',
                 fontSize: 11,
                 fontWeight: 700,
-                color: '#DC2626',
+                color: '#FCA5A5',
                 cursor: 'pointer',
               }}
             >
@@ -390,7 +449,7 @@ export default function FormCanvas({
               width: '100%',
               height: posterHeight,
               overflow: 'hidden',
-              background: '#0F172A',
+              background: '#0B0F19',
             }}
           >
             <img
@@ -434,18 +493,18 @@ export default function FormCanvas({
         )}
 
         {/* Form Title & Description Card */}
-        <div style={{ padding: '28px 32px 20px', borderBottom: '1px solid rgba(184,206,207,0.25)' }}>
+        <div style={{ padding: '28px 32px 20px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16 }}>
             <div>
-              <h1 style={{ fontSize: 24, fontWeight: 800, color: theme?.text || '#263B3B', marginBottom: 8, letterSpacing: '-0.02em' }}>
+              <h1 style={{ fontSize: 24, fontWeight: 800, color: '#FFFFFF', marginBottom: 8, letterSpacing: '-0.02em' }}>
                 {title || 'Untitled Form'}
               </h1>
               {description ? (
-                <p style={{ color: '#52796F', fontSize: 14, margin: 0, lineHeight: 1.6 }}>
+                <p style={{ color: '#94A3B8', fontSize: 14, margin: 0, lineHeight: 1.6 }}>
                   {description}
                 </p>
               ) : (
-                <p style={{ color: '#94A3B8', fontSize: 13, margin: 0, fontStyle: 'italic' }}>
+                <p style={{ color: '#64748B', fontSize: 13, margin: 0, fontStyle: 'italic' }}>
                   No description provided. Add form details in settings.
                 </p>
               )}
@@ -457,7 +516,7 @@ export default function FormCanvas({
                 type="button"
                 onClick={onOpenThemePanel}
                 className="btn btn-ghost btn-sm"
-                style={{ fontSize: 12, display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0, color: '#52796F' }}
+                style={{ fontSize: 12, display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0, color: '#C084FC' }}
                 title="Customize background & poster"
               >
                 <ImageIcon size={14} /> {currentPoster ? 'Edit Poster' : '+ Add Poster'}
@@ -471,19 +530,19 @@ export default function FormCanvas({
           {fields.length === 0 ? (
             <div
               style={{
-                border: '2px dashed rgba(184,206,207,0.6)',
+                border: '2px dashed rgba(139, 92, 246, 0.4)',
                 borderRadius: 12,
                 padding: '48px 24px',
                 textAlign: 'center',
-                color: '#52796F',
-                background: isOver ? 'rgba(207,229,227,0.2)' : '#FBFDFD',
+                color: '#94A3B8',
+                background: isOver ? 'rgba(139, 92, 246, 0.15)' : '#0B0F19',
               }}
             >
               <div style={{ fontSize: 36, marginBottom: 12 }}>✨</div>
-              <h3 style={{ fontSize: 17, fontWeight: 700, color: '#263B3B', marginBottom: 6 }}>
+              <h3 style={{ fontSize: 18, fontWeight: 700, color: '#FFFFFF', marginBottom: 6 }}>
                 Drag and Drop Fields Here
               </h3>
-              <p style={{ fontSize: 13, color: '#64748B', maxWidth: 380, margin: '0 auto 16px', lineHeight: 1.5 }}>
+              <p style={{ fontSize: 14, color: '#94A3B8', maxWidth: 380, margin: '0 auto 16px', lineHeight: 1.5 }}>
                 Drag question types from the left palette or click any field type to add it instantly to your form.
               </p>
               {onOpenThemePanel && (
@@ -499,7 +558,7 @@ export default function FormCanvas({
             </div>
           ) : (
             <SortableContext items={fields.map((f) => f.id)} strategy={verticalListSortingStrategy}>
-              {fields.map((field) => (
+              {fields.map((field, index) => (
                 <SortableFieldCard
                   key={field.id}
                   field={field}
@@ -507,6 +566,10 @@ export default function FormCanvas({
                   onSelect={() => onSelectField(field.id)}
                   onDelete={() => onDeleteField(field.id)}
                   onDuplicate={() => onDuplicateField(field.id)}
+                  onMoveUp={() => onMoveField?.(field.id, 'up')}
+                  onMoveDown={() => onMoveField?.(field.id, 'down')}
+                  isFirst={index === 0}
+                  isLast={index === fields.length - 1}
                   primaryColor={theme?.primary}
                 />
               ))}
