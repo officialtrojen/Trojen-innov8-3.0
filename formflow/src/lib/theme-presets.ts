@@ -200,7 +200,12 @@ export const PATTERN_PRESETS: PatternPreset[] = [
 /**
  * Computes background styles for any form container or preview
  */
-export function getBackgroundStyle(theme: FormTheme): React.CSSProperties {
+export function getBackgroundStyle(theme?: FormTheme | null): React.CSSProperties {
+  if (!theme) {
+    return {
+      backgroundColor: '#EAF4F4',
+    };
+  }
   const bgType = theme.backgroundType || 'solid';
 
   if (bgType === 'gradient' && theme.backgroundGradient) {

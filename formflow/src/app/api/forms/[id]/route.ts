@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getFormById, saveForm, deleteForm } from '@/lib/storage';
+import { createServerSupabaseClient } from '@/lib/supabase/server';
 
 export async function GET(
   request: Request,
@@ -7,6 +8,19 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
+
+    // 1. Try Supabase first
+    try {
+      const supabase = await createServerSupabaseClient();
+      const { data, error } = await supabase.from('forms').select('*').eq('id', id).single();
+      if (!error && data) {
+        return NextResponse.json(data);
+      }
+    } catch (dbErr) {
+      console.warn('Supabase fetch form failed, falling back to local storage:', dbErr);
+    }
+
+    // 2. Fallback to local file storage
     const form = await getFormById(id);
     if (!form) {
       return NextResponse.json({ error: 'Form not found' }, { status: 404 });

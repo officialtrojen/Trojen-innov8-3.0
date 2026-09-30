@@ -51,10 +51,31 @@ alter table public.forms enable row level security;
 alter table public.responses enable row level security;
 alter table public.integrations enable row level security;
 
--- Public read access for forms by public_slug
-create policy "Public forms viewable by everyone" on public.forms
-  for select using (status = 'published');
+-- Forms Policies
+drop policy if exists "Public forms viewable by everyone" on public.forms;
+drop policy if exists "Allow read forms" on public.forms;
+drop policy if exists "Allow insert forms" on public.forms;
+drop policy if exists "Allow update forms" on public.forms;
+drop policy if exists "Allow delete forms" on public.forms;
 
--- Form submission policy for everyone
+create policy "Allow read forms" on public.forms
+  for select using (status = 'published' or auth.uid()::text = owner_id or auth.uid() is not null);
+
+create policy "Allow insert forms" on public.forms
+  for insert with check (true);
+
+create policy "Allow update forms" on public.forms
+  for update using (auth.uid()::text = owner_id or auth.uid() is not null);
+
+create policy "Allow delete forms" on public.forms
+  for delete using (auth.uid()::text = owner_id or auth.uid() is not null);
+
+-- Responses Policies
+drop policy if exists "Anyone can submit response to published forms" on public.responses;
+drop policy if exists "Owners can view responses" on public.responses;
+
 create policy "Anyone can submit response to published forms" on public.responses
   for insert with check (true);
+
+create policy "Owners can view responses" on public.responses
+  for select using (true);

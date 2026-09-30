@@ -50,7 +50,27 @@ export default function FormBuilder({
   onSave,
   onPublish,
 }: FormBuilderProps) {
-  const [schema, setSchema] = useState<FormSchema>(initialSchema);
+  const [schema, setSchema] = useState<FormSchema>(() => ({
+    title: initialSchema?.title || 'Untitled Form',
+    description: initialSchema?.description || '',
+    fields: Array.isArray(initialSchema?.fields) ? initialSchema.fields : [],
+    logic: Array.isArray(initialSchema?.logic) ? initialSchema.logic : [],
+    theme: initialSchema?.theme || DEFAULT_THEME,
+    settings: initialSchema?.settings || DEFAULT_SETTINGS,
+  }));
+
+  useEffect(() => {
+    if (initialSchema) {
+      setSchema({
+        title: initialSchema.title || 'Untitled Form',
+        description: initialSchema.description || '',
+        fields: Array.isArray(initialSchema.fields) ? initialSchema.fields : [],
+        logic: Array.isArray(initialSchema.logic) ? initialSchema.logic : [],
+        theme: initialSchema.theme || DEFAULT_THEME,
+        settings: initialSchema.settings || DEFAULT_SETTINGS,
+      });
+    }
+  }, [initialSchema]);
   const [selectedFieldId, setSelectedFieldId] = useState<string | null>(null);
   const [activePanel, setActivePanel] = useState<'properties' | 'logic' | 'theme'>('properties');
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -147,7 +167,7 @@ export default function FormBuilder({
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
-  const selectedField = schema.fields.find((f) => f.id === selectedFieldId) || null;
+  const selectedField = (schema?.fields || []).find((f) => f.id === selectedFieldId) || null;
 
   // --- Field operations ---
   const addField = useCallback((type: string) => {

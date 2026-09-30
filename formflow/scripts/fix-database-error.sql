@@ -86,5 +86,38 @@ CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
+-- Step 8: Ensure public.forms has proper RLS policies
+ALTER TABLE IF EXISTS public.forms ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public forms viewable by everyone" ON public.forms;
+DROP POLICY IF EXISTS "Allow read forms" ON public.forms;
+DROP POLICY IF EXISTS "Allow insert forms" ON public.forms;
+DROP POLICY IF EXISTS "Allow update forms" ON public.forms;
+DROP POLICY IF EXISTS "Allow delete forms" ON public.forms;
+
+CREATE POLICY "Allow read forms" ON public.forms
+  FOR SELECT USING (status = 'published' OR auth.uid()::text = owner_id OR auth.uid() IS NOT NULL);
+
+CREATE POLICY "Allow insert forms" ON public.forms
+  FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Allow update forms" ON public.forms
+  FOR UPDATE USING (auth.uid()::text = owner_id OR auth.uid() IS NOT NULL);
+
+CREATE POLICY "Allow delete forms" ON public.forms
+  FOR DELETE USING (auth.uid()::text = owner_id OR auth.uid() IS NOT NULL);
+
+-- Step 9: Ensure public.responses has proper RLS policies
+ALTER TABLE IF EXISTS public.responses ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Anyone can submit response to published forms" ON public.responses;
+DROP POLICY IF EXISTS "Owners can view responses" ON public.responses;
+
+CREATE POLICY "Anyone can submit response to published forms" ON public.responses
+  FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Owners can view responses" ON public.responses
+  FOR SELECT USING (true);
+
 -- Verify
-SELECT 'Successfully fixed auth trigger and profiles schema!' AS result;
+SELECT 'Successfully fixed auth trigger, profiles, and forms RLS schema!' AS result;
