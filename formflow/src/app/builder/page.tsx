@@ -27,7 +27,7 @@ import {
   DEFAULT_THEME,
   DEFAULT_SETTINGS,
 } from '@/lib/types';
-import { generateId, generateSlug } from '@/lib/utils';
+import { generateId, generateSlug, formSchemaToCSV, downloadFile } from '@/lib/utils';
 import FieldPalette from '@/components/builder/FieldPalette';
 import FormCanvas from '@/components/builder/FormCanvas';
 import PropertiesPanel from '@/components/builder/PropertiesPanel';
@@ -250,12 +250,18 @@ export default function StandaloneBuilderPage() {
     }
   };
 
-  // --- Export JSON ---
+  // --- Export CSV & JSON ---
+  const handleExportCsv = () => {
+    const csv = formSchemaToCSV(schema);
+    const filename = `${schema.title.toLowerCase().replace(/[^a-z0-9]+/g, '_')}_fields.csv`;
+    downloadFile(csv, filename, 'text/csv;charset=utf-8;');
+  };
+
   const handleExportJson = () => {
     const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(schema, null, 2));
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute('href', dataStr);
-    downloadAnchor.setAttribute('download', `${schema.title.toLowerCase().replace(/\s+/g, '_')}_schema.json`);
+    downloadAnchor.setAttribute('download', `${schema.title.toLowerCase().replace(/[^a-z0-9]+/g, '_')}_schema.json`);
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
@@ -447,26 +453,54 @@ export default function StandaloneBuilderPage() {
 
           {/* Right Action Buttons */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <button
-              type="button"
-              onClick={handleExportJson}
+            {/* Export CSV & JSON */}
+            <div
               style={{
-                fontSize: 12,
-                fontWeight: 600,
-                color: '#263B3B',
+                display: 'flex',
+                alignItems: 'center',
                 background: '#EAF4F4',
                 border: '1.5px solid #B8CECF',
                 borderRadius: 8,
-                padding: '6px 12px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
+                overflow: 'hidden',
               }}
-              title="Download Schema JSON"
             >
-              <Download size={14} /> Export JSON
-            </button>
+              <button
+                type="button"
+                onClick={handleExportCsv}
+                style={{
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: '#263B3B',
+                  background: 'transparent',
+                  border: 'none',
+                  padding: '6px 12px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                }}
+                title="Download Form Questions & Structure as CSV"
+              >
+                <Download size={14} /> Export CSV
+              </button>
+              <div style={{ width: 1, height: 18, background: '#B8CECF' }} />
+              <button
+                type="button"
+                onClick={handleExportJson}
+                style={{
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: '#365F5D',
+                  background: 'transparent',
+                  border: 'none',
+                  padding: '6px 9px',
+                  cursor: 'pointer',
+                }}
+                title="Download as JSON"
+              >
+                JSON
+              </button>
+            </div>
 
             <button
               type="button"

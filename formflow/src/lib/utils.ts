@@ -3,6 +3,7 @@
 // ============================================================
 
 import { nanoid } from 'nanoid';
+import { FormSchema } from './types';
 
 /**
  * Generate a unique ID for fields, rules, etc.
@@ -74,6 +75,69 @@ export function responsesToCSV(
   });
 
   return [headers.map((h) => `"${h}"`).join(','), ...rows].join('\n');
+}
+
+/**
+ * Convert form schema and its questions/fields into clean CSV text.
+ */
+export function formSchemaToCSV(schema: FormSchema): string {
+  const headers = [
+    'Question #',
+    'Question ID',
+    'Field Type',
+    'Question Title',
+    'Description / Subtitle',
+    'Required',
+    'Options',
+    'Placeholder / Button Text',
+    'Validation / Rules',
+  ];
+
+  const rows = schema.fields.map((f, i) => {
+    let validationStr = '';
+    if (f.type === 'rating') validationStr = `Max Stars: ${f.maxStars || 5}`;
+    if (f.type === 'short_text' && f.validation) {
+      const parts = [];
+      if (f.validation.minLength) parts.push(`Min: ${f.validation.minLength}`);
+      if (f.validation.maxLength) parts.push(`Max: ${f.validation.maxLength}`);
+      validationStr = parts.join(', ');
+    }
+    if (f.type === 'paragraph' && f.validation?.charLimit) {
+      validationStr = `Char Limit: ${f.validation.charLimit}`;
+    }
+    if (f.type === 'file_upload' && f.validation) {
+      const types = (f.validation.allowedFileTypes || []).join('/');
+      validationStr = `Max: ${f.validation.maxFileSize || 10}MB${types ? ` (${types})` : ''}`;
+    }
+    if (f.type === 'date_picker' && f.validation) {
+      const parts = [];
+      if (f.validation.minDate) parts.push(`Min Date: ${f.validation.minDate}`);
+      if (f.validation.maxDate) parts.push(`Max Date: ${f.validation.maxDate}`);
+      validationStr = parts.join(', ');
+    }
+
+    const cols = [
+      i + 1,
+      f.id,
+      f.type,
+      f.label,
+      f.description || '',
+      f.required ? 'Yes' : 'No',
+      (f.options || []).join('; '),
+      f.placeholder || f.buttonText || '',
+      validationStr,
+    ];
+    return cols.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(',');
+  });
+
+  return [
+    `"Form Title","${String(schema.title).replace(/"/g, '""')}"`,
+    `"Form Description","${String(schema.description || '').replace(/"/g, '""')}"`,
+    `"Total Questions","${schema.fields.length}"`,
+    '',
+    headers.map((h) => `"${h}"`).join(','),
+    ...rows,
+  ].join('\r\n');
 }
 
 /**
