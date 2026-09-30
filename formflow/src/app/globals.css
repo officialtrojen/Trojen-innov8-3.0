@@ -305,20 +305,27 @@ body {
 }
 
 /* ---------- Form Elements ---------- */
+input,
+textarea,
+select,
 .input,
 .textarea,
 .select {
   width: 100%;
   padding: 9px 12px;
-  border: 1.5px solid #B8CECF;
+  border: 1.5px solid #CBD5E1;
   border-radius: var(--radius-sm);
-  background: #FFFEF9;
-  color: #263B3B;
+  background: #FFFFFF;
+  color: #1E293B;
+  caret-color: #4F7C7A;
   font-family: var(--font-sans);
-  font-size: 13px;
+  font-size: 14px;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
+input:focus,
+textarea:focus,
+select:focus,
 .input:focus,
 .textarea:focus,
 .select:focus {
@@ -327,9 +334,11 @@ body {
   box-shadow: 0 0 0 3px rgba(79, 124, 122, 0.18);
 }
 
+input::placeholder,
+textarea::placeholder,
 .input::placeholder,
 .textarea::placeholder {
-  color: #8CA3A2;
+  color: #94A3B8;
 }
 
 .textarea {

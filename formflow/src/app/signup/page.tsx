@@ -364,7 +364,7 @@ export default function SignupPage() {
                     <UserIcon
                       size={16}
                       color="#94A3B8"
-                      style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)' }}
+                      style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}
                     />
                     <input
                       id="name"
@@ -379,8 +379,12 @@ export default function SignupPage() {
                         borderRadius: 12,
                         border: '1.5px solid #CBD5E1',
                         fontSize: 14,
+                        color: '#1E293B',
+                        backgroundColor: '#FFFFFF',
+                        caretColor: '#4F7C7A',
                         outline: 'none',
                         transition: 'border 0.2s',
+                        cursor: 'text',
                       }}
                       onFocus={(e) => (e.target.style.borderColor = '#4F7C7A')}
                       onBlur={(e) => (e.target.style.borderColor = '#CBD5E1')}
@@ -397,7 +401,7 @@ export default function SignupPage() {
                     <Mail
                       size={16}
                       color="#94A3B8"
-                      style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)' }}
+                      style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}
                     />
                     <input
                       id="email"
@@ -412,8 +416,12 @@ export default function SignupPage() {
                         borderRadius: 12,
                         border: '1.5px solid #CBD5E1',
                         fontSize: 14,
+                        color: '#1E293B',
+                        backgroundColor: '#FFFFFF',
+                        caretColor: '#4F7C7A',
                         outline: 'none',
                         transition: 'border 0.2s',
+                        cursor: 'text',
                       }}
                       onFocus={(e) => (e.target.style.borderColor = '#4F7C7A')}
                       onBlur={(e) => (e.target.style.borderColor = '#CBD5E1')}
@@ -430,7 +438,7 @@ export default function SignupPage() {
                     <Lock
                       size={16}
                       color="#94A3B8"
-                      style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)' }}
+                      style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }}
                     />
                     <input
                       id="password"
@@ -446,8 +454,12 @@ export default function SignupPage() {
                         borderRadius: 12,
                         border: '1.5px solid #CBD5E1',
                         fontSize: 14,
+                        color: '#1E293B',
+                        backgroundColor: '#FFFFFF',
+                        caretColor: '#4F7C7A',
                         outline: 'none',
                         transition: 'border 0.2s',
+                        cursor: 'text',
                       }}
                       onFocus={(e) => (e.target.style.borderColor = '#4F7C7A')}
                       onBlur={(e) => (e.target.style.borderColor = '#CBD5E1')}
