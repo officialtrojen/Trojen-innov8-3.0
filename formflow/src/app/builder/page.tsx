@@ -38,6 +38,7 @@ import FormRenderer from '@/components/form/FormRenderer';
 import FormDeleteTrashBin from '@/components/builder/FormDeleteTrashBin';
 import FormCrunchAnimationOverlay from '@/components/builder/FormCrunchAnimationOverlay';
 import FormCrumpleExperience from '@/components/builder/FormCrumpleExperience';
+import AiFormAssistant from '@/components/builder/AiFormAssistant';
 import { getBackgroundStyle, POSTER_PRESETS } from '@/lib/theme-presets';
 import { createClient } from '@/lib/supabase/client';
 import * as XLSX from 'xlsx';
@@ -121,6 +122,7 @@ export default function StandaloneBuilderPage() {
   const [dragPointer, setDragPointer] = useState<{ x: number; y: number } | null>(null);
   const [isOverTrash, setIsOverTrash] = useState(false);
   const [isCrumpling, setIsCrumpling] = useState(false);
+  const [isAiOpen, setIsAiOpen] = useState(false);
   const trashBinRef = useRef<HTMLDivElement | null>(null);
 
   // Global pointer tracking when dragging armed form
@@ -591,6 +593,34 @@ export default function StandaloneBuilderPage() {
 
           {/* Right Action Buttons */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {/* AI Assistant Toggle Button */}
+            <button
+              type="button"
+              onClick={() => setIsAiOpen((prev) => !prev)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '6px 14px',
+                borderRadius: 8,
+                fontSize: 12,
+                fontWeight: 700,
+                border: 'none',
+                cursor: 'pointer',
+                background: isAiOpen
+                  ? 'linear-gradient(135deg, #8B5CF6 0%, #6D28D9 100%)'
+                  : 'linear-gradient(135deg, #1E1B4B 0%, #312E81 100%)',
+                color: '#FFFFFF',
+                boxShadow: isAiOpen
+                  ? '0 0 16px rgba(139, 92, 246, 0.5)'
+                  : '0 2px 8px rgba(0, 0, 0, 0.15)',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              <Sparkles size={14} style={{ color: '#FDE047' }} />
+              <span>{isAiOpen ? 'Close AI' : '✨ AI Assistant'}</span>
+            </button>
+
             {/* Export CSV & JSON */}
             <div
               style={{
@@ -917,6 +947,19 @@ export default function StandaloneBuilderPage() {
         onClose={() => setShowCrumpleExperience(false)}
         onNewForm={handleNewForm}
         schema={schema}
+      />
+
+      {/* AI Form Assistant Floating Chatbox */}
+      <AiFormAssistant
+        currentSchema={schema}
+        onApplySchema={(newSchema) => {
+          setSchema(newSchema);
+          if (newSchema.fields.length > 0) {
+            setSelectedFieldId(newSchema.fields[0].id);
+          }
+        }}
+        isOpen={isAiOpen}
+        onClose={() => setIsAiOpen(false)}
       />
 
       <style>{`

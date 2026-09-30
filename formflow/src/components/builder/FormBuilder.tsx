@@ -30,6 +30,7 @@ import ThemePanel from '@/components/builder/ThemePanel';
 import BuilderToolbar from '@/components/builder/BuilderToolbar';
 import FormDeleteTrashBin from '@/components/builder/FormDeleteTrashBin';
 import FormCrunchAnimationOverlay from '@/components/builder/FormCrunchAnimationOverlay';
+import AiFormAssistant from '@/components/builder/AiFormAssistant';
 import { getBackgroundStyle } from '@/lib/theme-presets';
 
 interface FormBuilderProps {
@@ -54,6 +55,7 @@ export default function FormBuilder({
   const [activePanel, setActivePanel] = useState<'properties' | 'logic' | 'theme'>('properties');
   const [activeId, setActiveId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [isAiOpen, setIsAiOpen] = useState(true);
   const [isFormArmed, setIsFormArmed] = useState(false);
   const [isDraggingArmedForm, setIsDraggingArmedForm] = useState(false);
   const [dragPointer, setDragPointer] = useState<{ x: number; y: number } | null>(null);
@@ -326,6 +328,8 @@ export default function FormBuilder({
           formId={formId}
           activePanel={activePanel}
           onPanelChange={setActivePanel}
+          onToggleAi={() => setIsAiOpen(!isAiOpen)}
+          isAiOpen={isAiOpen}
         />
 
         <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
@@ -533,6 +537,14 @@ export default function FormBuilder({
           setIsOverTrash(false);
           handleNewForm();
         }}
+      />
+
+      {/* Floating AI Form Builder Assistant Chatbox */}
+      <AiFormAssistant
+        currentSchema={schema}
+        onApplySchema={setSchema}
+        isOpen={isAiOpen}
+        onClose={() => setIsAiOpen(false)}
       />
 
       <style>{`
