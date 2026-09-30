@@ -417,16 +417,32 @@ export default function ShareModal({
             borderTop: '1px solid rgba(122, 139, 153, 0.2)',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'flex-end',
+            gap: 12,
           }}
         >
           <button
-            onClick={onClose}
+            onClick={() => {
+              onClose();
+              window.location.href = '/dashboard';
+            }}
             className="btn btn-secondary btn-sm"
             style={{
               background: '#FFFFFF',
               color: '#2A2E33',
               border: '1px solid #D8D2C7',
+              borderRadius: 8,
+              padding: '8px 16px',
+              fontSize: 13,
+              fontWeight: 700,
+              cursor: 'pointer',
+            }}
+          >
+            Go to Dashboard
+          </button>
+          <button
+            onClick={onClose}
+            className="btn btn-primary btn-sm"
+            style={{
               borderRadius: 8,
               padding: '8px 20px',
               fontSize: 13,

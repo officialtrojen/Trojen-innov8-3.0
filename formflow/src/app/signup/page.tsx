@@ -48,9 +48,15 @@ export default function SignUpPage() {
     return () => clearInterval(interval);
   }, [resendTimer]);
 
+  const [redirectUrl, setRedirectUrl] = useState('/dashboard');
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
+      const r = params.get('redirect');
+      if (r) {
+        setRedirectUrl(r);
+      }
       const urlError = params.get('error');
       if (urlError) {
         if (urlError === 'oauth_failed') {
@@ -109,7 +115,7 @@ export default function SignUpPage() {
     } else {
       setSuccessMsg('Account created successfully!');
       setTimeout(() => {
-        window.location.href = '/dashboard';
+        window.location.href = redirectUrl;
       }, 500);
     }
   };
@@ -140,7 +146,7 @@ export default function SignUpPage() {
   const handleGoogleSignUp = async () => {
     setError('');
     setGoogleLoading(true);
-    const { error: err } = await signInWithGoogle();
+    const { error: err } = await signInWithGoogle(redirectUrl);
     if (err) {
       setError(err);
       setGoogleLoading(false);
@@ -645,7 +651,10 @@ export default function SignUpPage() {
           {/* Footer Link */}
           <p style={{ textAlign: 'center', marginTop: 24, fontSize: 14, color: '#94A3B8' }}>
             Already have an account?{' '}
-            <Link href="/login" style={{ color: '#C084FC', fontWeight: 700, textDecoration: 'none' }}>
+            <Link
+              href={redirectUrl !== '/dashboard' ? `/login?redirect=${encodeURIComponent(redirectUrl)}` : '/login'}
+              style={{ color: '#C084FC', fontWeight: 700, textDecoration: 'none' }}
+            >
               Sign in with Password or OTP
             </Link>
           </p>

@@ -365,6 +365,101 @@ function BuilderCanvasInner() {
     });
   }, []);
 
+  useEffect(() => {
+    if (authUser) {
+      setUser({ id: authUser.id, email: authUser.email });
+    }
+  }, [authUser]);
+
+  const pendingPublishTriggered = useRef(false);
+
+  // Auto-save & publish draft after returning from login/signup
+  useEffect(() => {
+    const currentUserId = authUser?.id || user?.id;
+    if (!currentUserId || pendingPublishTriggered.current) return;
+
+    if (typeof window !== 'undefined') {
+      const isPending = localStorage.getItem('formflow_pending_publish') === 'true';
+      if (isPending) {
+        pendingPublishTriggered.current = true;
+        localStorage.removeItem('formflow_pending_publish');
+
+        let targetSchema = schema;
+        try {
+          const savedDraft = localStorage.getItem('formflow_builder_draft');
+          if (savedDraft) {
+            targetSchema = JSON.parse(savedDraft);
+            setSchema(targetSchema);
+          }
+        } catch {}
+
+        (async () => {
+          setSaving(true);
+          setCloudSyncStatus('saving');
+          const supabase = createClient();
+
+          // Check if form with same title already exists for this user
+          const { data: duplicate } = await supabase
+            .from('forms')
+            .select('id')
+            .eq('owner_id', currentUserId)
+            .ilike('title', targetSchema.title.trim())
+            .maybeSingle();
+
+          if (duplicate) {
+            setFormalModalInfo({
+              isOpen: true,
+              title: 'Form Name Already Exists',
+              message: `A form named "${targetSchema.title.trim()}" already exists in your account. Please choose a different title to save.`,
+              type: 'warning',
+              primaryActionText: 'Change Title',
+            });
+            setCloudSyncStatus('unsaved');
+            setSaving(false);
+            return;
+          }
+
+          const slug = generateSlug();
+          const { data, error } = await supabase
+            .from('forms')
+            .insert({
+              owner_id: currentUserId,
+              title: targetSchema.title,
+              description: targetSchema.description || null,
+              schema: targetSchema,
+              theme: targetSchema.theme,
+              status: 'published',
+              public_slug: slug,
+            })
+            .select('id, public_slug')
+            .single();
+
+          if (error) {
+            setFormalModalInfo({
+              isOpen: true,
+              title: 'Could Not Save Form',
+              message: error.message || 'An error occurred while saving your form.',
+              type: 'error',
+              primaryActionText: 'Close',
+            });
+            setSaving(false);
+          } else if (data) {
+            setExistingFormId(data.id);
+            setExistingPublicSlug(data.public_slug);
+            setCloudSyncStatus('synced');
+            setSaving(false);
+            setPublishedFormInfo({
+              isOpen: true,
+              publicSlug: data.public_slug,
+              formId: data.id,
+              title: targetSchema.title,
+            });
+          }
+        })();
+      }
+    }
+  }, [authUser, user]);
+
   // Auto-save to localStorage
   useEffect(() => {
     try {
@@ -568,14 +663,23 @@ function BuilderCanvasInner() {
     if (!ownerId) {
       const { data: authData } = await supabase.auth.getUser();
       ownerId = authData?.user?.id;
-    }
-    if (!ownerId) {
-      let guestId = typeof window !== 'undefined' ? localStorage.getItem('formflow_guest_id') : null;
-      if (!guestId) {
-        guestId = 'guest_' + Math.random().toString(36).substring(2, 10);
-        if (typeof window !== 'undefined') localStorage.setItem('formflow_guest_id', guestId);
+      if (authData?.user) {
+        setUser({ id: authData.user.id, email: authData.user.email });
       }
-      ownerId = guestId;
+    }
+
+    // Unauthenticated: save draft to localStorage and redirect to login
+    if (!ownerId) {
+      try {
+        localStorage.setItem('formflow_builder_draft', JSON.stringify(schema));
+        localStorage.setItem('formflow_pending_publish', 'true');
+      } catch (err) {
+        console.warn('Failed to save draft to localStorage:', err);
+      }
+      setSaving(false);
+      setCloudSyncStatus('unsaved');
+      router.push('/login?redirect=/builder');
+      return;
     }
 
     try {
@@ -726,13 +830,9 @@ function BuilderCanvasInner() {
             <button
               type="button"
               onClick={() => {
-                if (typeof window !== 'undefined' && window.history.length > 1) {
-                  router.back();
-                } else {
-                  router.push('/dashboard');
-                }
+                router.push('/dashboard');
               }}
-              title="Back to previous window"
+              title="Back to Dashboard"
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -1030,7 +1130,7 @@ function BuilderCanvasInner() {
               }}
             >
               {saving ? <span className="spinner" /> : <Save size={14} style={{ color: '#FFFFFF' }} />}
-              {user ? 'Save to Dashboard' : 'Save & Publish'}
+              Save to Dashboard
             </button>
           </div>
         </header>

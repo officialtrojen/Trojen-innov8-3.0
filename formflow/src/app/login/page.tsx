@@ -35,9 +35,15 @@ export default function LoginPage() {
     return () => clearInterval(interval);
   }, [resendTimer]);
 
+  const [redirectUrl, setRedirectUrl] = useState('/dashboard');
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
+      const r = params.get('redirect');
+      if (r) {
+        setRedirectUrl(r);
+      }
       const urlError = params.get('error');
       if (urlError) {
         if (urlError === 'oauth_failed') {
@@ -64,7 +70,7 @@ export default function LoginPage() {
       setError(err);
       setLoading(false);
     } else {
-      window.location.href = '/dashboard';
+      window.location.href = redirectUrl;
     }
   };
 
@@ -110,14 +116,14 @@ export default function LoginPage() {
       setError(err);
       setLoading(false);
     } else {
-      window.location.href = '/dashboard';
+      window.location.href = redirectUrl;
     }
   };
 
   const handleGoogleSignIn = async () => {
     setError('');
     setGoogleLoading(true);
-    const { error: err } = await signInWithGoogle();
+    const { error: err } = await signInWithGoogle(redirectUrl);
     if (err) {
       setError(err);
       setGoogleLoading(false);
@@ -574,7 +580,10 @@ export default function LoginPage() {
 
           <p style={{ textAlign: 'center', marginTop: 24, fontSize: 14, color: '#94A3B8' }}>
             Don&apos;t have an account?{' '}
-            <Link href="/signup" style={{ color: '#C084FC', fontWeight: 700, textDecoration: 'none' }}>
+            <Link
+              href={redirectUrl !== '/dashboard' ? `/signup?redirect=${encodeURIComponent(redirectUrl)}` : '/signup'}
+              style={{ color: '#C084FC', fontWeight: 700, textDecoration: 'none' }}
+            >
               Sign up
             </Link>
           </p>
