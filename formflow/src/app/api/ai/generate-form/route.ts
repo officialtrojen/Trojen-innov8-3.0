@@ -16,18 +16,26 @@ export async function POST(req: Request) {
     const apiKey = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY;
 
     if (apiKey) {
-      try {
-        const geminiRes = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contents: [
-                {
-                  parts: [
-                    {
-                      text: `You are an AI Form Builder Expert. Analyze this user prompt and generate or modify a JSON form schema for FormFlow.
+      const modelsToTry = [
+        'gemini-1.5-flash',
+        'gemini-2.0-flash',
+        'gemini-2.5-flash',
+        'gemini-1.5-pro'
+      ];
+
+      for (const model of modelsToTry) {
+        try {
+          const geminiRes = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contents: [
+                  {
+                    parts: [
+                      {
+                        text: `You are an AI Form Builder Expert. Analyze this user prompt and generate or modify a JSON form schema for FormFlow.
 User Prompt: "${prompt}"
 
 Current Schema (if any): ${currentSchema ? JSON.stringify(currentSchema) : 'None'}
@@ -46,7 +54,7 @@ Return ONLY a valid JSON object with the following structure:
         "label": "Question Label",
         "required": boolean,
         "placeholder": "Optional placeholder",
-        "options": ["Option 1", "Option 2"] // only for multiple_choice
+        "options": ["Option 1", "Option 2"]
       }
     ],
     "theme": {
@@ -57,26 +65,29 @@ Return ONLY a valid JSON object with the following structure:
   }
 }
 Return strict JSON only without markdown formatting.`,
-                    },
-                  ],
-                },
-              ],
-            }),
-          }
-        );
+                      },
+                    ],
+                  },
+                ],
+              }),
+            }
+          );
 
-        const geminiData = await geminiRes.json();
-        const responseText = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (geminiRes.ok) {
+            const geminiData = await geminiRes.json();
+            const responseText = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text;
 
-        if (responseText) {
-          const cleanedText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
-          const parsed = JSON.parse(cleanedText);
-          if (parsed.schema && parsed.schema.fields) {
-            return NextResponse.json(parsed);
+            if (responseText) {
+              const cleanedText = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
+              const parsed = JSON.parse(cleanedText);
+              if (parsed.schema && parsed.schema.fields) {
+                return NextResponse.json(parsed);
+              }
+            }
           }
+        } catch (geminiError) {
+          console.warn(`Gemini API model ${model} attempt error:`, geminiError);
         }
-      } catch (geminiError) {
-        console.warn('Gemini API call fallback to local AI engine:', geminiError);
       }
     }
 
