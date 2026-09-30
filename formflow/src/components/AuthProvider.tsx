@@ -111,31 +111,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const verifyOtp = async (email: string, token: string) => {
     try {
-      // First attempt type: 'email' (for signInWithOtp)
-      let { data, error } = await supabase.auth.verifyOtp({
-        email: email.trim(),
-        token: token.trim(),
-        type: 'email',
-      });
+      // Fire both OTP types in PARALLEL — whichever succeeds wins, no sequential wait
+      const [emailResult, signupResult] = await Promise.allSettled([
+        supabase.auth.verifyOtp({ email: email.trim(), token: token.trim(), type: 'email' }),
+        supabase.auth.verifyOtp({ email: email.trim(), token: token.trim(), type: 'signup' }),
+      ]);
 
-      // If that fails, attempt type: 'signup' (for confirmation after signUp)
-      if (error) {
-        const retry = await supabase.auth.verifyOtp({
-          email: email.trim(),
-          token: token.trim(),
-          type: 'signup',
-        });
-        if (!retry.error) {
-          data = retry.data;
-          error = null;
+      let sessionData = null;
+      let errorMsg: string | null = null;
+
+      for (const result of [emailResult, signupResult]) {
+        if (result.status === 'fulfilled' && !result.value.error && result.value.data?.session) {
+          sessionData = result.value.data;
+          break;
+        }
+        if (result.status === 'fulfilled' && result.value.error) {
+          errorMsg = result.value.error.message;
         }
       }
 
-      if (!error && data?.session) {
-        setSession(data.session);
-        setUser(data.user);
+      if (sessionData?.session) {
+        setSession(sessionData.session);
+        setUser(sessionData.user);
+        return { error: null };
       }
-      return { error: error?.message ?? null };
+      return { error: errorMsg || 'Invalid or expired OTP code.' };
     } catch (e: any) {
       return { error: e.message || 'Failed to verify OTP' };
     }

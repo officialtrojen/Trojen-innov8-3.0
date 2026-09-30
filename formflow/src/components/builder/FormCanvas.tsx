@@ -107,13 +107,28 @@ function SortableFieldCard({
         </div>
 
         {/* Field content */}
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-            <span style={{ fontWeight: 600, fontSize: 14, color: isDarkCard ? '#F8FAFC' : '#263B3B' }}>
+        <div style={{ flex: 1, minWidth: 0, fontFamily: field.fontFamily || undefined }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
+            <span style={{ fontWeight: 600, fontSize: 14, color: isDarkCard ? '#F8FAFC' : '#263B3B', fontFamily: field.fontFamily || undefined }}>
               {field.label}
             </span>
             {field.required && (
               <span style={{ color: '#ef4444', fontSize: 13, fontWeight: 700 }}>*</span>
+            )}
+            {field.fontFamily && (
+              <span
+                style={{
+                  fontSize: 10,
+                  padding: '1px 6px',
+                  borderRadius: 4,
+                  background: isDarkCard ? 'rgba(255,255,255,0.1)' : '#E2E8F0',
+                  color: isDarkCard ? '#CBD5E1' : '#475569',
+                  fontWeight: 500,
+                  fontFamily: field.fontFamily,
+                }}
+              >
+                🔤 {field.fontFamily}
+              </span>
             )}
           </div>
 

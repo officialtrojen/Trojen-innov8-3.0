@@ -50,7 +50,7 @@ export default function LoginPage() {
     }
   };
 
-  // Handle Send OTP
+  // Handle Send OTP — optimistic: switch to OTP screen instantly, send in background
   const handleSendOtp = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!email || !email.includes('@')) {
@@ -59,27 +59,24 @@ export default function LoginPage() {
     }
 
     setError('');
-    setLoading(true);
+    // Switch to OTP screen IMMEDIATELY — no waiting for API
+    setOtpSent(true);
+    setResendTimer(30);
+    setSuccessMsg(`OTP sent to ${email}! Check your inbox.`);
 
-    try {
-      // Single call: Supabase sends the OTP email directly (no SMTP delay)
-      const { error: otpErr } = await sendOtp(email);
+    // Fire API in background
+    sendOtp(email).then(({ error: otpErr }) => {
       if (otpErr) {
+        // Revert if API actually failed
+        setOtpSent(false);
+        setResendTimer(0);
+        setSuccessMsg('');
         setError(otpErr);
-        return;
       }
-
-      setOtpSent(true);
-      setResendTimer(30);
-      setSuccessMsg(`OTP code sent to ${email}! Check your inbox.`);
-    } catch (err: any) {
-      setError(err.message || 'Failed to send OTP code');
-    } finally {
-      setLoading(false);
-    }
+    });
   };
 
-  // Handle Verify OTP
+  // Handle Verify OTP — show loading instantly, verify then navigate
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!otpCode || otpCode.length < 6) {
@@ -88,7 +85,7 @@ export default function LoginPage() {
     }
 
     setError('');
-    setLoading(true);
+    setLoading(true); // Show loading immediately
 
     const { error: err } = await verifyOtp(email, otpCode);
     if (err) {

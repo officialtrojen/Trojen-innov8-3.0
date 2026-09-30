@@ -27,6 +27,7 @@ export interface FormField {
   minRating?: number; // for rating
   maxRating?: number; // for rating
   validation?: ValidationRule;
+  fontFamily?: string;
 }
 
 export type LogicOperator = 'equals' | 'not_equals' | 'contains' | 'is_empty' | 'is_not_empty';
