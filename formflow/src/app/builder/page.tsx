@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import {
   DndContext,
   closestCenter,
+  pointerWithin,
   KeyboardSensor,
   PointerSensor,
   useSensor,
@@ -291,6 +292,19 @@ export default function StandaloneBuilderPage() {
     });
   }, []);
 
+  const moveField = useCallback((fieldId: string, direction: 'up' | 'down') => {
+    setSchema((prev) => {
+      const index = prev.fields.findIndex((f) => f.id === fieldId);
+      if (index === -1) return prev;
+      const targetIndex = direction === 'up' ? index - 1 : index + 1;
+      if (targetIndex < 0 || targetIndex >= prev.fields.length) return prev;
+      return {
+        ...prev,
+        fields: arrayMove(prev.fields, index, targetIndex),
+      };
+    });
+  }, []);
+
   // --- Logic rules ---
   const addRule = useCallback((rule: LogicRule) => {
     setSchema((prev) => ({ ...prev, logic: [...prev.logic, rule] }));
@@ -323,6 +337,20 @@ export default function StandaloneBuilderPage() {
     setActiveId(String(event.active.id));
   };
 
+  const handleCollisionDetection = useCallback((args: any) => {
+    const pointerCollisions = pointerWithin(args);
+    const cardCollisions = pointerCollisions.filter((c) => c.id !== 'canvas-drop-zone');
+    if (cardCollisions.length > 0) {
+      return cardCollisions;
+    }
+    const centerCollisions = closestCenter(args);
+    const cardCenterCollisions = centerCollisions.filter((c) => c.id !== 'canvas-drop-zone');
+    if (cardCenterCollisions.length > 0) {
+      return cardCenterCollisions;
+    }
+    return closestCenter(args);
+  }, []);
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     setActiveId(null);
@@ -338,8 +366,15 @@ export default function StandaloneBuilderPage() {
     if (active.id !== over.id) {
       setSchema((prev) => {
         const oldIndex = prev.fields.findIndex((f) => f.id === active.id);
-        const newIndex = prev.fields.findIndex((f) => f.id === over.id);
-        if (oldIndex === -1 || newIndex === -1) return prev;
+        let newIndex = prev.fields.findIndex((f) => f.id === over.id);
+
+        if (oldIndex === -1) return prev;
+
+        if (newIndex === -1 && over.id === 'canvas-drop-zone') {
+          newIndex = prev.fields.length - 1;
+        }
+
+        if (newIndex === -1 || oldIndex === newIndex) return prev;
         return { ...prev, fields: arrayMove(prev.fields, oldIndex, newIndex) };
       });
     }
@@ -425,7 +460,7 @@ export default function StandaloneBuilderPage() {
   return (
     <DndContext
       sensors={sensors}
-      collisionDetection={closestCenter}
+      collisionDetection={handleCollisionDetection}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
@@ -689,6 +724,7 @@ export default function StandaloneBuilderPage() {
                   }}
                   onDeleteField={deleteField}
                   onDuplicateField={duplicateField}
+                  onMoveField={moveField}
                   theme={schema.theme}
                   title={schema.title}
                   description={schema.description}
