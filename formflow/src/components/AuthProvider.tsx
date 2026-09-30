@@ -13,6 +13,12 @@ interface AuthContextType {
   signInWithGoogle: () => Promise<{ error: string | null }>;
   sendOtp: (email: string) => Promise<{ error: string | null }>;
   verifyOtp: (email: string, token: string) => Promise<{ error: string | null }>;
+  verifyOtpAndSetPassword: (
+    email: string,
+    token: string,
+    password?: string,
+    name?: string
+  ) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -45,26 +51,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [supabase.auth]);
 
   const signUp = async (email: string, password: string, name: string) => {
-    const { error } = await supabase.auth.signUp({
-      email,
+    const { data, error } = await supabase.auth.signUp({
+      email: email.trim(),
       password,
       options: { data: { name } },
     });
-    if (!error) {
-      const { data: { user: newUser } } = await supabase.auth.getUser();
-      if (newUser) {
-        await supabase.from('profiles').upsert({
-          id: newUser.id,
-          name,
-          email,
-        });
-      }
+    if (!error && data.user) {
+      await supabase.from('profiles').upsert({
+        id: data.user.id,
+        name,
+        email: email.trim(),
+      });
     }
-    return { error: error?.message ?? null };
+    return { error: error?.message ?? null, session: data?.session ?? null };
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
     return { error: error?.message ?? null };
   };
 
@@ -104,18 +107,96 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const verifyOtp = async (email: string, token: string) => {
     try {
-      const { data, error } = await supabase.auth.verifyOtp({
+      // First attempt type: 'email' (for signInWithOtp)
+      let { data, error } = await supabase.auth.verifyOtp({
         email: email.trim(),
         token: token.trim(),
         type: 'email',
       });
-      if (!error && data.session) {
+
+      // If that fails, attempt type: 'signup' (for confirmation after signUp)
+      if (error) {
+        const retry = await supabase.auth.verifyOtp({
+          email: email.trim(),
+          token: token.trim(),
+          type: 'signup',
+        });
+        if (!retry.error) {
+          data = retry.data;
+          error = null;
+        }
+      }
+
+      if (!error && data?.session) {
         setSession(data.session);
         setUser(data.user);
       }
       return { error: error?.message ?? null };
     } catch (e: any) {
       return { error: e.message || 'Failed to verify OTP' };
+    }
+  };
+
+  const verifyOtpAndSetPassword = async (
+    email: string,
+    token: string,
+    password?: string,
+    name?: string
+  ) => {
+    try {
+      // 1. Try verify with type: 'signup' first, then 'email'
+      let { data, error } = await supabase.auth.verifyOtp({
+        email: email.trim(),
+        token: token.trim(),
+        type: 'signup',
+      });
+
+      if (error) {
+        const retry = await supabase.auth.verifyOtp({
+          email: email.trim(),
+          token: token.trim(),
+          type: 'email',
+        });
+        if (!retry.error) {
+          data = retry.data;
+          error = null;
+        }
+      }
+
+      if (error) {
+        return { error: error.message };
+      }
+
+      if (data?.session) {
+        setSession(data.session);
+        setUser(data.user);
+      }
+
+      // 2. Set password and metadata if provided
+      if (password || name) {
+        const updatePayload: { password?: string; data?: { name: string } } = {};
+        if (password) updatePayload.password = password;
+        if (name) updatePayload.data = { name };
+
+        const { data: updated, error: updateErr } = await supabase.auth.updateUser(updatePayload);
+        if (!updateErr && updated.user) {
+          setUser(updated.user);
+        }
+      }
+
+      // 3. Upsert user profile
+      const activeUser = data?.user || (await supabase.auth.getUser()).data.user;
+      if (activeUser) {
+        await supabase.from('profiles').upsert({
+          id: activeUser.id,
+          name: name || activeUser.user_metadata?.name || '',
+          email: activeUser.email || email,
+        });
+      }
+
+      return { error: null };
+    } catch (e: any) {
+      return { error: e.message || 'Verification failed' };
     }
   };
 
@@ -137,6 +218,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signInWithGoogle,
         sendOtp,
         verifyOtp,
+        verifyOtpAndSetPassword,
         signOut,
       }}
     >
