@@ -48,41 +48,29 @@ export default function SignUpPage() {
     return () => clearInterval(interval);
   }, [resendTimer]);
 
-  // Handle Step 1: Start Registration & Send OTP
+  // Handle Step 1: Start Registration & Send OTP — optimistic: show OTP screen instantly
   const handleStartSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) {
-      setError('Please enter your full name.');
-      return;
-    }
-    if (!email || !email.includes('@')) {
-      setError('Please enter a valid email address.');
-      return;
-    }
-    if (!password || password.length < 6) {
-      setError('Password must be at least 6 characters long.');
-      return;
-    }
+    if (!name.trim()) { setError('Please enter your full name.'); return; }
+    if (!email || !email.includes('@')) { setError('Please enter a valid email address.'); return; }
+    if (!password || password.length < 6) { setError('Password must be at least 6 characters long.'); return; }
 
     setError('');
-    setLoading(true);
+    // Switch to OTP step IMMEDIATELY — no waiting for API
+    setStep('otp');
+    setResendTimer(30);
+    setSuccessMsg(`OTP sent to ${email}! Check your inbox.`);
 
-    try {
-      // Single Supabase call: registers user with password + sends OTP email automatically
-      const { error: signUpError } = await signUpWithPasswordAndSendOtp(name, email, password);
+    // Fire Supabase signup in background
+    signUpWithPasswordAndSendOtp(name, email, password).then(({ error: signUpError }) => {
       if (signUpError) {
+        // Revert to form if signup actually failed
+        setStep('form');
+        setResendTimer(0);
+        setSuccessMsg('');
         setError(signUpError);
-        return;
       }
-
-      setStep('otp');
-      setResendTimer(30);
-      setSuccessMsg(`We sent a 6-digit OTP code to ${email}!`);
-    } catch (err: any) {
-      setError(err.message || 'Failed to start registration.');
-    } finally {
-      setLoading(false);
-    }
+    });
   };
 
   // Handle Step 2: Verify OTP and finalize signup
