@@ -154,10 +154,41 @@ function SortableFieldCard({
               </div>
             )}
             {field.type === 'rating' && (
-              <div style={{ display: 'flex', gap: 4 }}>
-                {Array.from({ length: field.maxStars || 5 }).map((_, i) => (
-                  <Star key={i} size={18} style={{ color: '#4F7C7A', fill: '#CFE5E3' }} />
-                ))}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                  {[1, 2, 3, 4, 5].map((starIndex) => (
+                    <span
+                      key={starIndex}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        transition: 'transform 0.15s ease',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'scale(1.25)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'scale(1)';
+                      }}
+                      title={`Star ${starIndex}`}
+                    >
+                      <Star
+                        size={22}
+                        style={{
+                          color: '#F59E0B',
+                          fill: starIndex <= 3 ? '#F59E0B' : '#EAF4F4',
+                          stroke: starIndex <= 3 ? '#D97706' : '#B8CECF',
+                          transition: 'all 0.15s ease',
+                        }}
+                      />
+                    </span>
+                  ))}
+                </div>
+                <div style={{ fontSize: 11, color: '#365F5D', fontWeight: 600 }}>
+                  Tap on the stars to rate (1 - 5 stars)
+                </div>
               </div>
             )}
             {field.type === 'file_upload' && (

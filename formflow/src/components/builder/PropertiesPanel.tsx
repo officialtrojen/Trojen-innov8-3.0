@@ -416,31 +416,21 @@ export default function PropertiesPanel({ field, onUpdate }: PropertiesPanelProp
         </div>
       )}
 
-      {/* Rating Stars Scale */}
+      {/* Rating Stars Notice */}
       {field.type === 'rating' && (
-        <div style={{ marginBottom: 16 }}>
-          <label style={{ display: 'block', fontSize: 12, fontWeight: 700, color: '#263B3B', marginBottom: 6 }}>
-            Rating Scale (Max Stars)
-          </label>
-          <select
-            value={field.maxStars || 5}
-            onChange={(e) => onUpdate({ maxStars: parseInt(e.target.value) })}
-            style={{
-              width: '100%',
-              padding: '9px 12px',
-              borderRadius: 8,
-              border: '1.5px solid #B8CECF',
-              background: '#FFFEF9',
-              color: '#263B3B',
-              fontSize: 13,
-              outline: 'none',
-              cursor: 'pointer',
-            }}
-          >
-            {[3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
-              <option key={n} value={n}>{n} Stars</option>
-            ))}
-          </select>
+        <div
+          style={{
+            marginBottom: 16,
+            padding: '12px 14px',
+            background: '#EAF4F4',
+            borderRadius: 8,
+            border: '1px solid #B8CECF',
+            fontSize: 12,
+            color: '#365F5D',
+            lineHeight: 1.5,
+          }}
+        >
+          <span style={{ fontWeight: 700, color: '#263B3B' }}>⭐ Star Rating:</span> Respondents tap directly on the stars (1 - 5 stars) to give their rating.
         </div>
       )}
 

@@ -778,7 +778,7 @@ export default function TypeformRenderer({
                     {currentIndex + 1} →
                   </span>
                   <span style={{ fontSize: 13, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: 1, fontWeight: 600 }}>
-                    Rating Scale
+                    Rating
                   </span>
                 </div>
 
@@ -793,51 +793,67 @@ export default function TypeformRenderer({
                   </p>
                 )}
 
-                {/* Star Cards 1 to 5 */}
-                <div style={{ display: 'flex', gap: 12, marginBottom: 28, flexWrap: 'wrap' }}>
-                  {Array.from({ length: currentField.maxStars || 5 }).map((_, i) => {
-                    const score = i + 1;
-                    const isSelected = (answers[currentField.id] as number) >= score;
-                    const isExact = (answers[currentField.id] as number) === score;
-                    return (
-                      <button
-                        key={score}
-                        type="button"
-                        onClick={() => {
-                          setAnswer(currentField.id, score);
-                          setTimeout(() => handleNext(), 240);
-                        }}
-                        style={{
-                          flex: '1 1 60px',
-                          maxWidth: 80,
-                          height: 76,
-                          borderRadius: 14,
-                          background: isSelected ? 'rgba(56, 189, 248, 0.2)' : 'rgba(30, 41, 59, 0.6)',
-                          border: `2px solid ${isExact ? primaryColor : isSelected ? 'rgba(56, 189, 248, 0.5)' : 'rgba(255,255,255,0.12)'}`,
-                          color: textColor,
-                          cursor: 'pointer',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          gap: 6,
-                          backdropFilter: 'blur(8px)',
-                          transition: 'all 0.15s ease',
-                        }}
-                      >
-                        <Star
-                          size={24}
-                          style={{
-                            color: isSelected ? primaryColor : '#64748B',
-                            fill: isSelected ? primaryColor : 'transparent',
+                {/* Direct Tappable Stars (1 to 5 Stars) */}
+                <div style={{ marginBottom: 28 }}>
+                  <div style={{ display: 'flex', gap: 14, alignItems: 'center', flexWrap: 'wrap' }}>
+                    {[1, 2, 3, 4, 5].map((score) => {
+                      const selectedVal = (answers[currentField.id] as number) || 0;
+                      const isSelected = selectedVal >= score;
+                      return (
+                        <button
+                          key={score}
+                          type="button"
+                          onClick={() => {
+                            setAnswer(currentField.id, score);
+                            setTimeout(() => handleNext(), 280);
                           }}
-                        />
-                        <span style={{ fontSize: 13, fontWeight: 700, color: isSelected ? primaryColor : '#94A3B8' }}>
-                          {score}
-                        </span>
-                      </button>
-                    );
-                  })}
+                          style={{
+                            background: 'none',
+                            border: 'none',
+                            cursor: 'pointer',
+                            padding: 8,
+                            borderRadius: 12,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            gap: 6,
+                            transition: 'transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = 'scale(1.22)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = 'scale(1)';
+                          }}
+                          title={`Tap to give ${score} star${score > 1 ? 's' : ''}`}
+                        >
+                          <Star
+                            size={44}
+                            style={{
+                              color: isSelected ? '#F59E0B' : 'rgba(255, 255, 255, 0.25)',
+                              fill: isSelected ? '#F59E0B' : 'transparent',
+                              filter: isSelected ? 'drop-shadow(0 0 10px rgba(245, 158, 11, 0.5))' : 'none',
+                              transition: 'all 0.15s ease',
+                            }}
+                          />
+                          <span
+                            style={{
+                              fontSize: 12,
+                              fontWeight: 700,
+                              color: isSelected ? '#F59E0B' : '#94A3B8',
+                            }}
+                          >
+                            {score}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <div style={{ marginTop: 10, fontSize: 13, color: '#94A3B8' }}>
+                    {(answers[currentField.id] as number)
+                      ? `⭐ ${(answers[currentField.id] as number)} of 5 stars given`
+                      : 'Tap on the stars to give your rating'}
+                  </div>
                 </div>
 
                 {error && <div style={{ color: '#F43F5E', fontSize: 13, marginBottom: 16 }}>{error}</div>}
