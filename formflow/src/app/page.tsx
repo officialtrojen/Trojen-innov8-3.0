@@ -31,9 +31,9 @@ function Navbar() {
         left: 0,
         right: 0,
         zIndex: 50,
-        background: 'rgba(255, 254, 249, 0.85)',
-        backdropFilter: 'blur(12px)',
-        borderBottom: '1px solid rgba(184, 206, 207, 0.3)',
+        background: 'rgba(11, 15, 25, 0.8)',
+        backdropFilter: 'blur(16px)',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
       }}
     >
       <div
@@ -53,25 +53,26 @@ function Navbar() {
               width: 36,
               height: 36,
               borderRadius: 10,
-              background: 'linear-gradient(135deg, #4F7C7A, #52796F)',
+              background: 'linear-gradient(135deg, #6366F1, #8B5CF6)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: 'white',
               fontWeight: 700,
               fontSize: 18,
+              boxShadow: '0 0 12px rgba(99, 102, 241, 0.5)',
             }}
           >
             F
           </div>
-          <span style={{ fontWeight: 700, fontSize: 20, color: '#263B3B' }}>FormFlow</span>
+          <span style={{ fontWeight: 700, fontSize: 20, color: '#F3F4F6' }}>FormFlow</span>
         </Link>
 
         {/* Desktop nav */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 32 }} className="hidden-mobile">
-          <a href="#features" style={{ color: '#263B3B', textDecoration: 'none', fontSize: 14, fontWeight: 500 }}>Features</a>
-          <a href="#how-it-works" style={{ color: '#263B3B', textDecoration: 'none', fontSize: 14, fontWeight: 500 }}>How It Works</a>
-          <a href="#integrations" style={{ color: '#263B3B', textDecoration: 'none', fontSize: 14, fontWeight: 500 }}>Integrations</a>
+          <a href="#features" style={{ color: '#9CA3AF', textDecoration: 'none', fontSize: 14, fontWeight: 500 }}>Features</a>
+          <a href="#how-it-works" style={{ color: '#9CA3AF', textDecoration: 'none', fontSize: 14, fontWeight: 500 }}>How It Works</a>
+          <a href="#integrations" style={{ color: '#9CA3AF', textDecoration: 'none', fontSize: 14, fontWeight: 500 }}>Integrations</a>
           <Link href="/login" className="btn btn-ghost btn-sm">Log In</Link>
           <Link href="/signup" className="btn btn-primary btn-sm">Sign Up Free</Link>
         </div>
@@ -96,12 +97,12 @@ function Navbar() {
             display: 'flex',
             flexDirection: 'column',
             gap: 12,
-            borderTop: '1px solid rgba(184,206,207,0.3)',
+            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
           }}
         >
-          <a href="#features" style={{ color: '#263B3B', textDecoration: 'none' }} onClick={() => setOpen(false)}>Features</a>
-          <a href="#how-it-works" style={{ color: '#263B3B', textDecoration: 'none' }} onClick={() => setOpen(false)}>How It Works</a>
-          <a href="#integrations" style={{ color: '#263B3B', textDecoration: 'none' }} onClick={() => setOpen(false)}>Integrations</a>
+          <a href="#features" style={{ color: '#F3F4F6', textDecoration: 'none' }} onClick={() => setOpen(false)}>Features</a>
+          <a href="#how-it-works" style={{ color: '#F3F4F6', textDecoration: 'none' }} onClick={() => setOpen(false)}>How It Works</a>
+          <a href="#integrations" style={{ color: '#F3F4F6', textDecoration: 'none' }} onClick={() => setOpen(false)}>Integrations</a>
           <Link href="/login" onClick={() => setOpen(false)}>Log In</Link>
           <Link href="/signup" className="btn btn-primary" onClick={() => setOpen(false)}>Sign Up Free</Link>
         </div>
@@ -137,10 +138,11 @@ function Hero() {
           display: 'inline-block',
           padding: '6px 16px',
           borderRadius: 999,
-          background: 'var(--accent)',
-          color: 'var(--deep-sage)',
+          background: 'rgba(99, 102, 241, 0.15)',
+          color: '#A5B4FC',
+          border: '1px solid rgba(99, 102, 241, 0.3)',
           fontSize: 13,
-          fontWeight: 500,
+          fontWeight: 600,
           marginBottom: 24,
         }}
       >
@@ -149,22 +151,24 @@ function Hero() {
 
       <h1
         style={{
-          fontSize: 'clamp(2rem, 5vw, 3.5rem)',
+          fontSize: 'clamp(2.2rem, 5vw, 3.8rem)',
           fontWeight: 800,
           lineHeight: 1.15,
-          color: '#263B3B',
+          color: '#F3F4F6',
           marginBottom: 20,
           letterSpacing: '-0.02em',
         }}
       >
         Build Smarter Forms.{' '}
-        <span style={{ color: 'var(--primary)' }}>Automate Every Response.</span>
+        <span style={{ background: 'linear-gradient(135deg, #818CF8, #C084FC)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+          Automate Every Response.
+        </span>
       </h1>
 
       <p
         style={{
           fontSize: 'clamp(1rem, 2vw, 1.2rem)',
-          color: '#52796F',
+          color: '#9CA3AF',
           maxWidth: 600,
           margin: '0 auto 40px',
           lineHeight: 1.7,
@@ -189,11 +193,12 @@ function Hero() {
       <div
         style={{
           marginTop: 60,
-          borderRadius: 16,
+          borderRadius: 20,
           overflow: 'hidden',
-          boxShadow: '0 20px 60px rgba(38,59,59,0.12)',
-          border: '1px solid rgba(184,206,207,0.3)',
-          background: 'var(--card-bg)',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 0 30px rgba(99,102,241,0.15)',
+          border: '1px solid rgba(255,255,255,0.12)',
+          background: 'rgba(17, 24, 39, 0.85)',
+          backdropFilter: 'blur(16px)',
         }}
       >
         <div
@@ -205,8 +210,8 @@ function Hero() {
           }}
         >
           {/* Left panel */}
-          <div style={{ borderRight: '1px solid rgba(184,206,207,0.3)', padding: 16 }}>
-            <div style={{ fontWeight: 600, marginBottom: 16, color: '#52796F', fontSize: 12, textTransform: 'uppercase', letterSpacing: 1 }}>Field Types</div>
+          <div style={{ borderRight: '1px solid rgba(255,255,255,0.08)', padding: 16 }}>
+            <div style={{ fontWeight: 600, marginBottom: 16, color: '#A5B4FC', fontSize: 12, textTransform: 'uppercase', letterSpacing: 1 }}>Field Types</div>
             {['Short Text', 'Paragraph', 'Multiple Choice', 'Rating Stars', 'File Upload', 'Date Picker'].map((t, i) => (
               <div
                 key={i}
@@ -214,10 +219,11 @@ function Hero() {
                   padding: '8px 12px',
                   borderRadius: 8,
                   marginBottom: 4,
-                  background: i === 0 ? 'var(--accent)' : 'transparent',
-                  color: '#263B3B',
+                  background: i === 0 ? 'rgba(99,102,241,0.2)' : 'transparent',
+                  color: i === 0 ? '#C7D2FE' : '#9CA3AF',
                   cursor: 'pointer',
                   fontSize: 13,
+                  fontWeight: i === 0 ? 600 : 400,
                 }}
               >
                 {t}
@@ -227,7 +233,7 @@ function Hero() {
 
           {/* Center canvas */}
           <div style={{ padding: 24 }}>
-            <div style={{ fontWeight: 600, marginBottom: 16, fontSize: 16, color: '#263B3B' }}>Hackathon Registration</div>
+            <div style={{ fontWeight: 600, marginBottom: 16, fontSize: 16, color: '#F3F4F6' }}>Hackathon Registration</div>
             {[
               { label: 'Full Name', type: 'Short Text' },
               { label: 'Are you a student?', type: 'Multiple Choice' },
@@ -243,33 +249,35 @@ function Hero() {
                   alignItems: 'center',
                   justifyContent: 'space-between',
                   cursor: 'grab',
+                  background: 'rgba(15, 23, 42, 0.8)',
+                  borderColor: 'rgba(255,255,255,0.08)',
                 }}
               >
                 <div>
-                  <span style={{ fontWeight: 500 }}>{q.label}</span>
-                  <span style={{ color: '#52796F', fontSize: 12, marginLeft: 8 }}>{q.type}</span>
+                  <span style={{ fontWeight: 500, color: '#F3F4F6' }}>{q.label}</span>
+                  <span style={{ color: '#818CF8', fontSize: 12, marginLeft: 8 }}>{q.type}</span>
                 </div>
-                <span style={{ color: '#B8CECF' }}>⋮⋮</span>
+                <span style={{ color: '#6B7280' }}>⋮⋮</span>
               </div>
             ))}
           </div>
 
           {/* Right panel */}
-          <div style={{ borderLeft: '1px solid rgba(184,206,207,0.3)', padding: 16 }}>
-            <div style={{ fontWeight: 600, marginBottom: 16, color: '#52796F', fontSize: 12, textTransform: 'uppercase', letterSpacing: 1 }}>Properties</div>
+          <div style={{ borderLeft: '1px solid rgba(255,255,255,0.08)', padding: 16 }}>
+            <div style={{ fontWeight: 600, marginBottom: 16, color: '#A5B4FC', fontSize: 12, textTransform: 'uppercase', letterSpacing: 1 }}>Properties</div>
             <div style={{ marginBottom: 12 }}>
-              <div style={{ fontSize: 12, color: '#52796F', marginBottom: 4 }}>Question</div>
-              <div style={{ padding: '6px 10px', border: '1px solid var(--input-border)', borderRadius: 6, fontSize: 13 }}>Full Name</div>
+              <div style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 4 }}>Question</div>
+              <div style={{ padding: '6px 10px', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 6, fontSize: 13, background: 'rgba(15, 23, 42, 0.8)', color: '#F3F4F6' }}>Full Name</div>
             </div>
             <div style={{ marginBottom: 12 }}>
-              <div style={{ fontSize: 12, color: '#52796F', marginBottom: 4 }}>Required</div>
-              <div style={{ width: 36, height: 20, borderRadius: 10, background: 'var(--primary)', position: 'relative' }}>
+              <div style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 4 }}>Required</div>
+              <div style={{ width: 36, height: 20, borderRadius: 10, background: '#6366F1', position: 'relative' }}>
                 <div style={{ width: 16, height: 16, borderRadius: 8, background: 'white', position: 'absolute', top: 2, right: 2 }} />
               </div>
             </div>
             <div>
-              <div style={{ fontSize: 12, color: '#52796F', marginBottom: 4 }}>Placeholder</div>
-              <div style={{ padding: '6px 10px', border: '1px solid var(--input-border)', borderRadius: 6, fontSize: 13, color: '#B8CECF' }}>Enter name...</div>
+              <div style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 4 }}>Placeholder</div>
+              <div style={{ padding: '6px 10px', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 6, fontSize: 13, color: '#6B7280', background: 'rgba(15, 23, 42, 0.8)' }}>Enter name...</div>
             </div>
           </div>
         </div>
@@ -305,10 +313,10 @@ function Features() {
   return (
     <section id="features" style={{ padding: '80px 24px', maxWidth: 1200, margin: '0 auto', position: 'relative', zIndex: 1 }}>
       <div style={{ textAlign: 'center', marginBottom: 60 }}>
-        <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', fontWeight: 700, color: '#263B3B', marginBottom: 12 }}>
+        <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', fontWeight: 700, color: '#F3F4F6', marginBottom: 12 }}>
           Everything you need to build powerful forms
         </h2>
-        <p style={{ color: '#52796F', maxWidth: 600, margin: '0 auto', fontSize: 16 }}>
+        <p style={{ color: '#9CA3AF', maxWidth: 600, margin: '0 auto', fontSize: 16 }}>
           A complete toolkit for creating, distributing, and analyzing forms and surveys.
         </p>
       </div>
@@ -327,18 +335,19 @@ function Features() {
                 width: 48,
                 height: 48,
                 borderRadius: 12,
-                background: 'var(--accent)',
+                background: 'rgba(99, 102, 241, 0.15)',
+                border: '1px solid rgba(99, 102, 241, 0.3)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 marginBottom: 20,
-                color: 'var(--primary)',
+                color: '#818CF8',
               }}
             >
               <f.icon size={24} />
             </div>
-            <h3 style={{ fontSize: 18, fontWeight: 600, color: '#263B3B', marginBottom: 8 }}>{f.title}</h3>
-            <p style={{ color: '#52796F', fontSize: 14, lineHeight: 1.7 }}>{f.desc}</p>
+            <h3 style={{ fontSize: 18, fontWeight: 600, color: '#F3F4F6', marginBottom: 8 }}>{f.title}</h3>
+            <p style={{ color: '#9CA3AF', fontSize: 14, lineHeight: 1.7 }}>{f.desc}</p>
           </div>
         ))}
       </div>
@@ -358,8 +367,8 @@ function HowItWorks() {
   return (
     <section id="how-it-works" style={{ padding: '80px 24px', maxWidth: 900, margin: '0 auto', position: 'relative', zIndex: 1 }}>
       <div style={{ textAlign: 'center', marginBottom: 60 }}>
-        <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', fontWeight: 700, color: '#263B3B', marginBottom: 12 }}>How It Works</h2>
-        <p style={{ color: '#52796F', maxWidth: 500, margin: '0 auto', fontSize: 16 }}>Four simple steps from idea to insights.</p>
+        <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', fontWeight: 700, color: '#F3F4F6', marginBottom: 12 }}>How It Works</h2>
+        <p style={{ color: '#9CA3AF', maxWidth: 500, margin: '0 auto', fontSize: 16 }}>Four simple steps from idea to insights.</p>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
@@ -383,7 +392,7 @@ function HowItWorks() {
                   top: 48,
                   bottom: 0,
                   width: 2,
-                  background: 'linear-gradient(to bottom, var(--primary), var(--accent))',
+                  background: 'linear-gradient(to bottom, #6366F1, rgba(99,102,241,0.2))',
                 }}
               />
             )}
@@ -393,7 +402,7 @@ function HowItWorks() {
                 width: 48,
                 height: 48,
                 borderRadius: 14,
-                background: 'var(--primary)',
+                background: 'linear-gradient(135deg, #6366F1, #4F46E5)',
                 color: 'white',
                 display: 'flex',
                 alignItems: 'center',
@@ -401,17 +410,18 @@ function HowItWorks() {
                 flexShrink: 0,
                 position: 'relative',
                 zIndex: 1,
+                boxShadow: '0 0 15px rgba(99,102,241,0.4)',
               }}
             >
               <s.icon size={22} />
             </div>
 
             <div style={{ paddingTop: 4 }}>
-              <h3 style={{ fontSize: 18, fontWeight: 600, color: '#263B3B', marginBottom: 6 }}>
-                <span style={{ color: 'var(--primary)', marginRight: 8 }}>0{i + 1}</span>
+              <h3 style={{ fontSize: 18, fontWeight: 600, color: '#F3F4F6', marginBottom: 6 }}>
+                <span style={{ color: '#818CF8', marginRight: 8 }}>0{i + 1}</span>
                 {s.title}
               </h3>
-              <p style={{ color: '#52796F', fontSize: 14, lineHeight: 1.7 }}>{s.desc}</p>
+              <p style={{ color: '#9CA3AF', fontSize: 14, lineHeight: 1.7 }}>{s.desc}</p>
             </div>
           </div>
         ))}
@@ -425,40 +435,40 @@ function LogicDemo() {
   return (
     <section style={{ padding: '80px 24px', maxWidth: 900, margin: '0 auto', position: 'relative', zIndex: 1 }}>
       <div style={{ textAlign: 'center', marginBottom: 48 }}>
-        <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', fontWeight: 700, color: '#263B3B', marginBottom: 12 }}>
+        <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', fontWeight: 700, color: '#F3F4F6', marginBottom: 12 }}>
           Conditional Logic That Actually Works
         </h2>
-        <p style={{ color: '#52796F', maxWidth: 500, margin: '0 auto', fontSize: 16 }}>
+        <p style={{ color: '#9CA3AF', maxWidth: 500, margin: '0 auto', fontSize: 16 }}>
           Build branching paths so respondents only see relevant questions.
         </p>
       </div>
 
-      <div className="card" style={{ padding: 32, maxWidth: 600, margin: '0 auto' }}>
+      <div className="card" style={{ padding: 32, maxWidth: 600, margin: '0 auto', background: 'rgba(15, 23, 42, 0.85)' }}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <span style={{ background: 'var(--primary)', color: 'white', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 600 }}>IF</span>
-            <div style={{ flex: 1, padding: '8px 14px', border: '1px solid var(--input-border)', borderRadius: 8, fontSize: 14 }}>
+            <span style={{ background: '#6366F1', color: 'white', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 700 }}>IF</span>
+            <div style={{ flex: 1, padding: '8px 14px', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, fontSize: 14, color: '#F3F4F6', background: 'rgba(30, 41, 59, 0.6)' }}>
               &quot;Are you a student?&quot;
             </div>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <span style={{ background: 'var(--accent)', color: 'var(--deep-sage)', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 600 }}>EQUALS</span>
-            <div style={{ flex: 1, padding: '8px 14px', border: '1px solid var(--input-border)', borderRadius: 8, fontSize: 14 }}>
+            <span style={{ background: 'rgba(99, 102, 241, 0.2)', color: '#A5B4FC', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 700, border: '1px solid rgba(99,102,241,0.3)' }}>EQUALS</span>
+            <div style={{ flex: 1, padding: '8px 14px', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, fontSize: 14, color: '#F3F4F6', background: 'rgba(30, 41, 59, 0.6)' }}>
               &quot;Yes&quot;
             </div>
           </div>
 
-          <div style={{ borderTop: '1px dashed var(--input-border)', paddingTop: 16 }}>
+          <div style={{ borderTop: '1px dashed rgba(255,255,255,0.12)', paddingTop: 16 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-              <span style={{ background: '#d4edda', color: '#155724', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 600 }}>THEN</span>
-              <span style={{ fontSize: 14 }}>Show &quot;College Name&quot;</span>
-              <CheckCircle2 size={16} style={{ color: '#28a745' }} />
+              <span style={{ background: 'rgba(16, 185, 129, 0.2)', color: '#6EE7B7', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 700, border: '1px solid rgba(16,185,129,0.3)' }}>THEN</span>
+              <span style={{ fontSize: 14, color: '#F3F4F6' }}>Show &quot;College Name&quot;</span>
+              <CheckCircle2 size={16} style={{ color: '#34D399' }} />
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <span style={{ background: '#d4edda', color: '#155724', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 600 }}>AND</span>
-              <span style={{ fontSize: 14 }}>Show &quot;Year of Study&quot;</span>
-              <CheckCircle2 size={16} style={{ color: '#28a745' }} />
+              <span style={{ background: 'rgba(16, 185, 129, 0.2)', color: '#6EE7B7', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 700, border: '1px solid rgba(16,185,129,0.3)' }}>AND</span>
+              <span style={{ fontSize: 14, color: '#F3F4F6' }}>Show &quot;Year of Study&quot;</span>
+              <CheckCircle2 size={16} style={{ color: '#34D399' }} />
             </div>
           </div>
         </div>
@@ -472,10 +482,10 @@ function AnalyticsDemo() {
   return (
     <section style={{ padding: '80px 24px', maxWidth: 1000, margin: '0 auto', position: 'relative', zIndex: 1 }}>
       <div style={{ textAlign: 'center', marginBottom: 48 }}>
-        <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', fontWeight: 700, color: '#263B3B', marginBottom: 12 }}>
+        <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', fontWeight: 700, color: '#F3F4F6', marginBottom: 12 }}>
           Real-Time Analytics & Insights
         </h2>
-        <p style={{ color: '#52796F', maxWidth: 500, margin: '0 auto', fontSize: 16 }}>
+        <p style={{ color: '#9CA3AF', maxWidth: 500, margin: '0 auto', fontSize: 16 }}>
           Watch responses come in live. Understand your data at a glance.
         </p>
       </div>
@@ -487,10 +497,10 @@ function AnalyticsDemo() {
           { label: 'Avg. Rating', value: '4.6 ★', change: '+0.2' },
           { label: 'Today', value: '34', change: '+8' },
         ].map((s, i) => (
-          <div key={i} className="card" style={{ padding: 24, textAlign: 'center' }}>
-            <div style={{ fontSize: 28, fontWeight: 700, color: '#263B3B', marginBottom: 4 }}>{s.value}</div>
-            <div style={{ fontSize: 13, color: '#52796F', marginBottom: 6 }}>{s.label}</div>
-            <span style={{ fontSize: 12, color: '#28a745', fontWeight: 500 }}>{s.change}</span>
+          <div key={i} className="card" style={{ padding: 24, textAlign: 'center', background: 'rgba(15, 23, 42, 0.85)' }}>
+            <div style={{ fontSize: 28, fontWeight: 700, color: '#F3F4F6', marginBottom: 4 }}>{s.value}</div>
+            <div style={{ fontSize: 13, color: '#9CA3AF', marginBottom: 6 }}>{s.label}</div>
+            <span style={{ fontSize: 12, color: '#34D399', fontWeight: 600 }}>{s.change}</span>
           </div>
         ))}
       </div>
@@ -502,18 +512,18 @@ function AnalyticsDemo() {
 function Integrations() {
   return (
     <section id="integrations" style={{ padding: '80px 24px', maxWidth: 900, margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 1 }}>
-      <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', fontWeight: 700, color: '#263B3B', marginBottom: 12 }}>
+      <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', fontWeight: 700, color: '#F3F4F6', marginBottom: 12 }}>
         Connect to Your Favorite Tools
       </h2>
-      <p style={{ color: '#52796F', maxWidth: 500, margin: '0 auto 40px', fontSize: 16 }}>
+      <p style={{ color: '#9CA3AF', maxWidth: 500, margin: '0 auto 40px', fontSize: 16 }}>
         Trigger webhooks on every form submission. Integrate with Slack, Discord, Zapier, and any custom endpoint.
       </p>
 
-      <div className="card" style={{ padding: 32, maxWidth: 500, margin: '0 auto', textAlign: 'left' }}>
-        <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 16, color: '#263B3B' }}>Webhook Configuration</div>
+      <div className="card" style={{ padding: 32, maxWidth: 500, margin: '0 auto', textAlign: 'left', background: 'rgba(15, 23, 42, 0.85)' }}>
+        <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 16, color: '#F3F4F6' }}>Webhook Configuration</div>
         <div style={{ marginBottom: 12 }}>
-          <div style={{ fontSize: 12, color: '#52796F', marginBottom: 4 }}>Webhook URL</div>
-          <div style={{ padding: '8px 14px', border: '1px solid var(--input-border)', borderRadius: 8, fontSize: 13, color: '#52796F' }}>
+          <div style={{ fontSize: 12, color: '#9CA3AF', marginBottom: 4 }}>Webhook URL</div>
+          <div style={{ padding: '8px 14px', border: '1px solid rgba(255,255,255,0.12)', borderRadius: 8, fontSize: 13, color: '#9CA3AF', background: 'rgba(30, 41, 59, 0.6)' }}>
             https://hooks.slack.com/services/...
           </div>
         </div>
@@ -543,14 +553,15 @@ function CTA() {
           maxWidth: 700,
           margin: '0 auto',
           padding: '60px 40px',
-          background: 'linear-gradient(135deg, var(--card-bg), var(--accent))',
-          border: 'none',
+          background: 'linear-gradient(135deg, rgba(30,27,75,0.8), rgba(99,102,241,0.2))',
+          border: '1px solid rgba(99, 102, 241, 0.3)',
+          boxShadow: '0 0 40px rgba(99,102,241,0.2)',
         }}
       >
-        <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2rem)', fontWeight: 700, color: '#263B3B', marginBottom: 12 }}>
+        <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2rem)', fontWeight: 700, color: '#F3F4F6', marginBottom: 12 }}>
           Ready to build smarter forms?
         </h2>
-        <p style={{ color: '#52796F', marginBottom: 32, fontSize: 16 }}>
+        <p style={{ color: '#9CA3AF', marginBottom: 32, fontSize: 16 }}>
           Start creating in minutes. No credit card required.
         </p>
         <Link href="/signup" className="btn btn-primary btn-lg" style={{ fontSize: 16, borderRadius: 12 }}>
@@ -566,7 +577,7 @@ function Footer() {
   return (
     <footer
       style={{
-        borderTop: '1px solid rgba(184,206,207,0.3)',
+        borderTop: '1px solid rgba(255,255,255,0.08)',
         padding: '40px 24px',
         textAlign: 'center',
         position: 'relative',
@@ -579,7 +590,7 @@ function Footer() {
             width: 28,
             height: 28,
             borderRadius: 8,
-            background: 'linear-gradient(135deg, #4F7C7A, #52796F)',
+            background: 'linear-gradient(135deg, #6366F1, #8B5CF6)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -590,9 +601,9 @@ function Footer() {
         >
           F
         </div>
-        <span style={{ fontWeight: 600, fontSize: 16, color: '#263B3B' }}>FormFlow</span>
+        <span style={{ fontWeight: 600, fontSize: 16, color: '#F3F4F6' }}>FormFlow</span>
       </div>
-      <p style={{ color: '#52796F', fontSize: 13 }}>
+      <p style={{ color: '#9CA3AF', fontSize: 13 }}>
         © {new Date().getFullYear()} FormFlow. Built with ❤️ for hackathons.
       </p>
     </footer>
