@@ -30,24 +30,117 @@ export async function POST(request: Request) {
       });
 
       const htmlContent = `
-        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 32px 24px; background: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0;">
-          <div style="text-align: center; margin-bottom: 24px;">
-            <div style="display: inline-block; width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #4F7C7A, #52796F); color: #ffffff; font-weight: bold; font-size: 22px; line-height: 44px;">F</div>
-            <h2 style="color: #263B3B; margin: 12px 0 4px 0; font-size: 22px;">Verification Code</h2>
-            <p style="color: #64748b; font-size: 14px; margin: 0;">Use the 6-digit code below to sign in to FormFlow.</p>
-          </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FormFlow Verification Code</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #F1F5F5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased;">
+  <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #F1F5F5; padding: 40px 16px;">
+    <tr>
+      <td align="center">
+        <!-- Main Card Container -->
+        <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 520px; background-color: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 12px 36px rgba(38, 59, 59, 0.08); border: 1px solid #E2E8F0;">
           
-          <div style="background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 12px; padding: 20px; text-align: center; margin: 24px 0;">
-            <span style="font-size: 36px; font-weight: 800; letter-spacing: 8px; color: #4F7C7A; font-family: monospace;">${otp}</span>
-          </div>
+          <!-- Header Banner -->
+          <tr>
+            <td style="background: linear-gradient(135deg, #263B3B 0%, #355353 50%, #4F7C7A 100%); padding: 36px 32px 30px 32px; text-align: center;">
+              <!-- Brand Logo Icon -->
+              <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="center" style="margin: 0 auto;">
+                <tr>
+                  <td align="center" style="width: 48px; height: 48px; border-radius: 14px; background: rgba(255, 255, 255, 0.18); border: 1px solid rgba(255, 255, 255, 0.3); color: #ffffff; font-size: 24px; font-weight: 800; line-height: 48px; text-align: center;">
+                    F
+                  </td>
+                </tr>
+              </table>
+              <div style="color: #ffffff; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; margin-top: 12px;">FormFlow</div>
+              <div style="display: inline-block; margin-top: 8px; padding: 4px 14px; background: rgba(255, 255, 255, 0.16); border-radius: 20px; color: #E8F3F1; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px;">
+                Secure Identity Verification
+              </div>
+            </td>
+          </tr>
 
-          <p style="font-size: 13px; color: #64748b; line-height: 1.5; margin: 0;">This code is valid for <strong>10 minutes</strong>. If you did not request this email, please safely ignore it.</p>
-          
-          <hr style="border: none; border-top: 1px solid #f1f5f9; margin: 24px 0;" />
-          <div style="font-size: 12px; color: #94a3b8; text-align: center;">
-            Sent by <strong>FormFlow Team</strong> &bull; <a href="mailto:${gmailUser}" style="color: #4F7C7A; text-decoration: none;">${gmailUser}</a>
-          </div>
-        </div>
+          <!-- Body Content -->
+          <tr>
+            <td style="padding: 36px 32px 28px 32px;">
+              <h1 style="margin: 0 0 10px 0; font-size: 22px; font-weight: 800; color: #1E293B; line-height: 1.3;">
+                Your One-Time Passcode
+              </h1>
+              <p style="margin: 0 0 24px 0; font-size: 14px; line-height: 1.6; color: #475569;">
+                Hello,<br>
+                We received a request to verify your identity for your FormFlow account (<strong style="color: #1E293B;">${email}</strong>). Use the secure 6-digit code below to complete your authentication:
+              </p>
+
+              <!-- OTP Code Display Card -->
+              <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background: #F8FAFB; border: 2px solid #E2E8F0; border-radius: 16px; margin: 24px 0; text-align: center;">
+                <tr>
+                  <td style="padding: 26px 16px 22px 16px;">
+                    <div style="font-size: 11px; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px;">
+                      Verification Code
+                    </div>
+                    <div style="font-size: 42px; font-weight: 800; letter-spacing: 12px; color: #263B3B; font-family: 'SF Mono', Monaco, Consolas, 'Liberation Mono', monospace; line-height: 1; padding-left: 12px; margin-bottom: 14px;">
+                      ${otp}
+                    </div>
+                    <table role="presentation" border="0" cellspacing="0" cellpadding="0" align="center" style="margin: 0 auto;">
+                      <tr>
+                        <td style="background: #E8F3F1; border-radius: 20px; padding: 5px 14px; color: #4F7C7A; font-size: 12px; font-weight: 700;">
+                          ⏱ Valid for 10 minutes &bull; Single-use only
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Security Information Grid -->
+              <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0" style="background: #F8FAFC; border-radius: 12px; border: 1px solid #E2E8F0; margin-bottom: 24px;">
+                <tr>
+                  <td style="padding: 16px 18px;">
+                    <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
+                      <tr>
+                        <td width="24" valign="top" style="font-size: 16px; line-height: 1.3;">🔒</td>
+                        <td style="padding-left: 10px; font-size: 12.5px; line-height: 1.5; color: #475569;">
+                          <strong style="color: #1E293B;">Security Reminder:</strong> Never share this code with anyone. FormFlow employees and automated systems will never request your verification code.
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colspan="2" style="height: 10px;"></td>
+                      </tr>
+                      <tr>
+                        <td width="24" valign="top" style="font-size: 16px; line-height: 1.3;">⚡</td>
+                        <td style="padding-left: 10px; font-size: 12.5px; line-height: 1.5; color: #475569;">
+                          <strong style="color: #1E293B;">Didn't request this?</strong> If you didn't attempt to sign up or log in, you can safely ignore this email. No changes have been made to your credentials.
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Divider -->
+              <div style="border-top: 1px solid #E2E8F0; margin: 24px 0 20px 0;"></div>
+
+              <!-- Footer Signature -->
+              <table role="presentation" width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td style="font-size: 12px; line-height: 1.6; color: #94A3B8; text-align: center;">
+                    Sent with security by <strong>FormFlow Identity Protection</strong><br>
+                    Official dispatch: <a href="mailto:${gmailUser}" style="color: #4F7C7A; text-decoration: none; font-weight: 600;">${gmailUser}</a><br>
+                    &copy; 2026 FormFlow &bull; SBIT Hackathon Track WEB-08 &bull; All rights reserved.
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
       `;
 
       await transporter.sendMail({
