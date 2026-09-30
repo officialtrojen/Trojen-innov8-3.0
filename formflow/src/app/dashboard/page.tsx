@@ -8,12 +8,12 @@ import {
   MessageSquare,
   TrendingUp,
   PlusCircle,
+  MoreHorizontal,
   Edit3,
   Eye,
   BarChart3,
   Copy,
   Trash2,
-  Sparkles,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/components/AuthProvider';
@@ -23,12 +23,7 @@ import { formatDate, truncate } from '@/lib/utils';
 export default function DashboardPage() {
   const { user } = useAuth();
   const supabase = createClient();
-  const [stats, setStats] = useState<DashboardStats>({
-    totalForms: 0,
-    publishedForms: 0,
-    totalResponses: 0,
-    avgResponseRate: 0,
-  });
+  const [stats, setStats] = useState<DashboardStats>({ totalForms: 0, publishedForms: 0, totalResponses: 0, avgResponseRate: 0 });
   const [forms, setForms] = useState<DBForm[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -64,8 +59,7 @@ export default function DashboardPage() {
         totalForms: allForms.length,
         publishedForms,
         totalResponses,
-        avgResponseRate:
-          allForms.length > 0 ? Math.round((totalResponses / Math.max(allForms.length, 1)) * 10) / 10 : 0,
+        avgResponseRate: allForms.length > 0 ? Math.round((totalResponses / Math.max(allForms.length, 1)) * 10) / 10 : 0,
       });
 
       setLoading(false);
@@ -96,402 +90,105 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
-        <div className="spinner" style={{ width: 32, height: 32 }} />
+      <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 80 }}>
+        <div className="spinner" style={{ width: 28, height: 28 }} />
       </div>
     );
   }
 
   const statCards = [
-    {
-      label: 'Total Forms',
-      value: stats.totalForms,
-      icon: FileText,
-      color: '#C084FC',
-      bg: 'rgba(192, 132, 252, 0.15)',
-      border: 'rgba(192, 132, 252, 0.25)',
-    },
-    {
-      label: 'Published Forms',
-      value: stats.publishedForms,
-      icon: Globe,
-      color: '#38BDF8',
-      bg: 'rgba(56, 189, 248, 0.15)',
-      border: 'rgba(56, 189, 248, 0.25)',
-    },
-    {
-      label: 'Total Responses',
-      value: stats.totalResponses,
-      icon: MessageSquare,
-      color: '#34D399',
-      bg: 'rgba(52, 211, 153, 0.15)',
-      border: 'rgba(52, 211, 153, 0.25)',
-    },
-    {
-      label: 'Avg per Form',
-      value: stats.avgResponseRate,
-      icon: TrendingUp,
-      color: '#FBBF24',
-      bg: 'rgba(251, 191, 36, 0.15)',
-      border: 'rgba(251, 191, 36, 0.25)',
-    },
+    { label: 'Total Forms', value: stats.totalForms, icon: FileText, color: '#4F7C7A' },
+    { label: 'Published Forms', value: stats.publishedForms, icon: Globe, color: '#52796F' },
+    { label: 'Total Responses', value: stats.totalResponses, icon: MessageSquare, color: '#3F6258' },
+    { label: 'Avg per Form', value: stats.avgResponseRate, icon: TrendingUp, color: '#4F7C7A' },
   ];
 
   return (
     <div>
-      {/* Top Header */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          marginBottom: 32,
-          flexWrap: 'wrap',
-          gap: 16,
-        }}
-      >
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 32, flexWrap: 'wrap', gap: 16 }}>
         <div>
-          <h1
-            style={{
-              fontSize: 26,
-              fontWeight: 800,
-              color: '#FFFFFF',
-              marginBottom: 6,
-              letterSpacing: '-0.5px',
-            }}
-          >
-            Dashboard
-          </h1>
-          <p style={{ color: '#94A3B8', fontSize: 14 }}>
-            Welcome back! Here&apos;s an overview of your forms and real-time activity.
-          </p>
+          <h1 style={{ fontSize: 24, fontWeight: 700, color: '#263B3B', marginBottom: 4 }}>Dashboard</h1>
+          <p style={{ color: '#52796F', fontSize: 14 }}>Welcome back! Here&apos;s an overview of your forms.</p>
         </div>
-        <Link
-          href="/dashboard/forms/new"
-          className="btn btn-primary"
-          style={{
-            background: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)',
-            color: '#FFFFFF',
-            padding: '11px 20px',
-            borderRadius: 12,
-            fontWeight: 700,
-            fontSize: 14,
-            boxShadow: '0 4px 18px rgba(99, 102, 241, 0.45)',
-          }}
-        >
+        <Link href="/dashboard/forms/new" className="btn btn-primary">
           <PlusCircle size={18} /> Create Form
         </Link>
       </div>
 
-      {/* 4 Stat Cards */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-          gap: 18,
-          marginBottom: 36,
-        }}
-      >
+      {/* Stat cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 40 }}>
         {statCards.map((s, i) => (
-          <div
-            key={i}
-            className="card"
-            style={{
-              padding: '22px 24px',
-              background: 'rgba(15, 23, 42, 0.75)',
-              backdropFilter: 'blur(16px)',
-              border: `1px solid ${s.border}`,
-              borderRadius: 18,
-              boxShadow: '0 10px 30px rgba(0, 0, 0, 0.45)',
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginBottom: 16,
-              }}
-            >
-              <span
-                style={{
-                  fontSize: 12.5,
-                  color: '#94A3B8',
-                  fontWeight: 600,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.6px',
-                }}
-              >
-                {s.label}
-              </span>
-              <div
-                style={{
-                  width: 38,
-                  height: 38,
-                  borderRadius: 11,
-                  background: s.bg,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: s.color,
-                }}
-              >
-                <s.icon size={19} />
+          <div key={i} className="card" style={{ padding: 24 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+              <span style={{ fontSize: 13, color: '#52796F', fontWeight: 500 }}>{s.label}</span>
+              <div style={{ width: 36, height: 36, borderRadius: 10, background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: s.color }}>
+                <s.icon size={18} />
               </div>
             </div>
-            <div
-              style={{
-                fontSize: 34,
-                fontWeight: 800,
-                color: '#FFFFFF',
-                letterSpacing: '-0.8px',
-                lineHeight: 1,
-              }}
-            >
-              {s.value}
-            </div>
+            <div style={{ fontSize: 28, fontWeight: 700, color: '#263B3B' }}>{s.value}</div>
           </div>
         ))}
       </div>
 
-      {/* Recent Forms Header */}
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          marginBottom: 18,
-        }}
-      >
-        <h2 style={{ fontSize: 20, fontWeight: 700, color: '#FFFFFF', letterSpacing: '-0.3px' }}>
-          Recent Forms
-        </h2>
-        <Link
-          href="/dashboard/forms"
-          style={{
-            color: '#A855F7',
-            fontSize: 14,
-            fontWeight: 600,
-            textDecoration: 'none',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 4,
-          }}
-        >
-          View All &rarr;
+      {/* Recent forms */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+        <h2 style={{ fontSize: 18, fontWeight: 600, color: '#263B3B' }}>Recent Forms</h2>
+        <Link href="/dashboard/forms" style={{ color: 'var(--primary)', fontSize: 14, fontWeight: 500, textDecoration: 'none' }}>
+          View All →
         </Link>
       </div>
 
-      {/* Empty State or Table */}
       {forms.length === 0 ? (
-        <div
-          className="card"
-          style={{
-            padding: '60px 24px',
-            textAlign: 'center',
-            background: 'rgba(15, 23, 42, 0.7)',
-            backdropFilter: 'blur(16px)',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
-            borderRadius: 20,
-            boxShadow: '0 12px 36px rgba(0, 0, 0, 0.4)',
-          }}
-        >
-          <div
-            style={{
-              width: 68,
-              height: 68,
-              borderRadius: 22,
-              background: 'rgba(139, 92, 246, 0.16)',
-              color: '#A855F7',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginBottom: 20,
-              boxShadow: '0 4px 20px rgba(139, 92, 246, 0.3)',
-            }}
-          >
-            <FileText size={34} />
-          </div>
-          <h3
-            style={{
-              fontSize: 20,
-              fontWeight: 700,
-              color: '#FFFFFF',
-              marginBottom: 8,
-            }}
-          >
-            No forms created yet
-          </h3>
-          <p
-            style={{
-              color: '#94A3B8',
-              fontSize: 14,
-              maxWidth: 380,
-              margin: '0 auto 26px auto',
-              lineHeight: 1.5,
-            }}
-          >
-            Build your first drag-and-drop workflow to start collecting live responses and viewing analytics.
-          </p>
-          <Link
-            href="/dashboard/forms/new"
-            className="btn btn-primary"
-            style={{
-              background: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)',
-              color: '#FFFFFF',
-              padding: '12px 24px',
-              borderRadius: 12,
-              fontWeight: 700,
-              fontSize: 14,
-              boxShadow: '0 4px 18px rgba(99, 102, 241, 0.45)',
-            }}
-          >
+        <div className="card" style={{ padding: 48, textAlign: 'center' }}>
+          <FileText size={40} style={{ color: '#B8CECF', marginBottom: 16 }} />
+          <h3 style={{ fontSize: 18, fontWeight: 600, color: '#263B3B', marginBottom: 8 }}>No forms yet</h3>
+          <p style={{ color: '#52796F', fontSize: 14, marginBottom: 24 }}>Create your first form to get started.</p>
+          <Link href="/dashboard/forms/new" className="btn btn-primary">
             <PlusCircle size={18} /> Create Your First Form
           </Link>
         </div>
       ) : (
-        <div
-          className="card"
-          style={{
-            overflow: 'hidden',
-            background: 'rgba(15, 23, 42, 0.75)',
-            backdropFilter: 'blur(16px)',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
-            borderRadius: 18,
-            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4)',
-          }}
-        >
+        <div className="card" style={{ overflow: 'hidden' }}>
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
               <thead>
-                <tr
-                  style={{
-                    borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-                    background: 'rgba(255, 255, 255, 0.02)',
-                  }}
-                >
-                  <th
-                    style={{
-                      padding: '14px 20px',
-                      textAlign: 'left',
-                      color: '#94A3B8',
-                      fontWeight: 600,
-                      fontSize: 12,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.6px',
-                    }}
-                  >
-                    Form Name
-                  </th>
-                  <th
-                    style={{
-                      padding: '14px 20px',
-                      textAlign: 'left',
-                      color: '#94A3B8',
-                      fontWeight: 600,
-                      fontSize: 12,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.6px',
-                    }}
-                  >
-                    Status
-                  </th>
-                  <th
-                    style={{
-                      padding: '14px 20px',
-                      textAlign: 'left',
-                      color: '#94A3B8',
-                      fontWeight: 600,
-                      fontSize: 12,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.6px',
-                    }}
-                  >
-                    Updated
-                  </th>
-                  <th
-                    style={{
-                      padding: '14px 20px',
-                      textAlign: 'right',
-                      color: '#94A3B8',
-                      fontWeight: 600,
-                      fontSize: 12,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.6px',
-                    }}
-                  >
-                    Actions
-                  </th>
+                <tr style={{ borderBottom: '1px solid rgba(184,206,207,0.3)' }}>
+                  <th style={{ padding: '12px 16px', textAlign: 'left', color: '#52796F', fontWeight: 500, fontSize: 13 }}>Form Name</th>
+                  <th style={{ padding: '12px 16px', textAlign: 'left', color: '#52796F', fontWeight: 500, fontSize: 13 }}>Status</th>
+                  <th style={{ padding: '12px 16px', textAlign: 'left', color: '#52796F', fontWeight: 500, fontSize: 13 }}>Updated</th>
+                  <th style={{ padding: '12px 16px', textAlign: 'right', color: '#52796F', fontWeight: 500, fontSize: 13 }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {forms.map((form) => (
-                  <tr
-                    key={form.id}
-                    style={{
-                      borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
-                      transition: 'background 0.15s ease',
-                    }}
-                    onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.03)')}
-                    onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-                  >
-                    <td style={{ padding: '16px 20px', fontWeight: 600, color: '#FFFFFF' }}>
+                  <tr key={form.id} style={{ borderBottom: '1px solid rgba(184,206,207,0.15)' }}>
+                    <td style={{ padding: '14px 16px', fontWeight: 500, color: '#263B3B' }}>
                       {truncate(form.title, 40)}
                     </td>
-                    <td style={{ padding: '16px 20px' }}>
+                    <td style={{ padding: '14px 16px' }}>
                       <span className={`badge badge-${form.status}`}>
                         {form.status.charAt(0).toUpperCase() + form.status.slice(1)}
                       </span>
                     </td>
-                    <td style={{ padding: '16px 20px', color: '#94A3B8' }}>{formatDate(form.updated_at)}</td>
-                    <td style={{ padding: '16px 20px' }}>
-                      <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
-                        <Link
-                          href={`/dashboard/forms/${form.id}/edit`}
-                          className="btn btn-ghost btn-sm"
-                          title="Edit Form"
-                          style={{ color: '#94A3B8' }}
-                        >
+                    <td style={{ padding: '14px 16px', color: '#52796F' }}>{formatDate(form.updated_at)}</td>
+                    <td style={{ padding: '14px 16px' }}>
+                      <div style={{ display: 'flex', gap: 4, justifyContent: 'flex-end' }}>
+                        <Link href={`/dashboard/forms/${form.id}/edit`} className="btn btn-ghost btn-sm" title="Edit">
                           <Edit3 size={15} />
                         </Link>
-                        <Link
-                          href={`/dashboard/forms/${form.id}/preview`}
-                          className="btn btn-ghost btn-sm"
-                          title="Preview Form"
-                          style={{ color: '#94A3B8' }}
-                        >
+                        <Link href={`/dashboard/forms/${form.id}/preview`} className="btn btn-ghost btn-sm" title="Preview">
                           <Eye size={15} />
                         </Link>
-                        <Link
-                          href={`/dashboard/forms/${form.id}/responses`}
-                          className="btn btn-ghost btn-sm"
-                          title="View Responses"
-                          style={{ color: '#94A3B8' }}
-                        >
+                        <Link href={`/dashboard/forms/${form.id}/responses`} className="btn btn-ghost btn-sm" title="Responses">
                           <MessageSquare size={15} />
                         </Link>
-                        <Link
-                          href={`/dashboard/forms/${form.id}/analytics`}
-                          className="btn btn-ghost btn-sm"
-                          title="View Analytics"
-                          style={{ color: '#94A3B8' }}
-                        >
+                        <Link href={`/dashboard/forms/${form.id}/analytics`} className="btn btn-ghost btn-sm" title="Analytics">
                           <BarChart3 size={15} />
                         </Link>
-                        <button
-                          onClick={() => handleDuplicate(form)}
-                          className="btn btn-ghost btn-sm"
-                          title="Duplicate Form"
-                          style={{ color: '#94A3B8' }}
-                        >
+                        <button onClick={() => handleDuplicate(form)} className="btn btn-ghost btn-sm" title="Duplicate">
                           <Copy size={15} />
                         </button>
-                        <button
-                          onClick={() => handleDelete(form.id)}
-                          className="btn btn-ghost btn-sm"
-                          title="Delete Form"
-                          style={{ color: '#EF4444' }}
-                        >
+                        <button onClick={() => handleDelete(form.id)} className="btn btn-ghost btn-sm" title="Delete" style={{ color: '#e74c3c' }}>
                           <Trash2 size={15} />
                         </button>
                       </div>

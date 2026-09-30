@@ -131,40 +131,40 @@ export default function AnalyticsPage() {
 
   return (
     <div>
-      <h1 style={{ fontSize: 26, fontWeight: 800, color: '#FFFFFF', marginBottom: 4 }}>Analytics</h1>
-      <p style={{ color: '#94A3B8', fontSize: 14, marginBottom: 32 }}>{form.title}</p>
+      <h1 style={{ fontSize: 24, fontWeight: 700, color: '#263B3B', marginBottom: 4 }}>Analytics</h1>
+      <p style={{ color: '#52796F', fontSize: 14, marginBottom: 32 }}>{form.title}</p>
 
       {/* Summary cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16, marginBottom: 40 }}>
         <div className="card" style={{ padding: 24, textAlign: 'center' }}>
-          <div style={{ fontSize: 32, fontWeight: 800, color: '#FFFFFF' }}>{analytics.totalResponses}</div>
-          <div style={{ fontSize: 13, color: '#94A3B8', marginTop: 4 }}>Total Responses</div>
+          <div style={{ fontSize: 32, fontWeight: 700, color: '#263B3B' }}>{analytics.totalResponses}</div>
+          <div style={{ fontSize: 13, color: '#52796F' }}>Total Responses</div>
         </div>
         <div className="card" style={{ padding: 24, textAlign: 'center' }}>
-          <div style={{ fontSize: 32, fontWeight: 800, color: '#FFFFFF' }}>{form.schema.fields.length}</div>
-          <div style={{ fontSize: 13, color: '#94A3B8', marginTop: 4 }}>Questions</div>
+          <div style={{ fontSize: 32, fontWeight: 700, color: '#263B3B' }}>{form.schema.fields.length}</div>
+          <div style={{ fontSize: 13, color: '#52796F' }}>Questions</div>
         </div>
         <div className="card" style={{ padding: 24, textAlign: 'center' }}>
-          <div style={{ fontSize: 32, fontWeight: 800, color: '#FFFFFF' }}>
+          <div style={{ fontSize: 32, fontWeight: 700, color: '#263B3B' }}>
             {analytics.totalResponses > 0
               ? `${Math.round((analytics.fieldAnalytics.filter((f) => f.answeredCount > 0).length / analytics.fieldAnalytics.length) * 100)}%`
               : '—'}
           </div>
-          <div style={{ fontSize: 13, color: '#94A3B8', marginTop: 4 }}>Response Rate</div>
+          <div style={{ fontSize: 13, color: '#52796F' }}>Response Rate</div>
         </div>
       </div>
 
       {/* Submission Trend */}
       {analytics.trendData.length > 1 && (
         <div className="card" style={{ padding: 24, marginBottom: 24 }}>
-          <h3 style={{ fontSize: 16, fontWeight: 600, color: '#FFFFFF', marginBottom: 20 }}>Submission Trend</h3>
+          <h3 style={{ fontSize: 16, fontWeight: 600, color: '#263B3B', marginBottom: 20 }}>Submission Trend</h3>
           <ResponsiveContainer width="100%" height={250}>
             <LineChart data={analytics.trendData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
-              <XAxis dataKey="date" tick={{ fontSize: 12, fill: '#94A3B8' }} />
-              <YAxis tick={{ fontSize: 12, fill: '#94A3B8' }} allowDecimals={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="rgba(184,206,207,0.3)" />
+              <XAxis dataKey="date" tick={{ fontSize: 12, fill: '#52796F' }} />
+              <YAxis tick={{ fontSize: 12, fill: '#52796F' }} allowDecimals={false} />
               <Tooltip />
-              <Line type="monotone" dataKey="count" stroke="#8B5CF6" strokeWidth={2} dot={{ fill: '#8B5CF6', r: 4 }} />
+              <Line type="monotone" dataKey="count" stroke="#4F7C7A" strokeWidth={2} dot={{ fill: '#4F7C7A', r: 4 }} />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -174,8 +174,8 @@ export default function AnalyticsPage() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: 20 }}>
         {analytics.fieldAnalytics.map((fa) => (
           <div key={fa.field.id} className="card" style={{ padding: 24 }}>
-            <h3 style={{ fontSize: 15, fontWeight: 600, color: '#FFFFFF', marginBottom: 4 }}>{fa.field.label}</h3>
-            <div style={{ fontSize: 12, color: '#94A3B8', marginBottom: 16 }}>{fa.answeredCount} response{fa.answeredCount !== 1 ? 's' : ''}</div>
+            <h3 style={{ fontSize: 15, fontWeight: 600, color: '#263B3B', marginBottom: 4 }}>{fa.field.label}</h3>
+            <div style={{ fontSize: 12, color: '#52796F', marginBottom: 16 }}>{fa.answeredCount} response{fa.answeredCount !== 1 ? 's' : ''}</div>
 
             {fa.type === 'choice' && (
               <div style={{ display: 'flex', gap: 20, flexWrap: 'wrap' }}>
@@ -192,11 +192,11 @@ export default function AnalyticsPage() {
                 <div style={{ flex: 1, minWidth: 200 }}>
                   <ResponsiveContainer width="100%" height={200}>
                     <BarChart data={fa.chartData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
-                      <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#94A3B8' }} />
-                      <YAxis tick={{ fontSize: 11, fill: '#94A3B8' }} allowDecimals={false} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(184,206,207,0.3)" />
+                      <XAxis dataKey="name" tick={{ fontSize: 11, fill: '#52796F' }} />
+                      <YAxis tick={{ fontSize: 11, fill: '#52796F' }} allowDecimals={false} />
                       <Tooltip />
-                      <Bar dataKey="value" fill="#8B5CF6" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="value" fill="#4F7C7A" radius={[4, 4, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -206,15 +206,15 @@ export default function AnalyticsPage() {
             {fa.type === 'rating' && (
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16 }}>
-                  <span style={{ fontSize: 28, fontWeight: 800, color: '#FFFFFF' }}>{fa.avg}</span>
+                  <span style={{ fontSize: 28, fontWeight: 700, color: '#263B3B' }}>{fa.avg}</span>
                   <Star size={24} fill="#F5A623" stroke="#F5A623" />
-                  <span style={{ fontSize: 13, color: '#94A3B8' }}>average</span>
+                  <span style={{ fontSize: 13, color: '#52796F' }}>average</span>
                 </div>
                 <ResponsiveContainer width="100%" height={160}>
                   <BarChart data={fa.chartData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
-                    <XAxis dataKey="rating" tick={{ fontSize: 12, fill: '#94A3B8' }} />
-                    <YAxis tick={{ fontSize: 12, fill: '#94A3B8' }} allowDecimals={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(184,206,207,0.3)" />
+                    <XAxis dataKey="rating" tick={{ fontSize: 12, fill: '#52796F' }} />
+                    <YAxis tick={{ fontSize: 12, fill: '#52796F' }} allowDecimals={false} />
                     <Tooltip />
                     <Bar dataKey="count" fill="#F5A623" radius={[4, 4, 0, 0]} />
                   </BarChart>
@@ -225,11 +225,11 @@ export default function AnalyticsPage() {
             {fa.type === 'date' && (
               <ResponsiveContainer width="100%" height={180}>
                 <BarChart data={fa.chartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.08)" />
-                  <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#94A3B8' }} />
-                  <YAxis tick={{ fontSize: 11, fill: '#94A3B8' }} allowDecimals={false} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(184,206,207,0.3)" />
+                  <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#52796F' }} />
+                  <YAxis tick={{ fontSize: 11, fill: '#52796F' }} allowDecimals={false} />
                   <Tooltip />
-                  <Bar dataKey="count" fill="#8B5CF6" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="count" fill="#52796F" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             )}
@@ -237,10 +237,10 @@ export default function AnalyticsPage() {
             {fa.type === 'text' && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 200, overflowY: 'auto' }}>
                 {fa.answers.length === 0 ? (
-                  <div style={{ color: '#64748B', fontSize: 13 }}>No responses yet</div>
+                  <div style={{ color: '#B8CECF', fontSize: 13 }}>No responses yet</div>
                 ) : (
                   fa.answers.map((a, i) => (
-                    <div key={i} style={{ padding: '8px 12px', borderRadius: 8, background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255,255,255,0.06)', fontSize: 13, color: '#FFFFFF' }}>
+                    <div key={i} style={{ padding: '8px 12px', borderRadius: 6, background: 'var(--accent)', fontSize: 13, color: '#263B3B' }}>
                       {a}
                     </div>
                   ))

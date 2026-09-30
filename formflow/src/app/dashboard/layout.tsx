@@ -8,6 +8,7 @@ import {
   FileText,
   PlusCircle,
   MessageSquare,
+  BarChart3,
   Webhook,
   Settings,
   LogOut,
@@ -33,44 +34,33 @@ function Sidebar() {
 
   const sidebarContent = (
     <>
-      {/* Brand Logo Header */}
-      <div style={{ padding: '0 24px', marginBottom: 28 }}>
-        <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 12 }}>
+      {/* Logo */}
+      <div style={{ padding: '0 24px', marginBottom: 32 }}>
+        <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
           <div
             style={{
-              width: 36,
-              height: 36,
-              borderRadius: 10,
-              background: 'linear-gradient(135deg, #6366F1, #8B5CF6)',
+              width: 32,
+              height: 32,
+              borderRadius: 8,
+              background: 'linear-gradient(135deg, #4F7C7A, #52796F)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: 'white',
-              fontWeight: 800,
-              fontSize: 18,
-              boxShadow: '0 2px 12px rgba(139, 92, 246, 0.45)',
+              fontWeight: 700,
+              fontSize: 16,
             }}
           >
             F
           </div>
-          <span
-            style={{
-              fontWeight: 800,
-              fontSize: 19,
-              color: '#FFFFFF',
-              letterSpacing: '-0.3px',
-            }}
-          >
-            FormFlow
-          </span>
+          <span style={{ fontWeight: 700, fontSize: 18, color: '#263B3B' }}>FormFlow</span>
         </Link>
       </div>
 
-      {/* Navigation Links */}
+      {/* Nav links */}
       <div style={{ flex: 1 }}>
         {navItems.map((item) => {
-          const isActive =
-            pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
+          const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
           return (
             <Link
               key={item.href}
@@ -85,77 +75,45 @@ function Sidebar() {
         })}
       </div>
 
-      {/* User Card & Logout Footer */}
-      <div style={{ padding: '16px 20px', borderTop: '1px solid rgba(255, 255, 255, 0.08)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+      {/* User */}
+      <div style={{ padding: '16px 24px', borderTop: '1px solid rgba(184,206,207,0.3)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
           {user?.user_metadata?.avatar_url ? (
             <img
               src={user.user_metadata.avatar_url}
               alt="Avatar"
-              style={{ width: 34, height: 34, borderRadius: '50%', objectFit: 'cover' }}
+              style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover' }}
             />
           ) : (
             <div
               style={{
-                width: 34,
-                height: 34,
+                width: 32,
+                height: 32,
                 borderRadius: '50%',
-                background: 'linear-gradient(135deg, #6366F1, #8B5CF6)',
+                background: 'linear-gradient(135deg, #4285F4, #34A853)',
                 color: 'white',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 fontSize: 14,
-                fontWeight: 700,
-                boxShadow: '0 2px 8px rgba(99, 102, 241, 0.3)',
+                fontWeight: 600,
               }}
             >
               {(user?.user_metadata?.name || user?.email || 'U')[0].toUpperCase()}
             </div>
           )}
           <div style={{ minWidth: 0, flex: 1 }}>
-            <div
-              style={{
-                fontSize: 13,
-                fontWeight: 600,
-                color: '#FFFFFF',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
+            <div style={{ fontSize: 13, fontWeight: 600, color: '#263B3B', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {user?.user_metadata?.name || user?.user_metadata?.full_name || 'Creator'}
             </div>
-            <div
-              style={{
-                fontSize: 11,
-                color: '#94A3B8',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {user?.email || 'Authenticated User'}
+            <div style={{ fontSize: 11, color: '#52796F', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {user?.email || 'Google User'}
             </div>
           </div>
         </div>
 
         {user?.app_metadata?.provider === 'google' && (
-          <div
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 4,
-              background: 'rgba(59, 130, 246, 0.15)',
-              color: '#60A5FA',
-              fontSize: 10.5,
-              fontWeight: 600,
-              padding: '3px 9px',
-              borderRadius: 20,
-              marginBottom: 10,
-              border: '1px solid rgba(59, 130, 246, 0.25)',
-            }}
-          >
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: '#EFF6FF', color: '#1D4ED8', fontSize: 10, fontWeight: 600, padding: '2px 8px', borderRadius: 9999, marginBottom: 10 }}>
             <span>✓ Google Verified</span>
           </div>
         )}
@@ -163,20 +121,13 @@ function Sidebar() {
         <button
           onClick={signOut}
           className="btn btn-ghost btn-sm"
-          style={{
-            width: '100%',
-            justifyContent: 'flex-start',
-            color: '#F87171',
-            borderRadius: 8,
-            padding: '7px 10px',
-            fontSize: 13,
-          }}
+          style={{ width: '100%', justifyContent: 'flex-start', color: '#f87171' }}
         >
-          <LogOut size={15} /> Sign Out
+          <LogOut size={16} /> Sign Out
         </button>
 
-        <div style={{ marginTop: 14, textAlign: 'center', fontSize: 10.5, color: '#64748B' }}>
-          &copy; 2026 FormFlow &bull; Built with ❤️ by team trojen
+        <div style={{ marginTop: 14, textAlign: 'center', fontSize: 10, color: '#88A7A5' }}>
+          © 2026 FormFlow. Built with ❤️ by team trojen
         </div>
       </div>
     </>
@@ -193,39 +144,34 @@ function Sidebar() {
           left: 0,
           right: 0,
           zIndex: 50,
-          background: 'rgba(10, 15, 30, 0.95)',
-          backdropFilter: 'blur(16px)',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+          background: 'var(--card-bg)',
+          borderBottom: '1px solid rgba(184,206,207,0.3)',
           padding: '12px 16px',
           alignItems: 'center',
           justifyContent: 'space-between',
         }}
         className="mobile-header"
       >
-        <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
+        <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 8 }}>
           <div
             style={{
-              width: 30,
-              height: 30,
-              borderRadius: 8,
-              background: 'linear-gradient(135deg, #6366F1, #8B5CF6)',
+              width: 28,
+              height: 28,
+              borderRadius: 7,
+              background: 'linear-gradient(135deg, #4F7C7A, #52796F)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: 'white',
-              fontWeight: 800,
-              fontSize: 15,
+              fontWeight: 700,
+              fontSize: 14,
             }}
           >
             F
           </div>
-          <span style={{ fontWeight: 800, fontSize: 17, color: '#FFFFFF' }}>FormFlow</span>
+          <span style={{ fontWeight: 700, fontSize: 16, color: '#263B3B' }}>FormFlow</span>
         </Link>
-        <button
-          onClick={() => setMobileOpen(!mobileOpen)}
-          className="btn btn-ghost"
-          style={{ padding: 6, color: '#FFFFFF' }}
-        >
+        <button onClick={() => setMobileOpen(!mobileOpen)} className="btn btn-ghost" style={{ padding: 6 }}>
           {mobileOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
       </div>
@@ -237,8 +183,7 @@ function Sidebar() {
             position: 'fixed',
             inset: 0,
             zIndex: 49,
-            background: 'rgba(0, 0, 0, 0.65)',
-            backdropFilter: 'blur(4px)',
+            background: 'rgba(38,59,59,0.3)',
           }}
           onClick={() => setMobileOpen(false)}
         />
@@ -255,9 +200,8 @@ function Sidebar() {
           bottom: 0,
           width: 260,
           zIndex: 50,
-          background: 'rgba(10, 15, 30, 0.98)',
-          backdropFilter: 'blur(20px)',
-          borderRight: '1px solid rgba(255, 255, 255, 0.08)',
+          background: 'var(--card-bg)',
+          borderRight: '1px solid rgba(184,206,207,0.3)',
           flexDirection: 'column',
           paddingTop: 16,
           transform: mobileOpen ? 'translateX(0)' : 'translateX(-100%)',
@@ -268,7 +212,7 @@ function Sidebar() {
       </div>
 
       {/* Desktop sidebar */}
-      <aside className="sidebar desktop-sidebar" style={{ background: 'rgba(10, 15, 30, 0.92)' }}>
+      <aside className="sidebar desktop-sidebar">
         {sidebarContent}
       </aside>
 
@@ -299,10 +243,7 @@ function DashboardShell({ children }: { children: React.ReactNode }) {
       <LiveBackground />
       <div style={{ display: 'flex', minHeight: '100vh', position: 'relative', zIndex: 1 }}>
         <Sidebar />
-        <main
-          style={{ flex: 1, padding: '36px 36px', maxWidth: '100%', overflowX: 'hidden' }}
-          className="dashboard-main"
-        >
+        <main style={{ flex: 1, padding: '32px 32px', maxWidth: '100%', overflowX: 'hidden' }} className="dashboard-main">
           {children}
         </main>
       </div>
