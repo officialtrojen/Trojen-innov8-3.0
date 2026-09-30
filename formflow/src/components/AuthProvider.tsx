@@ -23,17 +23,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const supabase = createClient();
 
   useEffect(() => {
-    // Check local storage for demo google session if offline
-    const demoUser = typeof window !== 'undefined' ? localStorage.getItem('formflow_demo_user') : null;
-    if (demoUser) {
-      try {
-        const parsed = JSON.parse(demoUser);
-        setUser(parsed);
-        setLoading(false);
-        return;
-      } catch (e) {}
-    }
-
     // Get initial session from Supabase
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
@@ -78,47 +67,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signInWithGoogle = async () => {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-    const isPlaceholder = !supabaseUrl || supabaseUrl.includes('placeholder');
-
-    if (isPlaceholder) {
-      // In local demo mode, simulate direct Google verification
-      const mockGoogleUser = {
-        id: 'google-demo-user-123',
-        app_metadata: { provider: 'google' },
-        user_metadata: {
-          name: 'Verified Google User',
-          full_name: 'Verified Google User',
-          avatar_url: 'https://lh3.googleusercontent.com/a/default-user',
-          email_verified: true,
+    try {
+      const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${origin}/auth/callback`,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
         },
-        aud: 'authenticated',
-        email: 'user@gmail.com',
-        created_at: new Date().toISOString(),
-      } as unknown as User;
+      });
 
-      localStorage.setItem('formflow_demo_user', JSON.stringify(mockGoogleUser));
-      setUser(mockGoogleUser);
-      return { error: null };
+      return { error: error?.message ?? null };
+    } catch (e: any) {
+      return { error: e.message || 'Google OAuth failed to initialize' };
     }
-
-    const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${origin}/auth/callback`,
-        queryParams: {
-          access_type: 'offline',
-          prompt: 'consent',
-        },
-      },
-    });
-
-    return { error: error?.message ?? null };
   };
 
   const signOut = async () => {
-    localStorage.removeItem('formflow_demo_user');
     await supabase.auth.signOut();
     setUser(null);
     setSession(null);
