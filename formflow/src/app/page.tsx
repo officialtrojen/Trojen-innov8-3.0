@@ -16,15 +16,12 @@ import {
   Send,
   Menu,
   X,
-  Sparkles,
-  Zap,
 } from 'lucide-react';
 import Scroll3DCard from '@/components/Scroll3DCard';
 
 /* ── Navigation ── */
 function Navbar() {
   const [open, setOpen] = React.useState(false);
-
   return (
     <nav
       style={{
@@ -33,9 +30,9 @@ function Navbar() {
         left: 0,
         right: 0,
         zIndex: 50,
-        background: 'rgba(252, 251, 247, 0.92)',
+        background: 'rgba(252, 251, 247, 0.94)',
         backdropFilter: 'blur(16px)',
-        borderBottom: '1px solid rgba(122, 139, 153, 0.22)',
+        borderBottom: '1px solid rgba(122, 139, 153, 0.2)',
       }}
     >
       <div
@@ -46,7 +43,7 @@ function Navbar() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          height: 68,
+          height: 64,
         }}
       >
         <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -62,68 +59,24 @@ function Navbar() {
               color: '#FCFBF7',
               fontWeight: 800,
               fontSize: 18,
-              boxShadow: '0 2px 8px rgba(42, 46, 51, 0.2)',
+              boxShadow: '0 2px 8px rgba(42, 46, 51, 0.15)',
             }}
           >
             F
           </div>
-          <span style={{ fontWeight: 700, fontSize: 20, color: '#2A2E33', letterSpacing: '-0.02em' }}>
-            FormFlow
-          </span>
+          <span style={{ fontWeight: 800, fontSize: 20, color: '#2A2E33', letterSpacing: '-0.02em' }}>FormFlow</span>
         </Link>
 
         {/* Desktop nav */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 28 }} className="hidden-mobile">
-          <Link
-            href="/builder"
-            style={{
-              color: '#2A2E33',
-              textDecoration: 'none',
-              fontSize: 14,
-              fontWeight: 700,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 5,
-              background: '#F2EFE9',
-              padding: '6px 14px',
-              borderRadius: 20,
-              border: '1px solid rgba(122, 139, 153, 0.25)',
-            }}
-          >
-            <Zap size={14} /> Form Builder
+        <div style={{ display: 'flex', alignItems: 'center', gap: 24 }} className="hidden-mobile">
+          <Link href="/builder" style={{ color: '#2A2E33', textDecoration: 'none', fontSize: 14, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}>
+            ⚡ Form Builder
           </Link>
-          <a href="#features" style={{ color: '#7A8B99', textDecoration: 'none', fontSize: 14, fontWeight: 500, transition: 'color 0.2s' }} onMouseEnter={(e) => { e.currentTarget.style.color = '#2A2E33'; }} onMouseLeave={(e) => { e.currentTarget.style.color = '#7A8B99'; }}>
-            Features
-          </a>
-          <a href="#builder-features" style={{ color: '#7A8B99', textDecoration: 'none', fontSize: 14, fontWeight: 500, transition: 'color 0.2s' }} onMouseEnter={(e) => { e.currentTarget.style.color = '#2A2E33'; }} onMouseLeave={(e) => { e.currentTarget.style.color = '#7A8B99'; }}>
-            Themes & Posters
-          </a>
-          <a href="#how-it-works" style={{ color: '#7A8B99', textDecoration: 'none', fontSize: 14, fontWeight: 500, transition: 'color 0.2s' }} onMouseEnter={(e) => { e.currentTarget.style.color = '#2A2E33'; }} onMouseLeave={(e) => { e.currentTarget.style.color = '#7A8B99'; }}>
-            How It Works
-          </a>
-          <Link
-            href="/login"
-            style={{
-              color: '#2A2E33',
-              textDecoration: 'none',
-              fontSize: 14,
-              fontWeight: 600,
-              padding: '8px 14px',
-            }}
-          >
-            Log In
-          </Link>
-          <Link
-            href="/builder"
-            className="btn btn-primary btn-sm"
-            style={{
-              borderRadius: 10,
-              padding: '9px 18px',
-              fontWeight: 700,
-            }}
-          >
-            Start Building
-          </Link>
+          <a href="#features" style={{ color: '#7A8B99', textDecoration: 'none', fontSize: 14, fontWeight: 500 }}>Features</a>
+          <a href="#builder-features" style={{ color: '#7A8B99', textDecoration: 'none', fontSize: 14, fontWeight: 500 }}>Posters & Themes</a>
+          <a href="#how-it-works" style={{ color: '#7A8B99', textDecoration: 'none', fontSize: 14, fontWeight: 500 }}>How It Works</a>
+          <Link href="/login" className="btn btn-ghost btn-sm" style={{ color: '#2A2E33' }}>Log In</Link>
+          <Link href="/builder" className="btn btn-primary btn-sm">Start Building</Link>
         </div>
 
         {/* Mobile toggle */}
@@ -132,7 +85,6 @@ function Navbar() {
           className="btn btn-ghost"
           style={{ display: 'none', padding: 8, color: '#2A2E33' }}
           id="mobile-nav-toggle"
-          aria-label="Toggle menu"
         >
           {open ? <X size={24} /> : <Menu size={24} />}
         </button>
@@ -143,31 +95,19 @@ function Navbar() {
         <div
           style={{
             background: '#FCFBF7',
-            padding: '20px 24px',
+            padding: '16px 24px',
             display: 'flex',
             flexDirection: 'column',
-            gap: 14,
+            gap: 12,
             borderTop: '1px solid rgba(122, 139, 153, 0.2)',
           }}
         >
-          <Link href="/builder" style={{ color: '#2A2E33', fontWeight: 700, textDecoration: 'none' }} onClick={() => setOpen(false)}>
-            ⚡ Start Building (Drag & Drop)
-          </Link>
-          <a href="#features" style={{ color: '#7A8B99', textDecoration: 'none' }} onClick={() => setOpen(false)}>
-            Features
-          </a>
-          <a href="#builder-features" style={{ color: '#7A8B99', textDecoration: 'none' }} onClick={() => setOpen(false)}>
-            Themes & Posters
-          </a>
-          <a href="#how-it-works" style={{ color: '#7A8B99', textDecoration: 'none' }} onClick={() => setOpen(false)}>
-            How It Works
-          </a>
-          <Link href="/login" style={{ color: '#2A2E33', textDecoration: 'none', fontWeight: 600 }} onClick={() => setOpen(false)}>
-            Log In
-          </Link>
-          <Link href="/builder" className="btn btn-primary" onClick={() => setOpen(false)}>
-            Start Building Free
-          </Link>
+          <Link href="/builder" style={{ color: '#2A2E33', fontWeight: 700, textDecoration: 'none' }} onClick={() => setOpen(false)}>⚡ Start Building (Drag & Drop)</Link>
+          <a href="#features" style={{ color: '#7A8B99', textDecoration: 'none' }} onClick={() => setOpen(false)}>Features</a>
+          <a href="#builder-features" style={{ color: '#7A8B99', textDecoration: 'none' }} onClick={() => setOpen(false)}>Posters & Themes</a>
+          <a href="#how-it-works" style={{ color: '#7A8B99', textDecoration: 'none' }} onClick={() => setOpen(false)}>How It Works</a>
+          <Link href="/login" onClick={() => setOpen(false)} style={{ color: '#2A2E33', textDecoration: 'none', fontWeight: 600 }}>Log In</Link>
+          <Link href="/builder" className="btn btn-primary" onClick={() => setOpen(false)}>Start Building Free</Link>
         </div>
       )}
 
@@ -205,18 +145,18 @@ function Hero() {
           borderRadius: 999,
           background: '#F2EFE9',
           color: '#2A2E33',
-          border: '1px solid rgba(122, 139, 153, 0.35)',
+          border: '1px solid rgba(122, 139, 153, 0.25)',
           fontSize: 13,
           fontWeight: 600,
           marginBottom: 24,
         }}
       >
-        <Sparkles size={14} color="#7A8B99" /> Free for students & clubs
+        ✨ Free for students, creators & teams
       </div>
 
       <h1
         style={{
-          fontSize: 'clamp(2.4rem, 5.5vw, 4rem)',
+          fontSize: 'clamp(2.4rem, 5.5vw, 4.2rem)',
           fontWeight: 800,
           lineHeight: 1.15,
           color: '#2A2E33',
@@ -232,24 +172,27 @@ function Hero() {
 
       <p
         style={{
-          fontSize: 'clamp(1rem, 2vw, 1.25rem)',
+          fontSize: 'clamp(1.05rem, 2vw, 1.25rem)',
           color: '#7A8B99',
           maxWidth: 620,
           margin: '0 auto 40px',
           lineHeight: 1.7,
         }}
       >
-        Create powerful conversational forms, surveys, and conditional workflows visually — without writing code.
+        Create elegant forms, conversational surveys, and conditional logic workflows visually — without writing code.
       </p>
 
-      <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 28 }}>
+      <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 20 }}>
         <Link
           href="/builder"
           className="btn btn-primary btn-lg"
           style={{
-            fontSize: 15,
+            fontSize: 16,
             borderRadius: 12,
             padding: '14px 28px',
+            background: '#2A2E33',
+            color: '#FCFBF7',
+            boxShadow: '0 8px 24px rgba(42, 46, 51, 0.18)',
             display: 'flex',
             alignItems: 'center',
             gap: 10,
@@ -257,70 +200,70 @@ function Hero() {
         >
           ⚡ Start Building Form (Drag & Drop) <ArrowRight size={18} />
         </Link>
-        <a
+        <Link
           href="#builder-features"
           className="btn btn-secondary btn-lg"
           style={{
-            fontSize: 15,
+            fontSize: 16,
             borderRadius: 12,
-            padding: '14px 26px',
+            padding: '14px 24px',
+            background: '#F2EFE9',
+            color: '#2A2E33',
+            border: '1.5px solid rgba(122, 139, 153, 0.35)',
           }}
         >
-          🎨 Custom Themes & Posters
-        </a>
+          🎨 Custom Backgrounds & Posters
+        </Link>
       </div>
 
-      <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 48 }}>
-        <span style={{ fontSize: 12, padding: '6px 14px', background: '#F2EFE9', borderRadius: 20, color: '#2A2E33', fontWeight: 600, border: '1px solid rgba(122, 139, 153, 0.25)' }}>
-          ✨ Drag & Drop Builder (@dnd-kit)
+      <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap', marginBottom: 40 }}>
+        <span style={{ fontSize: 12, padding: '6px 14px', background: '#F2EFE9', borderRadius: 20, color: '#2A2E33', fontWeight: 600, border: '1px solid rgba(122, 139, 153, 0.2)' }}>
+          ✨ Drag & Drop Builder (dnd-kit)
         </span>
-        <span style={{ fontSize: 12, padding: '6px 14px', background: '#F2EFE9', borderRadius: 20, color: '#2A2E33', fontWeight: 600, border: '1px solid rgba(122, 139, 153, 0.25)' }}>
-          🎨 Clean Cream, Pebble & Slate Palette
+        <span style={{ fontSize: 12, padding: '6px 14px', background: '#F2EFE9', borderRadius: 20, color: '#2A2E33', fontWeight: 600, border: '1px solid rgba(122, 139, 153, 0.2)' }}>
+          🎨 Clean Cream & Slate Styling
         </span>
-        <span style={{ fontSize: 12, padding: '6px 14px', background: '#F2EFE9', borderRadius: 20, color: '#2A2E33', fontWeight: 600, border: '1px solid rgba(122, 139, 153, 0.25)' }}>
+        <span style={{ fontSize: 12, padding: '6px 14px', background: '#F2EFE9', borderRadius: 20, color: '#2A2E33', fontWeight: 600, border: '1px solid rgba(122, 139, 153, 0.2)' }}>
           🖼️ Custom Form Posters & Banners
         </span>
       </div>
 
-      {/* Product Preview Mockup */}
+      {/* Product Preview */}
       <div
         style={{
-          marginTop: 20,
+          marginTop: 40,
           borderRadius: 20,
           overflow: 'hidden',
-          boxShadow: '0 20px 60px rgba(42, 46, 51, 0.08), 0 2px 10px rgba(42, 46, 51, 0.04)',
-          border: '1.5px solid rgba(122, 139, 153, 0.25)',
-          background: '#FCFBF7',
-          textAlign: 'left',
+          boxShadow: '0 20px 60px rgba(42, 46, 51, 0.08), 0 2px 8px rgba(42, 46, 51, 0.04)',
+          border: '1px solid rgba(122, 139, 153, 0.25)',
+          background: '#FFFFFF',
         }}
       >
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: '190px 1fr 220px',
-            minHeight: 340,
+            gridTemplateColumns: '180px 1fr 200px',
+            minHeight: 320,
             fontSize: 13,
+            textAlign: 'left',
           }}
         >
           {/* Left panel */}
-          <div style={{ borderRight: '1px solid rgba(122, 139, 153, 0.2)', padding: 18, background: '#F2EFE9' }}>
-            <div style={{ fontWeight: 700, marginBottom: 14, color: '#2A2E33', fontSize: 11, textTransform: 'uppercase', letterSpacing: 1.2 }}>
-              Field Types
-            </div>
+          <div style={{ borderRight: '1px solid #F2EFE9', padding: 16, background: '#FCFBF7' }}>
+            <div style={{ fontWeight: 700, marginBottom: 16, color: '#7A8B99', fontSize: 11, textTransform: 'uppercase', letterSpacing: 1.2 }}>Field Types</div>
             {['Short Text', 'Paragraph', 'Multiple Choice', 'Rating Stars', 'File Upload', 'Date Picker'].map((t, i) => (
               <div
                 key={i}
                 style={{
                   padding: '8px 12px',
                   borderRadius: 8,
-                  marginBottom: 6,
-                  background: i === 0 ? '#FCFBF7' : 'transparent',
+                  marginBottom: 4,
+                  background: i === 0 ? '#F2EFE9' : 'transparent',
                   color: i === 0 ? '#2A2E33' : '#7A8B99',
                   cursor: 'pointer',
                   fontSize: 13,
                   fontWeight: i === 0 ? 700 : 500,
-                  border: i === 0 ? '1px solid rgba(122, 139, 153, 0.35)' : '1px solid transparent',
-                  boxShadow: i === 0 ? '0 1px 4px rgba(42, 46, 51, 0.05)' : 'none',
+                  border: i === 0 ? '1px solid #D8D2C7' : '1px solid transparent',
                 }}
               >
                 {t}
@@ -329,33 +272,29 @@ function Hero() {
           </div>
 
           {/* Center canvas with Poster Preview */}
-          <div style={{ padding: 0, overflow: 'hidden', background: '#FCFBF7' }}>
+          <div style={{ padding: 0, overflow: 'hidden', background: '#FFFFFF' }}>
             {/* Poster Header */}
-            <div style={{ position: 'relative', height: 96, overflow: 'hidden', background: '#2A2E33' }}>
+            <div style={{ position: 'relative', height: 95, overflow: 'hidden', background: '#2A2E33' }}>
               <img
                 src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80"
                 alt="Form Poster"
-                style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.8 }}
+                style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.85 }}
               />
-              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(42, 46, 51, 0.75), transparent)', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '10px 18px', color: '#FCFBF7' }}>
-                <span style={{ fontSize: 10, background: 'rgba(252, 251, 247, 0.25)', padding: '2px 8px', borderRadius: 10, width: 'fit-content', fontWeight: 600, marginBottom: 2 }}>
-                  Poster Header
-                </span>
+              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(42,46,51,0.7), transparent)', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '10px 18px', color: '#FCFBF7' }}>
+                <span style={{ fontSize: 10, background: 'rgba(252,251,247,0.25)', padding: '2px 8px', borderRadius: 10, width: 'fit-content', fontWeight: 600, marginBottom: 2 }}>Poster Header</span>
                 <span style={{ fontSize: 14, fontWeight: 700 }}>Innov8 Hackathon 2026</span>
               </div>
             </div>
 
             <div style={{ padding: 20 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
                 <span style={{ fontWeight: 700, fontSize: 15, color: '#2A2E33' }}>Participant Registration</span>
-                <Link href="/builder" style={{ fontSize: 12, color: '#2A2E33', fontWeight: 700, textDecoration: 'none' }}>
-                  Open Live Builder →
-                </Link>
+                <Link href="/builder" style={{ fontSize: 12, color: '#7A8B99', fontWeight: 700, textDecoration: 'none' }}>Open Live Builder →</Link>
               </div>
               {[
                 { label: 'Full Name', type: 'Short Text' },
                 { label: 'Are you a student?', type: 'Multiple Choice' },
-                { label: 'Rate your experience', type: 'Rating' },
+                { label: 'Rate your experience', type: 'Rating (5-Star)' },
               ].map((q, i) => (
                 <div
                   key={i}
@@ -368,7 +307,7 @@ function Hero() {
                     justifyContent: 'space-between',
                     cursor: 'grab',
                     background: '#FCFBF7',
-                    borderColor: 'rgba(122, 139, 153, 0.25)',
+                    border: '1px solid #F2EFE9',
                   }}
                 >
                   <div>
@@ -382,27 +321,21 @@ function Hero() {
           </div>
 
           {/* Right panel */}
-          <div style={{ borderLeft: '1px solid rgba(122, 139, 153, 0.2)', padding: 18, background: '#F2EFE9' }}>
-            <div style={{ fontWeight: 700, marginBottom: 14, color: '#2A2E33', fontSize: 11, textTransform: 'uppercase', letterSpacing: 1.2 }}>
-              Properties
+          <div style={{ borderLeft: '1px solid #F2EFE9', padding: 16, background: '#FCFBF7' }}>
+            <div style={{ fontWeight: 700, marginBottom: 16, color: '#7A8B99', fontSize: 11, textTransform: 'uppercase', letterSpacing: 1.2 }}>Properties</div>
+            <div style={{ marginBottom: 12 }}>
+              <div style={{ fontSize: 12, color: '#2A2E33', marginBottom: 4, fontWeight: 600 }}>Question</div>
+              <div style={{ padding: '6px 10px', border: '1px solid #D8D2C7', borderRadius: 6, fontSize: 13, background: '#FFFFFF', color: '#2A2E33', fontWeight: 600 }}>Full Name</div>
             </div>
-            <div style={{ marginBottom: 14 }}>
-              <div style={{ fontSize: 12, color: '#7A8B99', marginBottom: 4, fontWeight: 600 }}>Question Title</div>
-              <div style={{ padding: '7px 10px', border: '1px solid rgba(122, 139, 153, 0.3)', borderRadius: 6, fontSize: 13, background: '#FCFBF7', color: '#2A2E33', fontWeight: 600 }}>
-                Full Name
-              </div>
-            </div>
-            <div style={{ marginBottom: 14 }}>
-              <div style={{ fontSize: 12, color: '#7A8B99', marginBottom: 4, fontWeight: 600 }}>Required Field</div>
+            <div style={{ marginBottom: 12 }}>
+              <div style={{ fontSize: 12, color: '#2A2E33', marginBottom: 4, fontWeight: 600 }}>Required</div>
               <div style={{ width: 36, height: 20, borderRadius: 10, background: '#2A2E33', position: 'relative' }}>
                 <div style={{ width: 16, height: 16, borderRadius: 8, background: '#FCFBF7', position: 'absolute', top: 2, right: 2 }} />
               </div>
             </div>
             <div>
-              <div style={{ fontSize: 12, color: '#7A8B99', marginBottom: 4, fontWeight: 600 }}>Placeholder</div>
-              <div style={{ padding: '7px 10px', border: '1px solid rgba(122, 139, 153, 0.3)', borderRadius: 6, fontSize: 13, color: '#7A8B99', background: '#FCFBF7' }}>
-                Enter your name...
-              </div>
+              <div style={{ fontSize: 12, color: '#2A2E33', marginBottom: 4, fontWeight: 600 }}>Placeholder</div>
+              <div style={{ padding: '6px 10px', border: '1px solid #D8D2C7', borderRadius: 6, fontSize: 13, color: '#7A8B99', background: '#FFFFFF' }}>Enter name...</div>
             </div>
           </div>
         </div>
@@ -428,170 +361,168 @@ function Hero() {
 function BuilderShowcaseSection() {
   return (
     <section id="builder-features" style={{ padding: '80px 24px', maxWidth: 1200, margin: '0 auto', position: 'relative', zIndex: 1 }}>
-      <div style={{ background: '#F2EFE9', borderRadius: 24, padding: '64px 36px', border: '1px solid rgba(122, 139, 153, 0.2)' }}>
-        <div style={{ textAlign: 'center', marginBottom: 50 }}>
-          <div
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              padding: '6px 16px',
-              borderRadius: 999,
-              background: '#FCFBF7',
-              color: '#2A2E33',
-              border: '1px solid rgba(122, 139, 153, 0.3)',
-              fontSize: 13,
-              fontWeight: 600,
-              marginBottom: 16,
-            }}
-          >
-            ✨ Visual Studio Experience
+      <div style={{ textAlign: 'center', marginBottom: 54 }}>
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '6px 16px',
+            borderRadius: 999,
+            background: '#F2EFE9',
+            color: '#2A2E33',
+            border: '1px solid rgba(122, 139, 153, 0.25)',
+            fontSize: 13,
+            fontWeight: 600,
+            marginBottom: 16,
+          }}
+        >
+          ✨ New Visual Studio
+        </div>
+        <h2 style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)', fontWeight: 800, color: '#2A2E33', marginBottom: 14, letterSpacing: '-0.02em' }}>
+          Drag-and-Drop Building, Custom Backgrounds & Posters
+        </h2>
+        <p style={{ color: '#7A8B99', maxWidth: 640, margin: '0 auto', fontSize: 16, lineHeight: 1.6 }}>
+          Design stunning, on-brand forms in seconds with our fluid drag-and-drop canvas, customizable backdrop styling, and visual header posters.
+        </p>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: 24, marginBottom: 40 }}>
+        {/* Feature 1: Drag and drop */}
+        <div className="card" style={{ padding: 32, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', background: '#FFFFFF', border: '1px solid rgba(122, 139, 153, 0.22)' }}>
+          <div>
+            <div
+              style={{
+                width: 52,
+                height: 52,
+                borderRadius: 14,
+                background: '#F2EFE9',
+                border: '1px solid rgba(122, 139, 153, 0.25)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#2A2E33',
+                marginBottom: 20,
+              }}
+            >
+              <MousePointerClick size={26} />
+            </div>
+            <h3 style={{ fontSize: 20, fontWeight: 700, color: '#2A2E33', marginBottom: 10 }}>
+              Drag & Drop Questions
+            </h3>
+            <p style={{ color: '#7A8B99', fontSize: 14, lineHeight: 1.7, marginBottom: 20 }}>
+              Powered by <strong style={{ color: '#2A2E33' }}>@dnd-kit</strong>. Seamlessly drag question blocks onto the canvas, grab handles to reorder questions in real-time, and duplicate or delete with a single click.
+            </p>
           </div>
-          <h2 style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)', fontWeight: 800, color: '#2A2E33', marginBottom: 14, letterSpacing: '-0.02em' }}>
-            Drag-and-Drop Building, Custom Themes & Posters
-          </h2>
-          <p style={{ color: '#7A8B99', maxWidth: 640, margin: '0 auto', fontSize: 16, lineHeight: 1.6 }}>
-            Design stunning, on-brand forms in seconds with our fluid drag-and-drop canvas, customizable backdrop styling, and visual header posters.
+          <div style={{ background: '#F2EFE9', borderRadius: 10, padding: 14, border: '1px solid rgba(122, 139, 153, 0.2)', fontSize: 12, color: '#2A2E33', fontWeight: 500 }}>
+            ✓ Short text, paragraphs, ratings, multiple choices, dates & files
+          </div>
+        </div>
+
+        {/* Feature 2: Background Customizer */}
+        <div className="card" style={{ padding: 32, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', background: '#FFFFFF', border: '1px solid rgba(122, 139, 153, 0.22)' }}>
+          <div>
+            <div
+              style={{
+                width: 52,
+                height: 52,
+                borderRadius: 14,
+                background: '#F2EFE9',
+                border: '1px solid rgba(122, 139, 153, 0.25)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#2A2E33',
+                marginBottom: 20,
+              }}
+            >
+              <Palette size={26} />
+            </div>
+            <h3 style={{ fontSize: 20, fontWeight: 700, color: '#2A2E33', marginBottom: 10 }}>
+              Custom Backgrounds & Gradients
+            </h3>
+            <p style={{ color: '#7A8B99', fontSize: 14, lineHeight: 1.7, marginBottom: 20 }}>
+              Elevate your forms beyond plain white pages. Switch between curated color themes, smooth CSS gradients, architectural patterns, or upload custom wallpaper.
+            </p>
+          </div>
+          <div style={{ background: '#F2EFE9', borderRadius: 10, padding: 14, border: '1px solid rgba(122, 139, 153, 0.2)', fontSize: 12, color: '#2A2E33', fontWeight: 500 }}>
+            ✓ Solid colors, multi-stop gradients, mesh patterns & custom images
+          </div>
+        </div>
+
+        {/* Feature 3: Posters & Header Banners */}
+        <div className="card" style={{ padding: 32, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', background: '#FFFFFF', border: '1px solid rgba(122, 139, 153, 0.22)' }}>
+          <div>
+            <div
+              style={{
+                width: 52,
+                height: 52,
+                borderRadius: 14,
+                background: '#F2EFE9',
+                border: '1px solid rgba(122, 139, 153, 0.25)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#2A2E33',
+                marginBottom: 20,
+              }}
+            >
+              <Eye size={26} />
+            </div>
+            <h3 style={{ fontSize: 20, fontWeight: 700, color: '#2A2E33', marginBottom: 10 }}>
+              Add Posters & Cover Banners
+            </h3>
+            <p style={{ color: '#7A8B99', fontSize: 14, lineHeight: 1.7, marginBottom: 20 }}>
+              Upload your event, hackathon, or organization poster directly into the form header. Choose custom banner heights, tint overlays, and display custom event titles and subtitles on top.
+            </p>
+          </div>
+          <div style={{ background: '#F2EFE9', borderRadius: 10, padding: 14, border: '1px solid rgba(122, 139, 153, 0.2)', fontSize: 12, color: '#2A2E33', fontWeight: 500 }}>
+            ✓ Direct image file upload, curated presets, overlay dimming & titles
+          </div>
+        </div>
+      </div>
+
+      {/* Direct CTA Banner */}
+      <div
+        style={{
+          background: '#2A2E33',
+          borderRadius: 16,
+          padding: '40px 32px',
+          color: '#FCFBF7',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: 24,
+          boxShadow: '0 12px 32px rgba(42, 46, 51, 0.16)',
+        }}
+      >
+        <div>
+          <h3 style={{ fontSize: 22, fontWeight: 800, margin: '0 0 8px 0', color: '#FCFBF7' }}>
+            Ready to design your customized form?
+          </h3>
+          <p style={{ margin: 0, color: '#D5DCE2', fontSize: 15, maxWidth: 520 }}>
+            Open the visual drag & drop builder immediately. Add questions, pick your background, and upload a poster in real time.
           </p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: 24, marginBottom: 40 }}>
-          {/* Feature 1: Drag and drop */}
-          <div className="card" style={{ padding: 32, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', background: '#FCFBF7', border: '1px solid rgba(122, 139, 153, 0.25)' }}>
-            <div>
-              <div
-                style={{
-                  width: 50,
-                  height: 50,
-                  borderRadius: 12,
-                  background: '#F2EFE9',
-                  border: '1px solid rgba(122, 139, 153, 0.3)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#2A2E33',
-                  marginBottom: 20,
-                }}
-              >
-                <MousePointerClick size={24} />
-              </div>
-              <h3 style={{ fontSize: 20, fontWeight: 700, color: '#2A2E33', marginBottom: 10 }}>
-                Drag & Drop Questions
-              </h3>
-              <p style={{ color: '#7A8B99', fontSize: 14, lineHeight: 1.7, marginBottom: 20 }}>
-                Powered by <strong style={{ color: '#2A2E33' }}>@dnd-kit</strong>. Seamlessly drag question blocks onto the canvas, grab handles to reorder questions in real-time, and duplicate or delete with a single click.
-              </p>
-            </div>
-            <div style={{ background: '#F2EFE9', borderRadius: 8, padding: 12, border: '1px solid rgba(122, 139, 153, 0.2)', fontSize: 12, color: '#2A2E33', fontWeight: 600 }}>
-              ✓ Short text, paragraphs, ratings, multiple choices, dates & files
-            </div>
-          </div>
-
-          {/* Feature 2: Background Customizer */}
-          <div className="card" style={{ padding: 32, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', background: '#FCFBF7', border: '1px solid rgba(122, 139, 153, 0.25)' }}>
-            <div>
-              <div
-                style={{
-                  width: 50,
-                  height: 50,
-                  borderRadius: 12,
-                  background: '#F2EFE9',
-                  border: '1px solid rgba(122, 139, 153, 0.3)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#2A2E33',
-                  marginBottom: 20,
-                }}
-              >
-                <Palette size={24} />
-              </div>
-              <h3 style={{ fontSize: 20, fontWeight: 700, color: '#2A2E33', marginBottom: 10 }}>
-                Custom Backgrounds & Themes
-              </h3>
-              <p style={{ color: '#7A8B99', fontSize: 14, lineHeight: 1.7, marginBottom: 20 }}>
-                Elevate your forms beyond plain templates. Switch between curated color themes, smooth CSS gradients, subtle dot/grid architectural patterns, or upload custom wallpapers.
-              </p>
-            </div>
-            <div style={{ background: '#F2EFE9', borderRadius: 8, padding: 12, border: '1px solid rgba(122, 139, 153, 0.2)', fontSize: 12, color: '#2A2E33', fontWeight: 600 }}>
-              ✓ Solid colors, multi-stop gradients, mesh patterns & custom images
-            </div>
-          </div>
-
-          {/* Feature 3: Posters & Header Banners */}
-          <div className="card" style={{ padding: 32, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', background: '#FCFBF7', border: '1px solid rgba(122, 139, 153, 0.25)' }}>
-            <div>
-              <div
-                style={{
-                  width: 50,
-                  height: 50,
-                  borderRadius: 12,
-                  background: '#F2EFE9',
-                  border: '1px solid rgba(122, 139, 153, 0.3)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#2A2E33',
-                  marginBottom: 20,
-                }}
-              >
-                <Eye size={24} />
-              </div>
-              <h3 style={{ fontSize: 20, fontWeight: 700, color: '#2A2E33', marginBottom: 10 }}>
-                Add Posters & Cover Banners
-              </h3>
-              <p style={{ color: '#7A8B99', fontSize: 14, lineHeight: 1.7, marginBottom: 20 }}>
-                Upload your event, hackathon, or organization poster directly into the form header. Choose custom banner heights, tint overlays, and display custom event titles and subtitles on top.
-              </p>
-            </div>
-            <div style={{ background: '#F2EFE9', borderRadius: 8, padding: 12, border: '1px solid rgba(122, 139, 153, 0.2)', fontSize: 12, color: '#2A2E33', fontWeight: 600 }}>
-              ✓ Direct image file upload, curated presets, overlay dimming & titles
-            </div>
-          </div>
-        </div>
-
-        {/* Direct CTA Banner */}
-        <div
+        <Link
+          href="/builder"
+          className="btn btn-secondary btn-lg"
           style={{
-            background: '#2A2E33',
-            borderRadius: 16,
-            padding: '36px 32px',
-            color: '#FCFBF7',
+            fontSize: 15,
+            fontWeight: 700,
+            borderRadius: 10,
+            background: '#FCFBF7',
+            color: '#2A2E33',
+            border: 'none',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            gap: 24,
-            boxShadow: '0 10px 30px rgba(42, 46, 51, 0.15)',
+            gap: 8,
           }}
         >
-          <div>
-            <h3 style={{ fontSize: 22, fontWeight: 800, margin: '0 0 8px 0', color: '#FCFBF7' }}>
-              Ready to design your customized form?
-            </h3>
-            <p style={{ margin: 0, color: '#F2EFE9', fontSize: 15, maxWidth: 520, opacity: 0.9 }}>
-              Open the visual drag & drop builder immediately. Add questions, pick your background, and upload a poster in real time.
-            </p>
-          </div>
-
-          <Link
-            href="/builder"
-            className="btn btn-secondary btn-lg"
-            style={{
-              fontSize: 15,
-              fontWeight: 700,
-              borderRadius: 10,
-              background: '#FCFBF7',
-              color: '#2A2E33',
-              border: 'none',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-            }}
-          >
-            ⚡ Open Form Builder Now <ArrowRight size={18} />
-          </Link>
-        </div>
+          ⚡ Open Form Builder Now <ArrowRight size={18} />
+        </Link>
       </div>
     </section>
   );
@@ -610,8 +541,8 @@ const features = [
 function Features() {
   return (
     <section id="features" style={{ padding: '80px 24px', maxWidth: 1200, margin: '0 auto', position: 'relative', zIndex: 1 }}>
-      <div style={{ textAlign: 'center', marginBottom: 54 }}>
-        <h2 style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)', fontWeight: 800, color: '#2A2E33', marginBottom: 12, letterSpacing: '-0.02em' }}>
+      <div style={{ textAlign: 'center', marginBottom: 60 }}>
+        <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', fontWeight: 800, color: '#2A2E33', marginBottom: 12, letterSpacing: '-0.02em' }}>
           Everything you need to build powerful forms
         </h2>
         <p style={{ color: '#7A8B99', maxWidth: 600, margin: '0 auto', fontSize: 16 }}>
@@ -628,7 +559,7 @@ function Features() {
       >
         {features.map((f, i) => (
           <Scroll3DCard key={i}>
-            <div className="card" style={{ padding: 32, background: '#FCFBF7', border: '1px solid rgba(122, 139, 153, 0.22)' }}>
+            <div className="card" style={{ padding: 32, background: '#FFFFFF', border: '1px solid rgba(122, 139, 153, 0.22)' }}>
               <div
                 style={{
                   width: 48,
@@ -666,10 +597,8 @@ const steps = [
 function HowItWorks() {
   return (
     <section id="how-it-works" style={{ padding: '80px 24px', maxWidth: 900, margin: '0 auto', position: 'relative', zIndex: 1 }}>
-      <div style={{ textAlign: 'center', marginBottom: 54 }}>
-        <h2 style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)', fontWeight: 800, color: '#2A2E33', marginBottom: 12, letterSpacing: '-0.02em' }}>
-          How It Works
-        </h2>
+      <div style={{ textAlign: 'center', marginBottom: 60 }}>
+        <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', fontWeight: 800, color: '#2A2E33', marginBottom: 12, letterSpacing: '-0.02em' }}>How It Works</h2>
         <p style={{ color: '#7A8B99', maxWidth: 500, margin: '0 auto', fontSize: 16 }}>Four simple steps from idea to insights.</p>
       </div>
 
@@ -685,7 +614,7 @@ function HowItWorks() {
                 paddingBottom: i < steps.length - 1 ? 48 : 0,
               }}
             >
-              {/* Connecting Line */}
+              {/* Line */}
               {i < steps.length - 1 && (
                 <div
                   style={{
@@ -694,7 +623,7 @@ function HowItWorks() {
                     top: 48,
                     bottom: 0,
                     width: 2,
-                    background: 'rgba(122, 139, 153, 0.35)',
+                    background: '#F2EFE9',
                   }}
                 />
               )}
@@ -712,7 +641,7 @@ function HowItWorks() {
                   flexShrink: 0,
                   position: 'relative',
                   zIndex: 1,
-                  boxShadow: '0 4px 12px rgba(42, 46, 51, 0.15)',
+                  boxShadow: '0 2px 8px rgba(42, 46, 51, 0.2)',
                 }}
               >
                 <s.icon size={22} />
@@ -738,7 +667,7 @@ function LogicDemo() {
   return (
     <section style={{ padding: '80px 24px', maxWidth: 900, margin: '0 auto', position: 'relative', zIndex: 1 }}>
       <div style={{ textAlign: 'center', marginBottom: 48 }}>
-        <h2 style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)', fontWeight: 800, color: '#2A2E33', marginBottom: 12, letterSpacing: '-0.02em' }}>
+        <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', fontWeight: 800, color: '#2A2E33', marginBottom: 12, letterSpacing: '-0.02em' }}>
           Conditional Logic That Actually Works
         </h2>
         <p style={{ color: '#7A8B99', maxWidth: 500, margin: '0 auto', fontSize: 16 }}>
@@ -747,40 +676,32 @@ function LogicDemo() {
       </div>
 
       <Scroll3DCard>
-        <div className="card" style={{ padding: 36, maxWidth: 640, margin: '0 auto', background: '#FCFBF7', border: '1.5px solid rgba(122, 139, 153, 0.25)' }}>
+        <div className="card" style={{ padding: 32, maxWidth: 600, margin: '0 auto', background: '#FFFFFF', border: '1px solid rgba(122, 139, 153, 0.22)' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <span style={{ background: '#2A2E33', color: '#FCFBF7', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 700 }}>
-                IF
-              </span>
-              <div style={{ flex: 1, padding: '9px 14px', border: '1px solid rgba(122, 139, 153, 0.25)', borderRadius: 8, fontSize: 14, color: '#2A2E33', background: '#F2EFE9', fontWeight: 500 }}>
+              <span style={{ background: '#2A2E33', color: '#FCFBF7', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 700 }}>IF</span>
+              <div style={{ flex: 1, padding: '8px 14px', border: '1px solid #D8D2C7', borderRadius: 8, fontSize: 14, color: '#2A2E33', background: '#FCFBF7' }}>
                 &quot;Are you a student?&quot;
               </div>
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <span style={{ background: '#F2EFE9', color: '#2A2E33', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 700, border: '1px solid rgba(122, 139, 153, 0.35)' }}>
-                EQUALS
-              </span>
-              <div style={{ flex: 1, padding: '9px 14px', border: '1px solid rgba(122, 139, 153, 0.25)', borderRadius: 8, fontSize: 14, color: '#2A2E33', background: '#F2EFE9', fontWeight: 500 }}>
+              <span style={{ background: '#F2EFE9', color: '#7A8B99', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 700, border: '1px solid rgba(122, 139, 153, 0.3)' }}>EQUALS</span>
+              <div style={{ flex: 1, padding: '8px 14px', border: '1px solid #D8D2C7', borderRadius: 8, fontSize: 14, color: '#2A2E33', background: '#FCFBF7' }}>
                 &quot;Yes&quot;
               </div>
             </div>
 
             <div style={{ borderTop: '1px dashed rgba(122, 139, 153, 0.3)', paddingTop: 16 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-                <span style={{ background: '#2A2E33', color: '#FCFBF7', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 700 }}>
-                  THEN
-                </span>
-                <span style={{ fontSize: 14, color: '#2A2E33', fontWeight: 500 }}>Show &quot;College Name&quot;</span>
-                <CheckCircle2 size={16} style={{ color: '#2A2E33', marginLeft: 'auto' }} />
+                <span style={{ background: '#F2EFE9', color: '#2A2E33', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 700 }}>THEN</span>
+                <span style={{ fontSize: 14, color: '#2A2E33' }}>Show &quot;College Name&quot;</span>
+                <CheckCircle2 size={16} style={{ color: '#7A8B99' }} />
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <span style={{ background: '#2A2E33', color: '#FCFBF7', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 700 }}>
-                  AND
-                </span>
-                <span style={{ fontSize: 14, color: '#2A2E33', fontWeight: 500 }}>Show &quot;Year of Study&quot;</span>
-                <CheckCircle2 size={16} style={{ color: '#2A2E33', marginLeft: 'auto' }} />
+                <span style={{ background: '#F2EFE9', color: '#2A2E33', borderRadius: 6, padding: '4px 10px', fontSize: 12, fontWeight: 700 }}>AND</span>
+                <span style={{ fontSize: 14, color: '#2A2E33' }}>Show &quot;Year of Study&quot;</span>
+                <CheckCircle2 size={16} style={{ color: '#7A8B99' }} />
               </div>
             </div>
           </div>
@@ -795,7 +716,7 @@ function AnalyticsDemo() {
   return (
     <section style={{ padding: '80px 24px', maxWidth: 1000, margin: '0 auto', position: 'relative', zIndex: 1 }}>
       <div style={{ textAlign: 'center', marginBottom: 48 }}>
-        <h2 style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)', fontWeight: 800, color: '#2A2E33', marginBottom: 12, letterSpacing: '-0.02em' }}>
+        <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', fontWeight: 800, color: '#2A2E33', marginBottom: 12, letterSpacing: '-0.02em' }}>
           Real-Time Analytics & Insights
         </h2>
         <p style={{ color: '#7A8B99', maxWidth: 500, margin: '0 auto', fontSize: 16 }}>
@@ -803,7 +724,7 @@ function AnalyticsDemo() {
         </p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 20, maxWidth: 840, margin: '0 auto' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 20, maxWidth: 800, margin: '0 auto' }}>
         {[
           { label: 'Total Responses', value: '1,247', change: '+12%' },
           { label: 'Completion Rate', value: '89%', change: '+3%' },
@@ -811,12 +732,10 @@ function AnalyticsDemo() {
           { label: 'Today', value: '34', change: '+8' },
         ].map((s, i) => (
           <Scroll3DCard key={i}>
-            <div className="card" style={{ padding: 24, textAlign: 'center', background: '#FCFBF7', border: '1.5px solid rgba(122, 139, 153, 0.22)' }}>
+            <div className="card" style={{ padding: 24, textAlign: 'center', background: '#FFFFFF', border: '1px solid rgba(122, 139, 153, 0.22)' }}>
               <div style={{ fontSize: 28, fontWeight: 800, color: '#2A2E33', marginBottom: 4 }}>{s.value}</div>
-              <div style={{ fontSize: 13, color: '#7A8B99', marginBottom: 6, fontWeight: 500 }}>{s.label}</div>
-              <span style={{ fontSize: 12, color: '#2A2E33', fontWeight: 700, background: '#F2EFE9', padding: '2px 8px', borderRadius: 6 }}>
-                {s.change}
-              </span>
+              <div style={{ fontSize: 13, color: '#7A8B99', marginBottom: 6 }}>{s.label}</div>
+              <span style={{ fontSize: 12, color: '#2A2E33', background: '#F2EFE9', padding: '3px 8px', borderRadius: 6, fontWeight: 700 }}>{s.change}</span>
             </div>
           </Scroll3DCard>
         ))}
@@ -829,7 +748,7 @@ function AnalyticsDemo() {
 function Integrations() {
   return (
     <section id="integrations" style={{ padding: '80px 24px', maxWidth: 900, margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 1 }}>
-      <h2 style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.5rem)', fontWeight: 800, color: '#2A2E33', marginBottom: 12, letterSpacing: '-0.02em' }}>
+      <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', fontWeight: 800, color: '#2A2E33', marginBottom: 12, letterSpacing: '-0.02em' }}>
         Connect to Your Favorite Tools
       </h2>
       <p style={{ color: '#7A8B99', maxWidth: 500, margin: '0 auto 40px', fontSize: 16 }}>
@@ -837,11 +756,11 @@ function Integrations() {
       </p>
 
       <Scroll3DCard>
-        <div className="card" style={{ padding: 32, maxWidth: 500, margin: '0 auto', textAlign: 'left', background: '#FCFBF7', border: '1.5px solid rgba(122, 139, 153, 0.25)' }}>
+        <div className="card" style={{ padding: 32, maxWidth: 500, margin: '0 auto', textAlign: 'left', background: '#FFFFFF', border: '1px solid rgba(122, 139, 153, 0.22)' }}>
           <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, color: '#2A2E33' }}>Webhook Configuration</div>
-          <div style={{ marginBottom: 14 }}>
-            <div style={{ fontSize: 12, color: '#7A8B99', marginBottom: 4, fontWeight: 600 }}>Webhook URL</div>
-            <div style={{ padding: '9px 14px', border: '1px solid rgba(122, 139, 153, 0.25)', borderRadius: 8, fontSize: 13, color: '#7A8B99', background: '#F2EFE9' }}>
+          <div style={{ marginBottom: 12 }}>
+            <div style={{ fontSize: 12, color: '#7A8B99', marginBottom: 4 }}>Webhook URL</div>
+            <div style={{ padding: '8px 14px', border: '1px solid #D8D2C7', borderRadius: 8, fontSize: 13, color: '#2A2E33', background: '#FCFBF7' }}>
               https://hooks.slack.com/services/...
             </div>
           </div>
@@ -870,19 +789,18 @@ function CTA() {
         <div
           className="card"
           style={{
-            maxWidth: 720,
+            maxWidth: 700,
             margin: '0 auto',
-            padding: '64px 40px',
+            padding: '60px 40px',
             background: '#2A2E33',
-            border: 'none',
-            boxShadow: '0 20px 60px rgba(42, 46, 51, 0.18)',
-            color: '#FCFBF7',
+            border: '1px solid #2A2E33',
+            boxShadow: '0 20px 50px rgba(42, 46, 51, 0.14)',
           }}
         >
-          <h2 style={{ fontSize: 'clamp(1.75rem, 3.5vw, 2.25rem)', fontWeight: 800, color: '#FCFBF7', marginBottom: 14, letterSpacing: '-0.02em' }}>
+          <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.2rem)', fontWeight: 800, color: '#FCFBF7', marginBottom: 12, letterSpacing: '-0.02em' }}>
             Ready to build smarter forms?
           </h2>
-          <p style={{ color: '#F2EFE9', marginBottom: 32, fontSize: 16, opacity: 0.9 }}>
+          <p style={{ color: '#D5DCE2', marginBottom: 32, fontSize: 16 }}>
             Start creating in minutes. No credit card required.
           </p>
           <Link
@@ -894,7 +812,7 @@ function CTA() {
               background: '#FCFBF7',
               color: '#2A2E33',
               fontWeight: 700,
-              padding: '14px 28px',
+              border: 'none',
             }}
           >
             Get Started for Free <ArrowRight size={18} />
@@ -911,9 +829,9 @@ function Footer() {
     <footer
       style={{
         borderTop: '1px solid rgba(122, 139, 153, 0.2)',
+        background: '#F2EFE9',
         padding: '40px 24px',
         textAlign: 'center',
-        background: '#FCFBF7',
         position: 'relative',
         zIndex: 1,
       }}
@@ -937,7 +855,7 @@ function Footer() {
         </div>
         <span style={{ fontWeight: 700, fontSize: 16, color: '#2A2E33' }}>FormFlow</span>
       </div>
-      <p style={{ color: '#7A8B99', fontSize: 13, margin: 0 }}>
+      <p style={{ color: '#7A8B99', fontSize: 13, margin: 0, fontWeight: 500 }}>
         © 2026 FormFlow. Built with ❤️ by team trojen
       </p>
     </footer>
@@ -948,7 +866,6 @@ function Footer() {
 export default function LandingPage() {
   return (
     <div style={{ background: '#FCFBF7', minHeight: '100vh', color: '#2A2E33' }}>
-      {/* Background animation removed as requested */}
       <Navbar />
       <main>
         <Hero />
