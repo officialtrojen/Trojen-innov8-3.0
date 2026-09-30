@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/components/AuthProvider';
 import { DEFAULT_THEME, DEFAULT_SETTINGS, FormSchema } from '@/lib/types';
 import { generateSlug } from '@/lib/utils';
+import { PlusCircle } from 'lucide-react';
 
 export default function NewFormPage() {
   const router = useRouter();
@@ -54,39 +55,117 @@ export default function NewFormPage() {
   };
 
   return (
-    <div style={{ maxWidth: 560, margin: '0 auto', paddingTop: 40 }}>
-      <h1 style={{ fontSize: 24, fontWeight: 700, color: '#263B3B', marginBottom: 4 }}>Create a New Form</h1>
-      <p style={{ color: '#52796F', fontSize: 14, marginBottom: 32 }}>Give your form a name and start building.</p>
+    <div style={{ maxWidth: 560, margin: '0 auto', paddingTop: 20 }}>
+      <h1
+        style={{
+          fontSize: 26,
+          fontWeight: 800,
+          color: '#FFFFFF',
+          marginBottom: 6,
+          letterSpacing: '-0.5px',
+        }}
+      >
+        Create a New Form
+      </h1>
+      <p style={{ color: '#94A3B8', fontSize: 14, marginBottom: 32 }}>
+        Give your form a name and launch the drag-and-drop workflow builder.
+      </p>
 
       <form onSubmit={handleCreate}>
-        <div className="card" style={{ padding: 32 }}>
-          <div style={{ marginBottom: 20 }}>
-            <label className="label" htmlFor="form-title">Form Title</label>
+        <div
+          className="card"
+          style={{
+            padding: 36,
+            background: 'rgba(15, 23, 42, 0.75)',
+            backdropFilter: 'blur(16px)',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+            borderRadius: 20,
+            boxShadow: '0 12px 36px rgba(0, 0, 0, 0.4)',
+          }}
+        >
+          <div style={{ marginBottom: 22 }}>
+            <label
+              className="label"
+              htmlFor="form-title"
+              style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#E2E8F0', marginBottom: 8 }}
+            >
+              Form Title
+            </label>
             <input
               id="form-title"
-              className="input"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g. Hackathon Registration"
+              placeholder="e.g. Hackathon Registration Form"
               required
               autoFocus
+              style={{
+                width: '100%',
+                padding: '12px 14px',
+                borderRadius: 12,
+                border: '1.5px solid rgba(255, 255, 255, 0.15)',
+                background: 'rgba(10, 15, 30, 0.7)',
+                color: '#FFFFFF',
+                fontSize: 14,
+                outline: 'none',
+              }}
             />
           </div>
 
-          <div style={{ marginBottom: 24 }}>
-            <label className="label" htmlFor="form-desc">Description (optional)</label>
+          <div style={{ marginBottom: 28 }}>
+            <label
+              className="label"
+              htmlFor="form-desc"
+              style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#E2E8F0', marginBottom: 8 }}
+            >
+              Description <span style={{ color: '#94A3B8', fontWeight: 400 }}>(optional)</span>
+            </label>
             <textarea
               id="form-desc"
-              className="textarea"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Briefly describe this form..."
+              placeholder="Briefly describe what this form is for..."
               rows={3}
+              style={{
+                width: '100%',
+                padding: '12px 14px',
+                borderRadius: 12,
+                border: '1.5px solid rgba(255, 255, 255, 0.15)',
+                background: 'rgba(10, 15, 30, 0.7)',
+                color: '#FFFFFF',
+                fontSize: 14,
+                outline: 'none',
+                resize: 'vertical',
+              }}
             />
           </div>
 
-          <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={creating || !title.trim()}>
-            {creating ? <span className="spinner" /> : 'Create Form & Open Builder'}
+          <button
+            type="submit"
+            className="btn btn-primary"
+            style={{
+              width: '100%',
+              padding: '13px',
+              borderRadius: 12,
+              background: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)',
+              color: '#FFFFFF',
+              fontSize: 14.5,
+              fontWeight: 700,
+              boxShadow: '0 4px 18px rgba(99, 102, 241, 0.45)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+            }}
+            disabled={creating || !title.trim()}
+          >
+            {creating ? (
+              <span className="spinner" />
+            ) : (
+              <>
+                <PlusCircle size={18} />
+                <span>Create Form & Open Builder</span>
+              </>
+            )}
           </button>
         </div>
       </form>

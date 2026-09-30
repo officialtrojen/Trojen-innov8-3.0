@@ -124,8 +124,8 @@ export default function ResponsesPage() {
     <div>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24, flexWrap: 'wrap', gap: 12 }}>
         <div>
-          <h1 style={{ fontSize: 24, fontWeight: 700, color: '#263B3B', marginBottom: 4 }}>Responses</h1>
-          <p style={{ color: '#52796F', fontSize: 14 }}>{form.title} — {responses.length} response{responses.length !== 1 ? 's' : ''}</p>
+          <h1 style={{ fontSize: 26, fontWeight: 800, color: '#FFFFFF', marginBottom: 4 }}>Responses</h1>
+          <p style={{ color: '#94A3B8', fontSize: 14 }}>{form.title} — {responses.length} response{responses.length !== 1 ? 's' : ''}</p>
         </div>
         <div
           style={{
@@ -204,7 +204,7 @@ export default function ResponsesPage() {
 
       {/* Search */}
       <div style={{ marginBottom: 20, position: 'relative', maxWidth: 400 }}>
-        <Search size={16} style={{ position: 'absolute', left: 12, top: 12, color: '#B8CECF' }} />
+        <Search size={16} style={{ position: 'absolute', left: 12, top: 12, color: '#94A3B8' }} />
         <input
           className="input"
           placeholder="Search responses..."
@@ -216,7 +216,7 @@ export default function ResponsesPage() {
 
       {filteredResponses.length === 0 ? (
         <div className="card" style={{ padding: 48, textAlign: 'center' }}>
-          <p style={{ color: '#52796F', fontSize: 14 }}>
+          <p style={{ color: '#94A3B8', fontSize: 14 }}>
             {responses.length === 0 ? 'No responses yet. Share your form to start collecting.' : 'No matching responses.'}
           </p>
         </div>
@@ -225,39 +225,39 @@ export default function ResponsesPage() {
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
               <thead>
-                <tr style={{ borderBottom: '1px solid rgba(184,206,207,0.3)' }}>
-                  <th style={{ padding: '10px 14px', textAlign: 'left', color: '#52796F', fontWeight: 500, fontSize: 12 }}>#</th>
-                  <th style={{ padding: '10px 14px', textAlign: 'left', color: '#52796F', fontWeight: 500, fontSize: 12 }}>Submitted</th>
+                <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                  <th style={{ padding: '10px 14px', textAlign: 'left', color: '#94A3B8', fontWeight: 600, fontSize: 12 }}>#</th>
+                  <th style={{ padding: '10px 14px', textAlign: 'left', color: '#94A3B8', fontWeight: 600, fontSize: 12 }}>Submitted</th>
                   {form.schema.fields.slice(0, 4).map((f) => (
-                    <th key={f.id} style={{ padding: '10px 14px', textAlign: 'left', color: '#52796F', fontWeight: 500, fontSize: 12, maxWidth: 200 }}>
+                    <th key={f.id} style={{ padding: '10px 14px', textAlign: 'left', color: '#94A3B8', fontWeight: 600, fontSize: 12, maxWidth: 200 }}>
                       {f.label}
                     </th>
                   ))}
-                  <th style={{ padding: '10px 14px', textAlign: 'right', color: '#52796F', fontWeight: 500, fontSize: 12 }}>Actions</th>
+                  <th style={{ padding: '10px 14px', textAlign: 'right', color: '#94A3B8', fontWeight: 600, fontSize: 12 }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredResponses.map((resp, i) => (
-                  <tr key={resp.id} style={{ borderBottom: '1px solid rgba(184,206,207,0.15)' }}>
-                    <td style={{ padding: '10px 14px', color: '#B8CECF' }}>{responses.length - i}</td>
-                    <td style={{ padding: '10px 14px', color: '#52796F', whiteSpace: 'nowrap' }}>{formatDateTime(resp.submitted_at)}</td>
+                  <tr key={resp.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                    <td style={{ padding: '10px 14px', color: '#94A3B8' }}>{responses.length - i}</td>
+                    <td style={{ padding: '10px 14px', color: '#94A3B8', whiteSpace: 'nowrap' }}>{formatDateTime(resp.submitted_at)}</td>
                     {form.schema.fields.slice(0, 4).map((f) => {
                       const val = resp.answers[f.id];
                       const display = val === null || val === undefined ? '—'
                         : Array.isArray(val) ? val.join(', ')
                         : String(val);
                       return (
-                        <td key={f.id} style={{ padding: '10px 14px', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <td key={f.id} style={{ padding: '10px 14px', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: '#FFFFFF' }}>
                           {display}
                         </td>
                       );
                     })}
                     <td style={{ padding: '10px 14px' }}>
                       <div style={{ display: 'flex', gap: 4, justifyContent: 'flex-end' }}>
-                        <button onClick={() => setViewingResponse(resp)} className="btn btn-ghost btn-sm" style={{ padding: 4 }}>
+                        <button onClick={() => setViewingResponse(resp)} className="btn btn-ghost btn-sm" style={{ padding: 4, color: '#94A3B8' }}>
                           <Eye size={14} />
                         </button>
-                        <button onClick={() => handleDelete(resp.id)} className="btn btn-ghost btn-sm" style={{ padding: 4, color: '#e74c3c' }}>
+                        <button onClick={() => handleDelete(resp.id)} className="btn btn-ghost btn-sm" style={{ padding: 4, color: '#EF4444' }}>
                           <Trash2 size={14} />
                         </button>
                       </div>
@@ -273,23 +273,23 @@ export default function ResponsesPage() {
       {/* Response detail modal */}
       {viewingResponse && (
         <div className="modal-overlay" onClick={() => setViewingResponse(null)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ background: '#0F172A', border: '1px solid rgba(255,255,255,0.1)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-              <h2 style={{ fontSize: 18, fontWeight: 600, color: '#263B3B' }}>Response Details</h2>
-              <button onClick={() => setViewingResponse(null)} className="btn btn-ghost btn-sm" style={{ padding: 4 }}>
+              <h2 style={{ fontSize: 18, fontWeight: 700, color: '#FFFFFF' }}>Response Details</h2>
+              <button onClick={() => setViewingResponse(null)} className="btn btn-ghost btn-sm" style={{ padding: 4, color: '#FFFFFF' }}>
                 <X size={18} />
               </button>
             </div>
-            <div style={{ fontSize: 12, color: '#52796F', marginBottom: 20 }}>
+            <div style={{ fontSize: 12, color: '#94A3B8', marginBottom: 20 }}>
               Submitted: {formatDateTime(viewingResponse.submitted_at)}
             </div>
             {form.schema.fields.map((field) => {
               const val = viewingResponse.answers[field.id];
               return (
-                <div key={field.id} style={{ marginBottom: 16, padding: '12px 14px', borderRadius: 8, background: 'var(--accent)' }}>
-                  <div style={{ fontSize: 12, color: '#52796F', fontWeight: 500, marginBottom: 4 }}>{field.label}</div>
-                  <div style={{ fontSize: 14, color: '#263B3B' }}>
-                    {val === null || val === undefined ? <span style={{ color: '#B8CECF' }}>Not answered</span>
+                <div key={field.id} style={{ marginBottom: 16, padding: '12px 14px', borderRadius: 10, background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                  <div style={{ fontSize: 12, color: '#94A3B8', fontWeight: 600, marginBottom: 4 }}>{field.label}</div>
+                  <div style={{ fontSize: 14, color: '#FFFFFF' }}>
+                    {val === null || val === undefined ? <span style={{ color: '#64748B' }}>Not answered</span>
                       : Array.isArray(val) ? val.join(', ')
                       : String(val)}
                   </div>

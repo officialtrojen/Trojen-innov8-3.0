@@ -241,7 +241,7 @@ body {
   display: block;
   font-size: 13px;
   font-weight: 600;
-  color: #2A2E33;
+color: #E2E8F0;
   margin-bottom: 6px;
 }
 
@@ -395,3 +395,4 @@ body {
     text-wrap: balance;
   }
 }
+
