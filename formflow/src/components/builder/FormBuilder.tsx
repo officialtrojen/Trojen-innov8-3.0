@@ -28,8 +28,6 @@ import PropertiesPanel from '@/components/builder/PropertiesPanel';
 import LogicPanel from '@/components/builder/LogicPanel';
 import ThemePanel from '@/components/builder/ThemePanel';
 import BuilderToolbar from '@/components/builder/BuilderToolbar';
-import FormDeleteTrashBin from '@/components/builder/FormDeleteTrashBin';
-import FormCrunchAnimationOverlay from '@/components/builder/FormCrunchAnimationOverlay';
 import AiFormAssistant from '@/components/builder/AiFormAssistant';
 import { getBackgroundStyle } from '@/lib/theme-presets';
 

@@ -39,6 +39,7 @@ import FormDeleteTrashBin from '@/components/builder/FormDeleteTrashBin';
 import FormCrunchAnimationOverlay from '@/components/builder/FormCrunchAnimationOverlay';
 import FormCrumpleExperience from '@/components/builder/FormCrumpleExperience';
 import AiFormAssistant from '@/components/builder/AiFormAssistant';
+import ShareModal from '@/components/builder/ShareModal';
 import { getBackgroundStyle, POSTER_PRESETS } from '@/lib/theme-presets';
 import { createClient } from '@/lib/supabase/client';
 import * as XLSX from 'xlsx';
@@ -123,6 +124,17 @@ export default function StandaloneBuilderPage() {
   const [isOverTrash, setIsOverTrash] = useState(false);
   const [isCrumpling, setIsCrumpling] = useState(false);
   const [isAiOpen, setIsAiOpen] = useState(false);
+  const [publishedFormInfo, setPublishedFormInfo] = useState<{
+    isOpen: boolean;
+    formId: string;
+    publicSlug: string;
+    title: string;
+  }>({
+    isOpen: false,
+    formId: '',
+    publicSlug: '',
+    title: '',
+  });
   const trashBinRef = useRef<HTMLDivElement | null>(null);
 
   // Global pointer tracking when dragging armed form

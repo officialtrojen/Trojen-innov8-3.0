@@ -156,39 +156,30 @@ export default function BuilderToolbar({
             {saving ? <span className="spinner" /> : <Save size={15} />}
             Save
           </button>
-
-      {/* Right: Actions */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        {onToggleAi && (
-          <button
-            type="button"
-            onClick={onToggleAi}
-            className="btn btn-sm"
-            style={{
-              background: isAiOpen
-                ? 'linear-gradient(135deg, #8B5CF6, #7C3AED)'
-                : 'rgba(139, 92, 246, 0.15)',
-              color: isAiOpen ? '#FFFFFF' : '#C084FC',
-              border: '1px solid rgba(139, 92, 246, 0.4)',
-              borderRadius: 8,
-              fontWeight: 700,
-              fontSize: 12,
-              boxShadow: isAiOpen ? '0 0 14px rgba(139, 92, 246, 0.5)' : 'none',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-            }}
-          >
-            <Sparkles size={14} color={isAiOpen ? '#FFFFFF' : '#C084FC'} />
-            <span>✨ AI Assistant</span>
-          </button>
-        )}
-
-        {formStatus === 'published' && (
-          <button onClick={handleCopyLink} className="btn btn-ghost btn-sm" title="Copy public link">
-            {copied ? <Check size={15} style={{ color: '#28a745' }} /> : <LinkIcon size={15} />}
-            {copied ? 'Copied!' : 'Share'}
-          </button>
+          {onToggleAi && (
+            <button
+              type="button"
+              onClick={onToggleAi}
+              className="btn btn-sm"
+              style={{
+                background: isAiOpen
+                  ? 'linear-gradient(135deg, #8B5CF6, #7C3AED)'
+                  : 'rgba(139, 92, 246, 0.15)',
+                color: isAiOpen ? '#FFFFFF' : '#C084FC',
+                border: '1px solid rgba(139, 92, 246, 0.4)',
+                borderRadius: 8,
+                fontWeight: 700,
+                fontSize: 12,
+                boxShadow: isAiOpen ? '0 0 14px rgba(139, 92, 246, 0.5)' : 'none',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+              }}
+            >
+              <Sparkles size={14} color={isAiOpen ? '#FFFFFF' : '#C084FC'} />
+              <span>✨ AI Assistant</span>
+            </button>
+          )}
         </div>
       </div>
 
