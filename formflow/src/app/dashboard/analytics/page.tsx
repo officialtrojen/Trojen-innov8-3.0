@@ -538,7 +538,7 @@ export default function AnalyticsPage() {
             <p style={{ fontSize: 13, color: '#94A3B8', marginBottom: 20 }}>
               Create your first form to start capturing responses and analytics.
             </p>
-            <Link href="/builder" className="btn btn-primary" style={{ padding: '8px 20px', borderRadius: 8 }}>
+            <Link href="/builder?new=true" className="btn btn-primary" style={{ padding: '8px 20px', borderRadius: 8 }}>
               Create Form
             </Link>
           </div>
