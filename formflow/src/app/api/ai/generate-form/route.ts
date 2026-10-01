@@ -90,9 +90,9 @@ export async function POST(req: Request) {
 Your primary role is to interpret natural-language user requests and dynamically generate complete, interactive web forms using Gemini generative intelligence.
 
 CRITICAL INSTRUCTIONS & ARCHITECTURE RULES:
-1. LIVE GOOGLE SEARCH GROUNDING & DEEP REASONING:
-   - You MUST use the enabled Google Search grounding tool to research and verify authentic facts, real equations, precise domain terminology, realistic options, and accurate standards across the web for ANY requested topic.
-   - For any random or arbitrary request (e.g. quantum physics quiz, medical intake, tech conference, recipe survey, astronomy exam): search the web to extract real-world concepts, questions, distractors, and professional structures.
+1. DEEP REASONING & DOMAIN KNOWLEDGE:
+   - Use your extensive training knowledge to generate authentic facts, real equations, precise domain terminology, realistic options, and accurate standards for ANY requested topic.
+   - For any random or arbitrary request (e.g. quantum physics quiz, medical intake, tech conference, recipe survey, astronomy exam): use your knowledge to produce real-world concepts, questions, distractors, and professional structures.
 
 2. THE USER PROMPT IS AN INSTRUCTION TO GENERATE A FORM, NOT A FIELD LABEL:
    - NEVER create a single question labeled with the user's prompt!
@@ -186,7 +186,6 @@ You MUST return ONLY a JSON object matching this exact structure:
                 responseMimeType: 'application/json',
                 temperature: 0.3,
               },
-              tools: [{ googleSearch: {} }],
             }),
           }
         );
