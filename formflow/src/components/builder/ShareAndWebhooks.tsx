@@ -447,14 +447,36 @@ export const ShareAndWebhooks: React.FC<ShareAndWebhooksProps> = ({
               </div>
 
               {/* Quick Presets */}
-              <div className="grid grid-cols-4 gap-1.5 pb-1">
+              <div className="grid grid-cols-5 gap-1.5 pb-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const localOrigin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
+                    setNewWebhookName('⚡ FormFlow Live Sink');
+                    setNewWebhookUrl(`${localOrigin}/api/webhooks/demo`);
+                  }}
+                  className="py-1 px-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-400 text-[10px] font-bold transition-all text-center"
+                >
+                  ⚡ 1-Tap Demo
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    window.open('https://webhook.site', '_blank');
+                    setNewWebhookName('Webhook.site Live Bin');
+                    setNewWebhookUrl('https://webhook.site/');
+                  }}
+                  className="py-1 px-1.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 text-[10px] font-semibold transition-all text-center"
+                >
+                  🌐 Webhook.site
+                </button>
                 <button
                   type="button"
                   onClick={() => {
                     setNewWebhookName('Discord #submissions');
                     setNewWebhookUrl('https://discord.com/api/webhooks/');
                   }}
-                  className="py-1 px-2 rounded-lg bg-[#5865F2]/10 hover:bg-[#5865F2]/20 border border-[#5865F2]/30 text-[#818CF8] text-[10px] font-semibold transition-all text-center"
+                  className="py-1 px-1.5 rounded-lg bg-[#5865F2]/10 hover:bg-[#5865F2]/20 border border-[#5865F2]/30 text-[#818CF8] text-[10px] font-semibold transition-all text-center"
                 >
                   Discord
                 </button>
@@ -464,7 +486,7 @@ export const ShareAndWebhooks: React.FC<ShareAndWebhooksProps> = ({
                     setNewWebhookName('Slack #notifications');
                     setNewWebhookUrl('https://hooks.slack.com/services/');
                   }}
-                  className="py-1 px-2 rounded-lg bg-[#E01E5A]/10 hover:bg-[#E01E5A]/20 border border-[#E01E5A]/30 text-[#FB7185] text-[10px] font-semibold transition-all text-center"
+                  className="py-1 px-1.5 rounded-lg bg-[#E01E5A]/10 hover:bg-[#E01E5A]/20 border border-[#E01E5A]/30 text-[#FB7185] text-[10px] font-semibold transition-all text-center"
                 >
                   Slack
                 </button>
@@ -474,19 +496,9 @@ export const ShareAndWebhooks: React.FC<ShareAndWebhooksProps> = ({
                     setNewWebhookName('Google Sheets Sync');
                     setNewWebhookUrl('https://script.google.com/macros/s/');
                   }}
-                  className="py-1 px-2 rounded-lg bg-[#34A853]/10 hover:bg-[#34A853]/20 border border-[#34A853]/30 text-[#4ADE80] text-[10px] font-semibold transition-all text-center"
+                  className="py-1 px-1.5 rounded-lg bg-[#34A853]/10 hover:bg-[#34A853]/20 border border-[#34A853]/30 text-[#4ADE80] text-[10px] font-semibold transition-all text-center"
                 >
                   Sheets API
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setNewWebhookName('Custom REST Endpoint');
-                    setNewWebhookUrl('https://api.yourdomain.com/webhook');
-                  }}
-                  className="py-1 px-2 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 text-[10px] font-semibold transition-all text-center"
-                >
-                  REST API
                 </button>
               </div>
 
