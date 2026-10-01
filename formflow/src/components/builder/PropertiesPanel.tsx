@@ -2,27 +2,57 @@
 
 import React from 'react';
 import { FormField } from '@/lib/types';
-import { Plus, Trash2, GripVertical } from 'lucide-react';
+import { Plus, Trash2, GripVertical, Settings2 } from 'lucide-react';
 
 interface PropertiesPanelProps {
   field: FormField;
   onUpdate: (updates: Partial<FormField>) => void;
+  onEditFormSettings?: () => void;
 }
 
-export default function PropertiesPanel({ field, onUpdate }: PropertiesPanelProps) {
+export default function PropertiesPanel({ field, onUpdate, onEditFormSettings }: PropertiesPanelProps) {
   return (
     <div style={{ padding: 20 }}>
       <div
         style={{
-          fontSize: 11,
-          fontWeight: 600,
-          color: '#52796F',
-          textTransform: 'uppercase',
-          letterSpacing: 1,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
           marginBottom: 20,
         }}
       >
-        Field Properties
+        <div
+          style={{
+            fontSize: 11,
+            fontWeight: 600,
+            color: '#52796F',
+            textTransform: 'uppercase',
+            letterSpacing: 1,
+          }}
+        >
+          Field Properties
+        </div>
+        {onEditFormSettings && (
+          <button
+            type="button"
+            onClick={onEditFormSettings}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 4,
+              background: 'rgba(82, 121, 111, 0.1)',
+              border: 'none',
+              padding: '4px 10px',
+              borderRadius: 6,
+              fontSize: 11,
+              fontWeight: 600,
+              color: '#263B3B',
+              cursor: 'pointer',
+            }}
+          >
+            <Settings2 size={12} /> Form Title
+          </button>
+        )}
       </div>
 
       {/* Question Label */}

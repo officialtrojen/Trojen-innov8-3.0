@@ -159,6 +159,9 @@ export default function DashboardPage() {
           <h1 style={{ fontSize: 26, fontWeight: 700, color: '#F8FAFC', marginBottom: 4, letterSpacing: '-0.02em' }}>Dashboard</h1>
           <p style={{ color: '#94A3B8', fontSize: 14 }}>Welcome back! Here&apos;s an overview of your forms.</p>
         </div>
+        <Link href="/builder?new=true" className="btn btn-primary">
+          <PlusCircle size={18} /> Create Form
+        </Link>
       </div>
 
       {/* Stat cards */}

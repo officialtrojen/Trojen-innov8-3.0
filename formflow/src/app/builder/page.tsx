@@ -1221,20 +1221,49 @@ function BuilderCanvasInner() {
                 <PropertiesPanel
                   field={selectedField}
                   onUpdate={(updates) => updateField(selectedField.id, updates)}
+                  onEditFormSettings={() => setSelectedFieldId(null)}
                 />
               )}
 
               {activePanel === 'properties' && !selectedField && (
-                <div style={{ padding: 32, textAlign: 'center', color: '#52796F', fontSize: 13, marginTop: 40 }}>
-                  <p>Click on any form question to inspect and edit its title, options, and validations.</p>
-                  <button
-                    type="button"
-                    onClick={() => setActivePanel('theme')}
-                    className="btn btn-secondary btn-sm"
-                    style={{ marginTop: 12 }}
+                <div style={{ padding: 20 }}>
+                  <div
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 600,
+                      color: '#52796F',
+                      textTransform: 'uppercase',
+                      letterSpacing: 1,
+                      marginBottom: 20,
+                    }}
                   >
-                    Open Background & Poster
-                  </button>
+                    Form Settings
+                  </div>
+
+                  <div style={{ marginBottom: 16 }}>
+                    <label className="label">Form Title</label>
+                    <input
+                      className="input"
+                      value={schema.title}
+                      onChange={(e) => setSchema({ ...schema, title: e.target.value })}
+                      placeholder="e.g. Feedback Form"
+                    />
+                  </div>
+
+                  <div style={{ marginBottom: 16 }}>
+                    <label className="label">Form Description</label>
+                    <textarea
+                      className="textarea"
+                      rows={3}
+                      value={schema.description || ''}
+                      onChange={(e) => setSchema({ ...schema, description: e.target.value })}
+                      placeholder="Optional description or instructions..."
+                    />
+                  </div>
+
+                  <div style={{ padding: 16, marginTop: 24, background: '#EAF4F4', borderRadius: 8, fontSize: 13, color: '#52796F' }}>
+                    Click on any form question to inspect and edit its field properties, options, and validations.
+                  </div>
                 </div>
               )}
 
