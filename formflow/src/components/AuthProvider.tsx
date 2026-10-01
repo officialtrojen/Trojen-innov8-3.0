@@ -3,11 +3,14 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { createClient } from '@/lib/supabase/client';
+import { DBProfile } from '@/lib/types';
 
 interface AuthContextType {
   user: User | null;
+  profile: DBProfile | null;
   session: Session | null;
   loading: boolean;
+  refreshProfile: () => Promise<void>;
   signUp: (email: string, password: string, name: string) => Promise<{ error: string | null }>;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
   signInWithGoogle: (redirectTo?: string) => Promise<{ error: string | null }>;
@@ -31,9 +34,33 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<DBProfile | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const supabase = createClient();
+
+  const fetchProfile = async (userId: string) => {
+    try {
+      const { data } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .maybeSingle();
+      if (data) {
+        setProfile(data as DBProfile);
+        return data as DBProfile;
+      }
+    } catch (err) {
+      console.warn('Error fetching live profile from Supabase:', err);
+    }
+    return null;
+  };
+
+  const refreshProfile = async () => {
+    if (user?.id) {
+      await fetchProfile(user.id);
+    }
+  };
 
   useEffect(() => {
     // onAuthStateChange fires immediately from local storage cache — no network wait
@@ -42,6 +69,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
+      if (session?.user?.id) {
+        fetchProfile(session.user.id);
+      } else {
+        setProfile(null);
+      }
       setLoading(false);
     });
 
@@ -77,8 +109,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
-    return { error: error?.message ?? null };
+    const cleanEmail = email.trim().toLowerCase();
+    const { data, error } = await supabase.auth.signInWithPassword({ email: cleanEmail, password });
+    if (error) {
+      return { error: error.message };
+    }
+    if (data?.user) {
+      setUser(data.user);
+      setSession(data.session);
+      // Immediately upsert into public.profiles table
+      try {
+        await supabase.from('profiles').upsert({
+          id: data.user.id,
+          name: data.user.user_metadata?.name || data.user.user_metadata?.full_name || cleanEmail.split('@')[0],
+          email: data.user.email?.toLowerCase() || cleanEmail,
+          updated_at: new Date().toISOString(),
+        });
+        await fetchProfile(data.user.id);
+      } catch (profileErr) {
+        console.warn('Profile sync on sign in error:', profileErr);
+      }
+    }
+    return { error: null };
   };
 
   const signInWithGoogle = async (redirectTo?: string) => {
@@ -112,8 +164,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const sendOtp = async (email: string, shouldCreateUser: boolean = false) => {
     try {
+      const cleanEmail = email.trim().toLowerCase();
       const { error } = await supabase.auth.signInWithOtp({
-        email: email.trim(),
+        email: cleanEmail,
         options: {
           shouldCreateUser,
         },
@@ -136,10 +189,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const verifyOtp = async (email: string, token: string) => {
     try {
+      const cleanEmail = email.trim().toLowerCase();
       // Fire both OTP types in PARALLEL — whichever succeeds wins, no sequential wait
       const [emailResult, signupResult] = await Promise.allSettled([
-        supabase.auth.verifyOtp({ email: email.trim(), token: token.trim(), type: 'email' }),
-        supabase.auth.verifyOtp({ email: email.trim(), token: token.trim(), type: 'signup' }),
+        supabase.auth.verifyOtp({ email: cleanEmail, token: token.trim(), type: 'email' }),
+        supabase.auth.verifyOtp({ email: cleanEmail, token: token.trim(), type: 'signup' }),
       ]);
 
       let sessionData = null;
@@ -158,6 +212,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (sessionData?.session) {
         setSession(sessionData.session);
         setUser(sessionData.user);
+
+        // Ensure profile is synced into public.profiles
+        if (sessionData.user) {
+          try {
+            await supabase.from('profiles').upsert({
+              id: sessionData.user.id,
+              name: sessionData.user.user_metadata?.name || sessionData.user.user_metadata?.full_name || cleanEmail.split('@')[0],
+              email: sessionData.user.email?.toLowerCase() || cleanEmail,
+              updated_at: new Date().toISOString(),
+            });
+            await fetchProfile(sessionData.user.id);
+          } catch (profileErr) {
+            console.warn('Profile sync on verifyOtp error:', profileErr);
+          }
+        }
+
         return { error: null };
       }
       return { error: errorMsg || 'Invalid or expired OTP code.' };
@@ -173,16 +243,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     name?: string
   ) => {
     try {
+      const cleanEmail = email.trim().toLowerCase();
       // 1. Try verify with type: 'signup' first, then 'email'
       let { data, error } = await supabase.auth.verifyOtp({
-        email: email.trim(),
+        email: cleanEmail,
         token: token.trim(),
         type: 'signup',
       });
 
       if (error) {
         const retry = await supabase.auth.verifyOtp({
-          email: email.trim(),
+          email: cleanEmail,
           token: token.trim(),
           type: 'email',
         });
@@ -219,8 +290,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         await supabase.from('profiles').upsert({
           id: activeUser.id,
           name: name || activeUser.user_metadata?.name || '',
-          email: activeUser.email || email,
+          email: activeUser.email || cleanEmail,
+          updated_at: new Date().toISOString(),
         });
+        await fetchProfile(activeUser.id);
       }
 
       return { error: null };
@@ -232,11 +305,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Register user in Supabase (password stored) + send OTP via Supabase — single call, no SMTP delay
   const signUpWithPasswordAndSendOtp = async (name: string, email: string, password: string) => {
     try {
+      const cleanEmail = email.trim().toLowerCase();
+      const cleanName = name.trim();
+
       // Step 1: Create user with password (Supabase will send confirmation OTP email automatically)
       const { data, error } = await supabase.auth.signUp({
-        email: email.trim(),
+        email: cleanEmail,
         password,
-        options: { data: { name }, emailRedirectTo: undefined },
+        options: { data: { name: cleanName, full_name: cleanName }, emailRedirectTo: undefined },
       });
       if (error) {
         if (
@@ -252,9 +328,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return { error: msg };
       }
 
-      // Step 2: If user already existed (identities empty), do NOT sign in, inform user they exist
-      if (data.user && (!data.user.identities || data.user.identities.length === 0)) {
+      // Step 2: Supabase GoTrue duplicate check:
+      // When email confirmations are enabled, if the user ALREADY exists, Supabase returns
+      // data.user with identities as an empty array: Array.isArray(identities) && identities.length === 0.
+      if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+        // Backfill into public.profiles so the table remains in sync
+        try {
+          await supabase.from('profiles').upsert({
+            id: data.user.id,
+            name: cleanName,
+            email: cleanEmail,
+            updated_at: new Date().toISOString(),
+          });
+        } catch {}
         return { error: 'An account with this email already exists. Please sign in instead.' };
+      }
+
+      // Step 3: Brand new user! Immediately write to public.profiles table
+      if (data.user) {
+        try {
+          await supabase.from('profiles').upsert({
+            id: data.user.id,
+            name: cleanName,
+            email: cleanEmail,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          });
+        } catch (profileErr) {
+          console.warn('Failed to upsert profile during signup:', profileErr);
+        }
       }
 
       return { error: null };
@@ -266,6 +368,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signOut = async (targetPath: string = '/login') => {
     // 1. Immediately wipe React state
     setUser(null);
+    setProfile(null);
     setSession(null);
 
     // 2. Synchronously wipe all auth tokens and cookies
@@ -306,8 +409,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     <AuthContext.Provider
       value={{
         user,
+        profile,
         session,
         loading,
+        refreshProfile,
         signUp,
         signIn,
         signInWithGoogle,

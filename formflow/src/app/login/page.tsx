@@ -45,6 +45,10 @@ export default function LoginPage() {
       if (r) {
         setRedirectUrl(r);
       }
+      const emailParam = params.get('email');
+      if (emailParam) {
+        setEmail(emailParam);
+      }
       const urlError = params.get('error');
       if (urlError) {
         if (urlError === 'oauth_failed') {
@@ -60,42 +64,56 @@ export default function LoginPage() {
     }
   }, []);
 
-  // Handle password login
+  // Handle password login — checks Supabase profiles table directly
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const cleanEmail = email.trim().toLowerCase();
+    if (!cleanEmail || !cleanEmail.includes('@')) {
+      setError('Please enter a valid email address.');
+      return;
+    }
+    if (!password) {
+      setError('Please enter your password.');
+      return;
+    }
+
     setError('');
     setLoading(true);
 
     const supabase = createClient();
+    // Query public.profiles table directly (no client-side cache)
     const { data: profile } = await supabase
       .from('profiles')
-      .select('id')
-      .ilike('email', email.trim())
+      .select('id, email')
+      .ilike('email', cleanEmail)
       .maybeSingle();
 
-    if (!profile) {
-      setError('No account found with this email. Please sign up first.');
-      setLoading(false);
-      return;
-    }
-
-    const { error: err } = await signIn(email, password);
+    const { error: err } = await signIn(cleanEmail, password);
     if (err) {
-      if (err.includes('Invalid login credentials')) {
-        setError('Incorrect password. Please try again or sign in with Email OTP.');
-      } else {
-        setError(err);
-      }
       setLoading(false);
+      if (profile) {
+        if (err.includes('Invalid login credentials')) {
+          setError('Incorrect password. Please try again or sign in with Email OTP.');
+        } else {
+          setError(err);
+        }
+      } else {
+        if (err.includes('Invalid login credentials') || err.includes('User not found')) {
+          setError('No account found with this email. Please sign up first.');
+        } else {
+          setError(err);
+        }
+      }
     } else {
       window.location.href = redirectUrl;
     }
   };
 
-  // Handle Send OTP — verify user exists in Supabase first, only send if registered
+  // Handle Send OTP — verify user exists in Supabase public.profiles table first, only send if registered
   const handleSendOtp = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (!email || !email.includes('@')) {
+    const cleanEmail = email.trim().toLowerCase();
+    if (!cleanEmail || !cleanEmail.includes('@')) {
       setError('Please enter a valid email address.');
       return;
     }
@@ -103,40 +121,59 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
 
+    // Query Supabase public.profiles table directly (no client cache)
     const supabase = createClient();
     const { data: profile } = await supabase
       .from('profiles')
       .select('id, email')
-      .ilike('email', email.trim())
+      .ilike('email', cleanEmail)
       .maybeSingle();
 
     if (!profile) {
-      // Verify with Supabase auth (shouldCreateUser: false)
-      const { error: otpErr } = await sendOtp(email, false);
-      if (otpErr) {
-        setError('No account found with this email. Please sign up first.');
-        setLoading(false);
-        return;
-      }
-    } else {
-      const { error: otpErr } = await sendOtp(email, false);
-      if (otpErr) {
-        setError(otpErr);
-        setLoading(false);
-        return;
-      }
+      // User does not exist in Supabase database table! Inform user to sign up
+      setError('No account found with this email. Please sign up first.');
+      setLoading(false);
+      return;
+    }
+
+    // User exists in profiles table! Send OTP code
+    const { error: otpErr } = await sendOtp(cleanEmail, false);
+    if (otpErr) {
+      setError(otpErr);
+      setLoading(false);
+      return;
     }
 
     // Only switch to OTP input screen after verifying user exists and OTP was dispatched
     setLoading(false);
     setOtpSent(true);
     setResendTimer(30);
-    setSuccessMsg(`OTP sent to ${email}! Check your inbox.`);
+    setSuccessMsg(`OTP sent to ${cleanEmail}! Check your inbox.`);
+  };
+
+  // Handle Resend OTP
+  const handleResendOtp = async () => {
+    if (resendTimer > 0) return;
+    const cleanEmail = email.trim().toLowerCase();
+    setError('');
+    setLoading(true);
+
+    const { error: otpErr } = await sendOtp(cleanEmail, false);
+    if (otpErr) {
+      setError(otpErr);
+      setLoading(false);
+      return;
+    }
+
+    setResendTimer(30);
+    setSuccessMsg(`A new 6-digit OTP code has been sent to ${cleanEmail}`);
+    setLoading(false);
   };
 
   // Handle Verify OTP — show loading instantly, verify then navigate
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
+    const cleanEmail = email.trim().toLowerCase();
     if (!otpCode || otpCode.length < 6) {
       setError('Please enter the full 6-digit code.');
       return;
@@ -145,7 +182,7 @@ export default function LoginPage() {
     setError('');
     setLoading(true); // Show loading immediately
 
-    const { error: err } = await verifyOtp(email, otpCode);
+    const { error: err } = await verifyOtp(cleanEmail, otpCode);
     if (err) {
       setError(err);
       setLoading(false);
@@ -269,7 +306,7 @@ export default function LoginPage() {
               {error.includes('sign up') && (
                 <div style={{ marginTop: 8 }}>
                   <Link
-                    href={redirectUrl !== '/dashboard' ? `/signup?redirect=${encodeURIComponent(redirectUrl)}` : '/signup'}
+                    href={`/signup?email=${encodeURIComponent(email.trim().toLowerCase())}${redirectUrl !== '/dashboard' ? `&redirect=${encodeURIComponent(redirectUrl)}` : ''}`}
                     style={{ color: '#C084FC', fontWeight: 700, textDecoration: 'underline' }}
                   >
                     Click here to create a new account →

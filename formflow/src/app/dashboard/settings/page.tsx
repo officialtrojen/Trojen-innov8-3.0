@@ -1,10 +1,45 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/components/AuthProvider';
+import { createClient } from '@/lib/supabase/client';
 
 export default function SettingsPage() {
-  const { user } = useAuth();
+  const { user, profile, refreshProfile } = useAuth();
+  const [fullName, setFullName] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+
+  useEffect(() => {
+    if (profile?.name) {
+      setFullName(profile.name);
+    } else if (user?.user_metadata?.name || user?.user_metadata?.full_name) {
+      setFullName(user.user_metadata.name || user.user_metadata.full_name);
+    }
+  }, [profile, user]);
+
+  const handleSaveProfile = async () => {
+    if (!user) return;
+    setSaving(true);
+    setSaveSuccess(false);
+
+    try {
+      const supabase = createClient();
+      await supabase.from('profiles').upsert({
+        id: user.id,
+        name: fullName.trim(),
+        email: user.email?.toLowerCase(),
+        updated_at: new Date().toISOString(),
+      });
+      await refreshProfile();
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 3000);
+    } catch (err) {
+      console.error('Failed to update profile:', err);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div style={{ paddingBottom: 60, maxWidth: 800 }}>
@@ -21,27 +56,47 @@ export default function SettingsPage() {
           <h3 style={{ fontSize: 18, fontWeight: 600, color: '#F8FAFC', marginBottom: 16 }}>Profile Information</h3>
           <div style={{ background: 'rgba(15, 23, 42, 0.6)', border: '1px solid rgba(148, 163, 184, 0.1)', borderRadius: '16px', padding: '32px' }}>
             <div style={{ display: 'flex', gap: 24, alignItems: 'center', marginBottom: 24 }}>
-              <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'linear-gradient(135deg, #6366F1, #8B5CF6)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, fontWeight: 700, color: 'white' }}>
-                {user?.email?.charAt(0).toUpperCase() || 'U'}
+              <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'linear-gradient(135deg, #6366F1, #8B5CF6)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, fontWeight: 700, color: 'white', overflow: 'hidden' }}>
+                {profile?.avatar_url || user?.user_metadata?.avatar_url ? (
+                  <img src={profile?.avatar_url || user?.user_metadata?.avatar_url} alt="Avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  (fullName || profile?.email || user?.email || 'U').charAt(0).toUpperCase()
+                )}
               </div>
               <div>
-                <button className="btn" style={{ background: 'rgba(255,255,255,0.1)', color: 'white', border: 'none', padding: '8px 16px', borderRadius: 8, fontSize: 14 }}>Upload new avatar</button>
+                <div style={{ fontSize: 16, fontWeight: 700, color: '#FFFFFF' }}>{profile?.name || fullName || 'User'}</div>
+                <div style={{ fontSize: 13, color: '#94A3B8', marginTop: 2 }}>{profile?.email || user?.email}</div>
               </div>
             </div>
 
             <div style={{ display: 'grid', gap: 16 }}>
               <div>
-                <label style={{ display: 'block', fontSize: 13, color: '#94A3B8', marginBottom: 8 }}>Email Address</label>
-                <input type="text" disabled value={user?.email || ''} style={{ width: '100%', padding: '12px 16px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#94A3B8' }} />
+                <label style={{ display: 'block', fontSize: 13, color: '#94A3B8', marginBottom: 8 }}>Email Address (Supabase Verified)</label>
+                <input type="text" disabled value={profile?.email || user?.email || ''} style={{ width: '100%', padding: '12px 16px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#94A3B8' }} />
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: 13, color: '#94A3B8', marginBottom: 8 }}>Full Name</label>
-                <input type="text" placeholder="Enter your name" style={{ width: '100%', padding: '12px 16px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: 'white' }} />
+                <input
+                  type="text"
+                  placeholder="Enter your name"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  style={{ width: '100%', padding: '12px 16px', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, color: 'white' }}
+                />
               </div>
             </div>
             
-            <div style={{ marginTop: 24, display: 'flex', justifyContent: 'flex-end' }}>
-              <button style={{ background: '#8B5CF6', color: 'white', border: 'none', padding: '10px 24px', borderRadius: 8, fontWeight: 600, cursor: 'pointer' }}>Save Changes</button>
+            <div style={{ marginTop: 24, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 12 }}>
+              {saveSuccess && (
+                <span style={{ fontSize: 13, color: '#10B981', fontWeight: 600 }}>✓ Profile saved to database!</span>
+              )}
+              <button
+                onClick={handleSaveProfile}
+                disabled={saving}
+                style={{ background: '#8B5CF6', color: 'white', border: 'none', padding: '10px 24px', borderRadius: 8, fontWeight: 600, cursor: saving ? 'not-allowed' : 'pointer', opacity: saving ? 0.7 : 1 }}
+              >
+                {saving ? 'Saving...' : 'Save Changes'}
+              </button>
             </div>
           </div>
         </section>

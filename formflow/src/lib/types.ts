@@ -203,7 +203,9 @@ export interface DBProfile {
   id: string;
   name: string | null;
   email: string | null;
-  created_at: string;
+  avatar_url?: string | null;
+  created_at?: string;
+  updated_at?: string;
 }
 
 // ---------- Dashboard Stats ----------

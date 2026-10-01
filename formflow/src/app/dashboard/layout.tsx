@@ -83,7 +83,7 @@ const navSections: NavSection[] = [
 function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, signOut } = useAuth();
+  const { user, profile, signOut } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
   const [createModalOpen, setCreateModalOpen] = useState(false);
@@ -236,8 +236,8 @@ function Sidebar() {
     user?.app_metadata?.provider === 'google' ||
     (user?.app_metadata?.providers as string[] | undefined)?.includes('google');
 
-  const displayName = user?.user_metadata?.name || user?.user_metadata?.full_name || 'Creator';
-  const displayEmail = user?.email || 'user@formflow.io';
+  const displayName = profile?.name || user?.user_metadata?.name || user?.user_metadata?.full_name || 'Creator';
+  const displayEmail = profile?.email || user?.email || 'user@formflow.io';
   const userInitial = (displayName || displayEmail || 'U')[0].toUpperCase();
 
   const sidebarContent = (
@@ -456,9 +456,9 @@ function Sidebar() {
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ position: 'relative', flexShrink: 0 }}>
-              {user?.user_metadata?.avatar_url ? (
+              {(profile?.avatar_url || user?.user_metadata?.avatar_url) ? (
                 <img
-                  src={user.user_metadata.avatar_url}
+                  src={profile?.avatar_url || user?.user_metadata?.avatar_url}
                   alt="Avatar"
                   style={{
                     width: 34,

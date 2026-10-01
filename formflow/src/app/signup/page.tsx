@@ -58,6 +58,10 @@ export default function SignUpPage() {
       if (r) {
         setRedirectUrl(r);
       }
+      const emailParam = params.get('email');
+      if (emailParam) {
+        setEmail(emailParam);
+      }
       const urlError = params.get('error');
       if (urlError) {
         if (urlError === 'oauth_failed') {
@@ -76,19 +80,20 @@ export default function SignUpPage() {
   // Handle Step 1: Start Registration & Send OTP — verify if user already exists
   const handleStartSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    const cleanEmail = email.trim().toLowerCase();
     if (!name.trim()) { setError('Please enter your full name.'); return; }
-    if (!email || !email.includes('@')) { setError('Please enter a valid email address.'); return; }
+    if (!cleanEmail || !cleanEmail.includes('@')) { setError('Please enter a valid email address.'); return; }
     if (!password || password.length < 6) { setError('Password must be at least 6 characters long.'); return; }
 
     setError('');
     setLoading(true);
 
-    // 1. Check if user already exists in Supabase profiles
+    // 1. Check if user already exists in Supabase public.profiles table (live check, no cache)
     const supabase = createClient();
     const { data: existingProfile } = await supabase
       .from('profiles')
       .select('id, email')
-      .ilike('email', email.trim())
+      .ilike('email', cleanEmail)
       .maybeSingle();
 
     if (existingProfile) {
@@ -97,8 +102,8 @@ export default function SignUpPage() {
       return;
     }
 
-    // 2. Fire Supabase signup
-    const { error: signUpError } = await signUpWithPasswordAndSendOtp(name, email, password);
+    // 2. Fire Supabase signup with password & OTP
+    const { error: signUpError } = await signUpWithPasswordAndSendOtp(name.trim(), cleanEmail, password);
     if (signUpError) {
       setError(signUpError);
       setLoading(false);
@@ -109,12 +114,13 @@ export default function SignUpPage() {
     setLoading(false);
     setStep('otp');
     setResendTimer(30);
-    setSuccessMsg(`Verification code sent to ${email}! Check your inbox.`);
+    setSuccessMsg(`Verification code sent to ${cleanEmail}! Check your inbox.`);
   };
 
   // Handle Step 2: Verify OTP and finalize signup
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
+    const cleanEmail = email.trim().toLowerCase();
     if (!otpCode || otpCode.length < 6) {
       setError('Please enter the full 6-digit verification code.');
       return;
@@ -123,7 +129,7 @@ export default function SignUpPage() {
     setError('');
     setLoading(true);
 
-    const { error: err } = await verifyOtp(email, otpCode);
+    const { error: err } = await verifyOtp(cleanEmail, otpCode);
     if (err) {
       setError(err);
       setLoading(false);
@@ -138,17 +144,18 @@ export default function SignUpPage() {
   // Resend OTP
   const handleResendOtp = async () => {
     if (resendTimer > 0) return;
+    const cleanEmail = email.trim().toLowerCase();
     setError('');
     setLoading(true);
 
     try {
-      const { error: otpErr } = await sendOtp(email, true);
+      const { error: otpErr } = await sendOtp(cleanEmail, true);
       if (otpErr) {
         setError(otpErr);
         return;
       }
       setResendTimer(30);
-      setSuccessMsg(`A new 6-digit code has been sent to ${email}`);
+      setSuccessMsg(`A new 6-digit code has been sent to ${cleanEmail}`);
     } catch (err: any) {
       setError('Failed to resend OTP code.');
     } finally {
@@ -275,7 +282,7 @@ export default function SignUpPage() {
               {(error.includes('sign in') || error.includes('already exists')) && (
                 <div style={{ marginTop: 8 }}>
                   <Link
-                    href={redirectUrl !== '/dashboard' ? `/login?redirect=${encodeURIComponent(redirectUrl)}` : '/login'}
+                    href={`/login?email=${encodeURIComponent(email.trim().toLowerCase())}${redirectUrl !== '/dashboard' ? `&redirect=${encodeURIComponent(redirectUrl)}` : ''}`}
                     style={{ color: '#C084FC', fontWeight: 700, textDecoration: 'underline' }}
                   >
                     Click here to sign in with this email →
