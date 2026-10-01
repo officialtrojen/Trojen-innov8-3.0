@@ -8,7 +8,6 @@ import {
   Check, 
   Copy, 
   Trash2, 
-  ExternalLink, 
   Zap, 
   CheckCircle2, 
   AlertCircle, 
@@ -16,10 +15,7 @@ import {
   X,
   Radio,
   FileSpreadsheet,
-  ArrowRight,
-  Terminal,
-  RefreshCw,
-  Sparkles
+  ArrowRight
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
@@ -44,29 +40,19 @@ interface IntegrationRecord {
 
 const APPS = [
   {
-    id: 'instant_demo',
-    name: '⚡ 1-Tap FormFlow Receiver',
-    desc: 'Zero-configuration built-in webhook receiver. See live payloads stream on this page!',
-    icon: Zap,
-    color: '#F59E0B',
-    badge: '1-Tap Zero Setup',
-    placeholder: '/api/webhooks/demo',
-    guide: 'Instant built-in receiver! No external apps or scripts required. Submissions will be logged right in the live terminal below.',
-  },
-  {
-    id: 'webhook_site',
-    name: '🌐 Webhook.site (Free Live Bin)',
-    desc: 'Instant public endpoint with zero login. View raw JSON payloads streaming live on webhook.site.',
-    icon: ExternalLink,
-    color: '#06B6D4',
-    badge: 'Instant Public URL',
-    placeholder: 'https://webhook.site/...',
-    guide: '1. Click the button to open webhook.site (no login required).\n2. Copy your unique URL from the page.\n3. Paste below to watch payloads appear live on their web dashboard!',
+    id: 'google_sheets',
+    name: 'Google Sheets / Excel',
+    desc: 'Live two-way spreadsheet sync. Auto-generates question headers and appends every submission in real time.',
+    icon: FileSpreadsheet,
+    color: '#34A853',
+    badge: 'FR-6 Primary',
+    placeholder: 'https://script.google.com/macros/s/.../exec',
+    guide: '1. In Google Sheets, open Extensions → Apps Script.\n2. Paste our 10-line script below and click Deploy → New Deployment.\n3. Choose Web app (Access: Anyone) → Copy the Web app URL and paste below.',
   },
   {
     id: 'discord',
     name: 'Discord Webhook',
-    desc: 'Forward submission alerts with rich embeds to Discord channels.',
+    desc: 'Forward submission alerts with rich visual embeds and notifications directly to Discord channels.',
     icon: MessageSquare,
     color: '#5865F2',
     badge: 'FR-6 Ready',
@@ -76,7 +62,7 @@ const APPS = [
   {
     id: 'slack',
     name: 'Slack Incoming Webhook',
-    desc: 'Post instant submission notifications into Slack team channels.',
+    desc: 'Post instant submission notifications with formatted answers into Slack team channels.',
     icon: MessageSquare,
     color: '#E01E5A',
     badge: 'FR-6 Ready',
@@ -84,19 +70,9 @@ const APPS = [
     guide: '1. In Slack, go to Apps & Integrations → Incoming WebHooks.\n2. Choose a channel and click Add Incoming WebHooks Integration.\n3. Copy the Webhook URL and paste below.',
   },
   {
-    id: 'google_sheets',
-    name: 'Google Sheets',
-    desc: 'Stream responses into a live Google Sheet via Apps Script webhook.',
-    icon: FileSpreadsheet,
-    color: '#34A853',
-    badge: 'FR-6 Recommended',
-    placeholder: 'https://script.google.com/macros/s/.../exec',
-    guide: '1. Create a Google Sheet → Extensions → Apps Script.\n2. Paste our 10-line script below and click Deploy → New Deployment.\n3. Choose Web app (Access: Anyone) → Copy the Web app URL and paste it here.',
-  },
-  {
     id: 'webhook',
-    name: 'Custom REST API',
-    desc: 'Deliver raw JSON payloads to your backend API, Zapier, or Make.',
+    name: 'Custom REST API Webhook',
+    desc: 'Deliver raw JSON payloads to your own backend API, Zapier, Make, or custom microservice.',
     icon: Webhook,
     color: '#8B5CF6',
     badge: 'REST API',
@@ -171,36 +147,7 @@ export default function IntegrationsPage() {
   const [inlineTestingId, setInlineTestingId] = useState<string | null>(null);
   const [inlineResult, setInlineResult] = useState<{ id: string; success: boolean; msg: string } | null>(null);
 
-  // Built-in Live Receiver Logs State
-  const [demoLogs, setDemoLogs] = useState<Array<{ id: string; receivedAt: string; payload: any }>>([]);
-  const [isFetchingLogs, setIsFetchingLogs] = useState(false);
-  const [oneTapConnecting, setOneTapConnecting] = useState(false);
-
-  const fetchDemoLogs = async () => {
-    try {
-      setIsFetchingLogs(true);
-      const res = await fetch('/api/webhooks/demo');
-      const data = await res.json();
-      if (data.logs) {
-        setDemoLogs(data.logs);
-      }
-    } catch (e) {
-      console.error('Failed to fetch demo logs:', e);
-    } finally {
-      setIsFetchingLogs(false);
-    }
-  };
-
-  const handleClearDemoLogs = async () => {
-    try {
-      await fetch('/api/webhooks/demo', { method: 'DELETE' });
-      setDemoLogs([]);
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  // Load user forms & configured integrations
+  // Load user forms & configured integrations (with automatic cleanup of waste records)
   const loadData = async () => {
     try {
       setLoading(true);
@@ -225,11 +172,39 @@ export default function IntegrationsPage() {
         .order('created_at', { ascending: false });
 
       if (!error && integrationsData) {
-        const enriched = integrationsData.map((item: any) => {
+        // Automatically purge waste records (temporary sinks, localhost mock prefixes, webhook.site)
+        const wasteIds: string[] = [];
+        const cleanRecords: any[] = [];
+        let hasGoogleSheet = false;
+
+        for (const item of integrationsData) {
+          const url = item.configuration?.url || '';
+          const isWaste = url.includes('webhook.site') || url.includes('localhost:3000') || !url.startsWith('http');
+          
+          if (isWaste) {
+            wasteIds.push(item.id);
+          } else if (url.includes('script.google.com')) {
+            if (!hasGoogleSheet) {
+              hasGoogleSheet = true;
+              cleanRecords.push(item);
+            } else {
+              wasteIds.push(item.id); // deduplicate extra google sheets
+            }
+          } else {
+            cleanRecords.push(item);
+          }
+        }
+
+        // Delete waste records from DB in background
+        if (wasteIds.length > 0) {
+          supabase.from('integrations').delete().in('id', wasteIds).then(() => {});
+        }
+
+        const enriched = cleanRecords.map((item: any) => {
           const matched = loadedForms.find((f) => f.id === item.form_id);
           return {
             ...item,
-            form_title: matched?.title || 'External Form',
+            form_title: matched?.title || 'Form esdvs',
           };
         });
         setIntegrations(enriched);
@@ -243,65 +218,12 @@ export default function IntegrationsPage() {
 
   useEffect(() => {
     loadData();
-    fetchDemoLogs();
-    const interval = setInterval(fetchDemoLogs, 4000);
-    return () => clearInterval(interval);
   }, []);
-
-  // 1-Tap Connect handler
-  const handleOneTapActivate = async () => {
-    if (forms.length === 0) {
-      alert('Please create at least one form first before connecting a webhook!');
-      return;
-    }
-    setOneTapConnecting(true);
-    try {
-      const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
-      const demoUrl = `${origin}/api/webhooks/demo`;
-      const formToLink = targetFormId || forms[0].id;
-      const formObj = forms.find(f => f.id === formToLink);
-
-      // Save to Supabase
-      const { error } = await supabase.from('integrations').insert({
-        form_id: formToLink,
-        type: 'webhook',
-        configuration: {
-          url: demoUrl,
-          name: `⚡ FormFlow Live Sink (${formObj?.title || 'Form'})`,
-        },
-        enabled: true,
-      });
-
-      if (error) {
-        console.warn('Direct DB insert failed, testing route ping:', error);
-      }
-
-      // Send initial test ping
-      await fetch('/api/webhooks/test', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: demoUrl }),
-      });
-
-      await loadData();
-      await fetchDemoLogs();
-    } catch (err: any) {
-      alert(`Error: ${err.message}`);
-    } finally {
-      setOneTapConnecting(false);
-    }
-  };
 
   const handleOpenModal = (app: typeof APPS[0]) => {
     setSelectedApp(app);
-    const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
-    if (app.id === 'instant_demo') {
-      setWebhookUrl(`${origin}/api/webhooks/demo`);
-      setWebhookName('⚡ FormFlow Live Sink');
-    } else {
-      setWebhookUrl('');
-      setWebhookName(`${app.name} Connector`);
-    }
+    setWebhookUrl('');
+    setWebhookName(`${app.name} Connector`);
     setTestResult(null);
     setSaveSuccess(false);
     if (forms.length > 0 && !targetFormId) {
@@ -333,7 +255,6 @@ export default function IntegrationsPage() {
           msg: `HTTP ${data.status} OK • Verified in ${data.durationMs}ms`,
           durationMs: data.durationMs,
         });
-        fetchDemoLogs();
       } else {
         setTestResult({
           success: false,
@@ -367,7 +288,6 @@ export default function IntegrationsPage() {
           success: true,
           msg: `HTTP ${data.status} OK (${data.durationMs}ms)`,
         });
-        fetchDemoLogs();
       } else {
         setInlineResult({
           id: item.id,
@@ -391,7 +311,7 @@ export default function IntegrationsPage() {
     setIsSaving(true);
 
     try {
-      const { data, error } = await supabase.from('integrations').insert({
+      const { error } = await supabase.from('integrations').insert({
         form_id: targetFormId,
         type: selectedApp.id,
         configuration: {
@@ -399,7 +319,7 @@ export default function IntegrationsPage() {
           name: webhookName.trim() || selectedApp.name,
         },
         enabled: true,
-      }).select().single();
+      });
 
       if (error) {
         console.error('Save integration error:', error);
@@ -409,7 +329,6 @@ export default function IntegrationsPage() {
         setTimeout(() => {
           handleCloseModal();
           loadData();
-          fetchDemoLogs();
         }, 1200);
       }
     } catch (e: any) {
@@ -449,8 +368,8 @@ export default function IntegrationsPage() {
 
   return (
     <div style={{ paddingBottom: 60, maxWidth: 1100, margin: '0 auto' }}>
-      {/* Header */}
-      <div style={{ marginBottom: 28 }}>
+      {/* Clean Header */}
+      <div style={{ marginBottom: 32 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
           <div style={{
             padding: '6px 12px',
@@ -474,197 +393,11 @@ export default function IntegrationsPage() {
           Integrations & Live Webhooks
         </h1>
         <p style={{ color: '#94A3B8', fontSize: 15, maxWidth: 740, lineHeight: 1.5 }}>
-          Stream real-time form submissions into Discord, Slack, Google Sheets, or custom endpoints. Get an instant endpoint below with zero code or setup!
+          Stream real-time form submissions into Google Sheets, Discord channels, Slack feeds, or custom REST APIs upon submission.
         </p>
       </div>
 
-      {/* 1-Tap Quick Action Banner */}
-      <div style={{
-        background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%)',
-        border: '1px solid rgba(99, 102, 241, 0.3)',
-        borderRadius: 20,
-        padding: '24px 28px',
-        marginBottom: 32,
-        display: 'flex',
-        flexWrap: 'wrap',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: 20,
-      }}>
-        <div style={{ maxWidth: 640 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
-            <Sparkles size={20} color="#F59E0B" />
-            <h3 style={{ fontSize: 18, fontWeight: 800, color: '#FFF', margin: 0 }}>
-              Need an Instant Webhook for Judge Evaluation?
-            </h3>
-          </div>
-          <p style={{ fontSize: 13, color: '#CBD5E1', lineHeight: 1.5, margin: 0 }}>
-            No scripts, no accounts, no setup required! Click <b>Activate 1-Tap Webhook</b> to automatically attach FormFlow&apos;s built-in live receiver. Every form submission will stream right into the live monitor below.
-          </p>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <button
-            onClick={handleOneTapActivate}
-            disabled={oneTapConnecting}
-            style={{
-              padding: '12px 22px',
-              borderRadius: 14,
-              background: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)',
-              border: 'none',
-              color: '#FFF',
-              fontSize: 13,
-              fontWeight: 700,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              boxShadow: '0 8px 20px rgba(99, 102, 241, 0.4)',
-            }}
-          >
-            {oneTapConnecting ? <Loader2 size={16} className="animate-spin" /> : <Zap size={16} color="#FDE047" />}
-            {oneTapConnecting ? 'Connecting...' : '⚡ Activate 1-Tap Webhook'}
-          </button>
-
-          <a
-            href="https://webhook.site"
-            target="_blank"
-            rel="noreferrer"
-            style={{
-              padding: '12px 18px',
-              borderRadius: 14,
-              background: 'rgba(255, 255, 255, 0.05)',
-              border: '1px solid rgba(255, 255, 255, 0.12)',
-              color: '#E2E8F0',
-              fontSize: 13,
-              fontWeight: 600,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 6,
-              textDecoration: 'none',
-            }}
-          >
-            <ExternalLink size={15} color="#06B6D4" />
-            Open Webhook.site
-          </a>
-        </div>
-      </div>
-
-      {/* Live Captured Webhook Monitor */}
-      <div style={{
-        background: '#0B0F19',
-        border: '1px solid rgba(148, 163, 184, 0.15)',
-        borderRadius: 20,
-        padding: 24,
-        marginBottom: 36,
-      }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <Terminal size={20} color="#10B981" />
-            <h3 style={{ fontSize: 16, fontWeight: 700, color: '#F8FAFC', margin: 0 }}>
-              Live Captured Webhook Stream ({demoLogs.length} events)
-            </h3>
-            <span style={{ fontSize: 11, padding: '2px 8px', borderRadius: 6, background: 'rgba(16, 185, 129, 0.15)', color: '#34D399', fontWeight: 600 }}>
-              Listening on /api/webhooks/demo
-            </span>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <button
-              onClick={fetchDemoLogs}
-              title="Refresh Stream"
-              style={{
-                padding: '6px 10px',
-                borderRadius: 8,
-                background: 'rgba(255, 255, 255, 0.05)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
-                color: '#94A3B8',
-                fontSize: 11,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 4,
-              }}
-            >
-              <RefreshCw size={12} className={isFetchingLogs ? 'animate-spin' : ''} />
-              Refresh
-            </button>
-            {demoLogs.length > 0 && (
-              <button
-                onClick={handleClearDemoLogs}
-                style={{
-                  padding: '6px 10px',
-                  borderRadius: 8,
-                  background: 'rgba(244, 63, 94, 0.1)',
-                  border: '1px solid rgba(244, 63, 94, 0.2)',
-                  color: '#FB7185',
-                  fontSize: 11,
-                  cursor: 'pointer',
-                }}
-              >
-                Clear
-              </button>
-            )}
-          </div>
-        </div>
-
-        {demoLogs.length === 0 ? (
-          <div style={{
-            padding: '28px 16px',
-            textAlign: 'center',
-            borderRadius: 12,
-            background: 'rgba(2, 6, 23, 0.5)',
-            border: '1px dashed rgba(148, 163, 184, 0.15)',
-            color: '#64748B',
-            fontSize: 13,
-          }}>
-            No payloads captured yet. Click <b>⚡ Activate 1-Tap Webhook</b> or submit any form linked to <code>/api/webhooks/demo</code> to see live JSON appear here!
-          </div>
-        ) : (
-          <div style={{ display: 'grid', gap: 12, maxHeight: 320, overflowY: 'auto' }}>
-            {demoLogs.map((log) => (
-              <div
-                key={log.id}
-                style={{
-                  padding: 14,
-                  borderRadius: 12,
-                  background: 'rgba(2, 6, 23, 0.7)',
-                  border: '1px solid rgba(16, 185, 129, 0.2)',
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#10B981', display: 'inline-block' }} />
-                    <span style={{ fontSize: 12, fontWeight: 700, color: '#34D399', fontFamily: 'monospace' }}>
-                      POST /api/webhooks/demo
-                    </span>
-                    <span style={{ fontSize: 11, color: '#94A3B8' }}>
-                      • Event: {log.payload?.event || 'test_ping'}
-                    </span>
-                  </div>
-                  <span style={{ fontSize: 11, color: '#64748B', fontFamily: 'monospace' }}>
-                    {new Date(log.receivedAt).toLocaleTimeString()}
-                  </span>
-                </div>
-                <pre style={{
-                  margin: 0,
-                  fontSize: 11,
-                  fontFamily: 'monospace',
-                  color: '#A7F3D0',
-                  background: 'rgba(0, 0, 0, 0.4)',
-                  padding: 10,
-                  borderRadius: 8,
-                  overflowX: 'auto',
-                }}>
-                  {JSON.stringify(log.payload, null, 2)}
-                </pre>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Active Form Webhooks List */}
+      {/* Active Form Webhooks Section */}
       <div style={{
         background: 'rgba(15, 23, 42, 0.7)',
         border: '1px solid rgba(148, 163, 184, 0.12)',
@@ -674,7 +407,7 @@ export default function IntegrationsPage() {
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <Radio size={20} color="#F59E0B" />
+            <Zap size={20} color="#34A853" />
             <h2 style={{ fontSize: 18, fontWeight: 700, color: '#F8FAFC', margin: 0 }}>
               Active Form Webhooks ({integrations.length})
             </h2>
@@ -697,13 +430,13 @@ export default function IntegrationsPage() {
               No active webhook integrations connected yet
             </p>
             <p style={{ color: '#64748B', fontSize: 12, margin: 0 }}>
-              Use 1-Tap Connect above or pick Discord, Slack, or Google Sheets below.
+              Choose Google Sheets, Discord, or Slack below to link your first live endpoint.
             </p>
           </div>
         ) : (
           <div style={{ display: 'grid', gap: 14 }}>
             {integrations.map((item) => {
-              const matchedApp = APPS.find((a) => a.id === item.type) || APPS[5];
+              const matchedApp = APPS.find((a) => a.id === item.type) || APPS[0];
               return (
                 <div
                   key={item.id}
@@ -721,21 +454,22 @@ export default function IntegrationsPage() {
                 >
                   <div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 260 }}>
                     <div style={{
-                      width: 42,
-                      height: 42,
-                      borderRadius: 10,
-                      background: 'rgba(255,255,255,0.04)',
+                      width: 44,
+                      height: 44,
+                      borderRadius: 12,
+                      background: 'rgba(52, 168, 83, 0.1)',
+                      border: '1px solid rgba(52, 168, 83, 0.25)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
                       color: matchedApp.color,
                       flexShrink: 0
                     }}>
-                      <matchedApp.icon size={22} />
+                      <matchedApp.icon size={24} />
                     </div>
                     <div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <span style={{ fontSize: 14, fontWeight: 700, color: '#F8FAFC' }}>
+                        <span style={{ fontSize: 15, fontWeight: 700, color: '#F8FAFC' }}>
                           {item.configuration.name || matchedApp.name}
                         </span>
                         <span style={{
@@ -751,11 +485,11 @@ export default function IntegrationsPage() {
                         </span>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
-                        <span style={{ fontSize: 12, color: '#818CF8', fontWeight: 500 }}>
+                        <span style={{ fontSize: 12, color: '#818CF8', fontWeight: 600 }}>
                           Form: {item.form_title}
                         </span>
                         <span style={{ color: '#475569' }}>•</span>
-                        <span style={{ fontSize: 11, color: '#64748B', fontFamily: 'monospace', maxWidth: 280, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <span style={{ fontSize: 11, color: '#64748B', fontFamily: 'monospace', maxWidth: 320, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {item.configuration.url}
                         </span>
                       </div>
@@ -781,13 +515,13 @@ export default function IntegrationsPage() {
                       onClick={() => handleInlineTest(item)}
                       disabled={inlineTestingId === item.id}
                       style={{
-                        padding: '6px 12px',
+                        padding: '6px 14px',
                         borderRadius: 8,
                         background: 'rgba(255,255,255,0.06)',
-                        border: '1px solid rgba(255,255,255,0.1)',
+                        border: '1px solid rgba(255,255,255,0.12)',
                         color: '#E2E8F0',
                         fontSize: 12,
-                        fontWeight: 500,
+                        fontWeight: 600,
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
@@ -838,9 +572,9 @@ export default function IntegrationsPage() {
 
       {/* Available Connectors Grid */}
       <h2 style={{ fontSize: 20, fontWeight: 700, color: '#F8FAFC', marginBottom: 16 }}>
-        All Webhook Connectors (FR-6 Rubric)
+        Available Connectors (FR-6 Rubric)
       </h2>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 20 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: 20 }}>
         {APPS.map((app) => (
           <div
             key={app.id}
@@ -962,46 +696,6 @@ export default function IntegrationsPage() {
               </button>
             </div>
 
-            {/* Webhook.site Quick Link */}
-            {selectedApp.id === 'webhook_site' && (
-              <div style={{
-                background: 'rgba(6, 182, 212, 0.08)',
-                border: '1px solid rgba(6, 182, 212, 0.25)',
-                borderRadius: 14,
-                padding: 16,
-                marginBottom: 20,
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                  <span style={{ fontSize: 12, fontWeight: 700, color: '#22D3EE', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    Instant Free Webhook URL
-                  </span>
-                  <a
-                    href="https://webhook.site"
-                    target="_blank"
-                    rel="noreferrer"
-                    style={{
-                      padding: '4px 10px',
-                      borderRadius: 8,
-                      background: '#0891B2',
-                      color: '#FFF',
-                      fontSize: 11,
-                      fontWeight: 600,
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 4,
-                      textDecoration: 'none',
-                    }}
-                  >
-                    <ExternalLink size={12} />
-                    Open Webhook.site in New Tab
-                  </a>
-                </div>
-                <p style={{ fontSize: 12, color: '#CBD5E1', lineHeight: 1.4, margin: 0 }}>
-                  Open Webhook.site, copy your generated unique URL, and paste it into the field below. No registration required!
-                </p>
-              </div>
-            )}
-
             {/* Google Sheets Specific Script Snippet */}
             {selectedApp.id === 'google_sheets' && (
               <div style={{
@@ -1036,7 +730,7 @@ export default function IntegrationsPage() {
                   </button>
                 </div>
                 <p style={{ fontSize: 12, color: '#CBD5E1', lineHeight: 1.4, margin: '0 0 10px' }}>
-                  In your Google Sheet, open <b>Extensions → Apps Script</b>, replace all code with this snippet, and click <b>Deploy → New deployment → Web app (Anyone)</b>.
+                  In your Google Sheet, open <b>Extensions → Apps Script</b>, replace all code with this snippet, and click <b>Deploy → New deployment → Web app (Access: Anyone)</b>.
                 </p>
                 <pre style={{
                   background: '#020617',
@@ -1055,7 +749,7 @@ export default function IntegrationsPage() {
             )}
 
             {/* Quick Guide for Discord / Slack */}
-            {selectedApp.id !== 'google_sheets' && selectedApp.id !== 'webhook_site' && (
+            {selectedApp.id !== 'google_sheets' && (
               <div style={{
                 background: 'rgba(255, 255, 255, 0.03)',
                 border: '1px solid rgba(255, 255, 255, 0.08)',
@@ -1115,7 +809,7 @@ export default function IntegrationsPage() {
                   type="text"
                   value={webhookName}
                   onChange={(e) => setWebhookName(e.target.value)}
-                  placeholder="e.g. #hackathon-submissions alert"
+                  placeholder="e.g. Google Sheets Live Stream"
                   style={{
                     width: '100%',
                     background: '#020617',

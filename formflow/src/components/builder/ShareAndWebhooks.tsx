@@ -447,28 +447,16 @@ export const ShareAndWebhooks: React.FC<ShareAndWebhooksProps> = ({
               </div>
 
               {/* Quick Presets */}
-              <div className="grid grid-cols-5 gap-1.5 pb-1">
+              <div className="grid grid-cols-4 gap-1.5 pb-1">
                 <button
                   type="button"
                   onClick={() => {
-                    const localOrigin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000';
-                    setNewWebhookName('⚡ FormFlow Live Sink');
-                    setNewWebhookUrl(`${localOrigin}/api/webhooks/demo`);
+                    setNewWebhookName('Google Sheets / Excel Sync');
+                    setNewWebhookUrl('https://script.google.com/macros/s/');
                   }}
-                  className="py-1 px-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-400 text-[10px] font-bold transition-all text-center"
+                  className="py-1 px-1.5 rounded-lg bg-[#34A853]/10 hover:bg-[#34A853]/20 border border-[#34A853]/30 text-[#4ADE80] text-[10px] font-semibold transition-all text-center"
                 >
-                  ⚡ 1-Tap Demo
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    window.open('https://webhook.site', '_blank');
-                    setNewWebhookName('Webhook.site Live Bin');
-                    setNewWebhookUrl('https://webhook.site/');
-                  }}
-                  className="py-1 px-1.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 text-cyan-400 text-[10px] font-semibold transition-all text-center"
-                >
-                  🌐 Webhook.site
+                  Sheets / Excel
                 </button>
                 <button
                   type="button"
@@ -493,12 +481,12 @@ export const ShareAndWebhooks: React.FC<ShareAndWebhooksProps> = ({
                 <button
                   type="button"
                   onClick={() => {
-                    setNewWebhookName('Google Sheets Sync');
-                    setNewWebhookUrl('https://script.google.com/macros/s/');
+                    setNewWebhookName('Custom REST Endpoint');
+                    setNewWebhookUrl('https://api.yourdomain.com/webhook');
                   }}
-                  className="py-1 px-1.5 rounded-lg bg-[#34A853]/10 hover:bg-[#34A853]/20 border border-[#34A853]/30 text-[#4ADE80] text-[10px] font-semibold transition-all text-center"
+                  className="py-1 px-1.5 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 text-[10px] font-semibold transition-all text-center"
                 >
-                  Sheets API
+                  REST API
                 </button>
               </div>
 
