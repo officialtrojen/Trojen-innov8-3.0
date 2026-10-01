@@ -96,11 +96,7 @@ export default function MyFormsPage() {
           <p style={{ color: '#94A3B8', fontSize: 16 }}>Manage, edit, and organize all your forms in one place.</p>
         </div>
         
-        <div style={{ display: 'flex', gap: 12 }}>
-          <Link href="/builder" className="btn btn-primary" style={{ padding: '10px 20px', borderRadius: 8 }}>
-            <Plus size={16} /> Create Form
-          </Link>
-        </div>
+
       </motion.div>
 
       {!hasData ? (

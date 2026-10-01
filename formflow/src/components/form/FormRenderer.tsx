@@ -344,6 +344,47 @@ export default function FormRenderer({ schema, onSubmit, readOnly = false }: For
               if (readOnly) return;
               document.getElementById(`file-${field.id}`)?.click();
             }}
+            onDragOver={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              if (!readOnly) {
+                e.currentTarget.style.borderColor = 'var(--primary)';
+                e.currentTarget.style.background = 'rgba(255,255,255,0.8)';
+              }
+            }}
+            onDragLeave={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              if (!readOnly) {
+                e.currentTarget.style.borderColor = error ? '#e74c3c' : 'var(--input-border)';
+                e.currentTarget.style.background = 'rgba(255,255,255,0.5)';
+              }
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              if (!readOnly) {
+                e.currentTarget.style.borderColor = error ? '#e74c3c' : 'var(--input-border)';
+                e.currentTarget.style.background = 'rgba(255,255,255,0.5)';
+              }
+              if (readOnly) return;
+              const file = e.dataTransfer.files?.[0];
+              if (file) {
+                const maxSize = (field.validation?.maxFileSize || 10) * 1024 * 1024;
+                if (file.size > maxSize) {
+                  setErrors((prev) => ({ ...prev, [field.id]: `File exceeds maximum size of ${field.validation?.maxFileSize || 10}MB.` }));
+                  return;
+                }
+                if (field.validation?.allowedFileTypes?.length) {
+                  const ext = file.name.split('.').pop()?.toLowerCase();
+                  if (ext && !field.validation.allowedFileTypes.includes(ext)) {
+                    setErrors((prev) => ({ ...prev, [field.id]: 'This file type is not supported.' }));
+                    return;
+                  }
+                }
+                updateAnswer(field.id, file);
+              }
+            }}
           >
             <Upload size={24} style={{ color: '#B8CECF', marginBottom: 8 }} />
             <div style={{ fontSize: 13, color: '#52796F' }}>
@@ -356,13 +397,11 @@ export default function FormRenderer({ schema, onSubmit, readOnly = false }: For
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) {
-                  // Validate file size
                   const maxSize = (field.validation?.maxFileSize || 10) * 1024 * 1024;
                   if (file.size > maxSize) {
                     setErrors((prev) => ({ ...prev, [field.id]: `File exceeds maximum size of ${field.validation?.maxFileSize || 10}MB.` }));
                     return;
                   }
-                  // Validate file type
                   if (field.validation?.allowedFileTypes?.length) {
                     const ext = file.name.split('.').pop()?.toLowerCase();
                     if (ext && !field.validation.allowedFileTypes.includes(ext)) {

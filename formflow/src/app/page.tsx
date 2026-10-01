@@ -288,23 +288,6 @@ export default function ParallaxDeepSpaceLandingPage() {
             </span>
           </div>
 
-          <nav
-            style={{ display: 'flex', alignItems: 'center', gap: 28 }}
-            className="hidden-mobile"
-          >
-            <a
-              href="#architecture"
-              style={{ fontSize: 13, color: '#94A3B8', textDecoration: 'none', fontWeight: 500 }}
-            >
-              Workflow
-            </a>
-            <a
-              href="#features"
-              style={{ fontSize: 13, color: '#94A3B8', textDecoration: 'none', fontWeight: 500 }}
-            >
-              Features
-            </a>
-          </nav>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             <Link

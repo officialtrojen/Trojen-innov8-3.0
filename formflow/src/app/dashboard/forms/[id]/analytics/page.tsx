@@ -9,7 +9,8 @@ import {
   BarChart, Bar, PieChart, Pie, Cell, LineChart, Line,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from 'recharts';
-import { Star } from 'lucide-react';
+import { Star, Download } from 'lucide-react';
+import * as XLSX from 'xlsx';
 
 const COLORS = ['#38BDF8', '#818CF8', '#34D399', '#FBBF24', '#F472B6', '#A78BFA', '#2DD4BF'];
 
@@ -129,10 +130,67 @@ export default function AnalyticsPage() {
 
   if (!form || !analytics) return <div>Form not found.</div>;
 
+  const generateExportData = () => {
+    if (!form) return [];
+    return responses.map((r, index) => {
+      const row: Record<string, string | number> = { 'Response #': index + 1, 'Submitted At': new Date(r.submitted_at).toLocaleString() };
+      form.schema.fields.forEach(f => {
+        let val = r.answers[f.id];
+        if (Array.isArray(val)) val = val.join(', ');
+        row[f.label] = val !== undefined && val !== null ? String(val) : '';
+      });
+      return row;
+    });
+  };
+
+  const handleExportCsv = () => {
+    if (!form) return;
+    if (responses.length === 0) {
+      alert("There are no responses to download yet.");
+      return;
+    }
+    const data = generateExportData();
+    const ws = XLSX.utils.json_to_sheet(data);
+    const csv = XLSX.utils.sheet_to_csv(ws);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${form.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_analytics.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExportExcel = () => {
+    if (!form) return;
+    if (responses.length === 0) {
+      alert("There are no responses to download yet.");
+      return;
+    }
+    const data = generateExportData();
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Analytics");
+    XLSX.writeFile(wb, `${form.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_analytics.xlsx`);
+  };
+
   return (
     <div>
-      <h1 style={{ fontSize: 26, fontWeight: 700, color: '#F8FAFC', marginBottom: 4, letterSpacing: '-0.02em' }}>Analytics</h1>
-      <p style={{ color: '#94A3B8', fontSize: 14, marginBottom: 32 }}>{form.title}</p>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 32 }}>
+        <div>
+          <h1 style={{ fontSize: 26, fontWeight: 700, color: '#F8FAFC', marginBottom: 4, letterSpacing: '-0.02em' }}>Analytics</h1>
+          <p style={{ color: '#94A3B8', fontSize: 14, margin: 0 }}>{form.title}</p>
+        </div>
+        
+        <div style={{ display: 'flex', gap: 12 }}>
+          <button onClick={handleExportCsv} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.05)', color: '#E2E8F0', border: '1px solid rgba(255,255,255,0.1)', padding: '6px 12px', borderRadius: 8, fontSize: 13, cursor: 'pointer' }}>
+            <Download size={14} /> CSV
+          </button>
+          <button onClick={handleExportExcel} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.05)', color: '#E2E8F0', border: '1px solid rgba(255,255,255,0.1)', padding: '6px 12px', borderRadius: 8, fontSize: 13, cursor: 'pointer' }}>
+            <Download size={14} /> Excel
+          </button>
+        </div>
+      </div>
 
       {/* Summary cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 16, marginBottom: 40 }}>

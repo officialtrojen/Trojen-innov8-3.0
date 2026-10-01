@@ -23,7 +23,9 @@ import {
   CheckCircle2,
   ChevronDown,
   Sparkles,
+  Download,
 } from 'lucide-react';
+import * as XLSX from 'xlsx';
 import {
   AreaChart,
   Area,
@@ -173,6 +175,57 @@ export default function AnalyticsPage() {
     };
   }, [forms, filteredResponses]);
 
+  const generateExportData = () => {
+    return filteredResponses.map((r, index) => {
+      const form = forms.find(f => f.id === r.form_id);
+      const row: Record<string, string | number> = { 
+        'Response #': index + 1, 
+        'Form Title': form?.title || 'Unknown Form',
+        'Submitted At': new Date(r.submitted_at).toLocaleString() 
+      };
+      
+      if (form && form.schema && typeof form.schema === 'object' && Array.isArray((form.schema as any).fields)) {
+        (form.schema as any).fields.forEach((f: any) => {
+          let val = (r.answers as any)?.[f.id];
+          if (Array.isArray(val)) val = val.join(', ');
+          row[f.label || f.id] = val !== undefined && val !== null ? String(val) : '';
+        });
+      } else {
+        row['Raw Answers'] = JSON.stringify(r.answers);
+      }
+      return row;
+    });
+  };
+
+  const handleExportCsv = () => {
+    if (filteredResponses.length === 0) {
+      alert("There are no responses to download yet.");
+      return;
+    }
+    const data = generateExportData();
+    const ws = XLSX.utils.json_to_sheet(data);
+    const csv = XLSX.utils.sheet_to_csv(ws);
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `advanced_analytics.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExportExcel = () => {
+    if (filteredResponses.length === 0) {
+      alert("There are no responses to download yet.");
+      return;
+    }
+    const data = generateExportData();
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Analytics");
+    XLSX.writeFile(wb, `advanced_analytics.xlsx`);
+  };
+
   if (loading) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '65vh', gap: 12 }}>
@@ -219,8 +272,15 @@ export default function AnalyticsPage() {
           </p>
         </div>
 
-        {/* Form Filter Selector */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+        {/* Form Filter Selector & Export Options */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+          <button onClick={handleExportCsv} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.05)', color: '#E2E8F0', border: '1px solid rgba(255,255,255,0.1)', padding: '9px 14px', borderRadius: 10, fontSize: 13, cursor: 'pointer', fontWeight: 600 }}>
+            <Download size={15} /> CSV
+          </button>
+          <button onClick={handleExportExcel} style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.05)', color: '#E2E8F0', border: '1px solid rgba(255,255,255,0.1)', padding: '9px 14px', borderRadius: 10, fontSize: 13, cursor: 'pointer', fontWeight: 600 }}>
+            <Download size={15} /> Excel
+          </button>
+
           <div style={{ position: 'relative' }}>
             <select
               value={selectedFormId}
