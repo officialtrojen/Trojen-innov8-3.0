@@ -64,7 +64,7 @@ export default function LoginPage() {
     }
   }, []);
 
-  // Handle password login — checks Supabase profiles table directly
+  // Handle password login
   const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const cleanEmail = email.trim().toLowerCase();
@@ -81,7 +81,6 @@ export default function LoginPage() {
     setLoading(true);
 
     const supabase = createClient();
-    // Query public.profiles table directly (no client-side cache)
     const { data: profile } = await supabase
       .from('profiles')
       .select('id, email')
@@ -91,25 +90,21 @@ export default function LoginPage() {
     const { error: err } = await signIn(cleanEmail, password);
     if (err) {
       setLoading(false);
-      if (profile) {
-        if (err.includes('Invalid login credentials')) {
+      if (err.includes('Invalid login credentials')) {
+        if (profile) {
           setError('Incorrect password. Please try again or sign in with Email OTP.');
         } else {
-          setError(err);
+          setError('Incorrect password or no account found. Please sign up or sign in with Email OTP.');
         }
       } else {
-        if (err.includes('Invalid login credentials') || err.includes('User not found')) {
-          setError('No account found with this email. Please sign up first.');
-        } else {
-          setError(err);
-        }
+        setError(err);
       }
     } else {
       window.location.href = redirectUrl;
     }
   };
 
-  // Handle Send OTP — verify user exists in Supabase public.profiles table first, only send if registered
+  // Handle Send OTP — verify user exists in Supabase (profiles table or auth.users), only send if registered
   const handleSendOtp = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     const cleanEmail = email.trim().toLowerCase();
@@ -121,30 +116,15 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
 
-    // Query Supabase public.profiles table directly (no client cache)
-    const supabase = createClient();
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('id, email')
-      .ilike('email', cleanEmail)
-      .maybeSingle();
-
-    if (!profile) {
-      // User does not exist in Supabase database table! Inform user to sign up
+    // Call Supabase auth with shouldCreateUser: false (strictly for registered users)
+    const { error: otpErr } = await sendOtp(cleanEmail, false);
+    if (otpErr) {
       setError('No account found with this email. Please sign up first.');
       setLoading(false);
       return;
     }
 
-    // User exists in profiles table! Send OTP code
-    const { error: otpErr } = await sendOtp(cleanEmail, false);
-    if (otpErr) {
-      setError(otpErr);
-      setLoading(false);
-      return;
-    }
-
-    // Only switch to OTP input screen after verifying user exists and OTP was dispatched
+    // Dispatched successfully to existing user!
     setLoading(false);
     setOtpSent(true);
     setResendTimer(30);
