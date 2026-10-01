@@ -165,7 +165,7 @@ export default function FormRenderer({ schema, onSubmit, readOnly = false }: For
         >
           <CheckCircle2 size={56} style={{ color: schema.theme.primary, marginBottom: 20 }} />
           <h2 style={{ fontSize: 24, fontWeight: 700, color: schema.theme.text, marginBottom: 12 }}>
-            {schema.settings.successMessage}
+            {schema.settings?.successMessage || 'Your response has been recorded.'}
           </h2>
         </div>
       </div>
@@ -528,7 +528,7 @@ export default function FormRenderer({ schema, onSubmit, readOnly = false }: For
             )}
 
             {/* Progress bar */}
-            {schema.settings.showProgressBar && visibleFields.length > 0 && (
+            {schema.settings?.showProgressBar && visibleFields.length > 0 && (
               <div style={{ marginBottom: 32 }}>
                 <div style={{ height: 4, borderRadius: 2, background: 'rgba(0,0,0,0.06)' }}>
                   <div
@@ -571,7 +571,7 @@ export default function FormRenderer({ schema, onSubmit, readOnly = false }: For
                   }}
                   disabled={submitting}
                 >
-                  {submitting ? <span className="spinner" /> : (schema.settings.submitButtonText || 'Submit')}
+                  {submitting ? <span className="spinner" /> : (schema.settings?.submitButtonText || 'Submit')}
                 </button>
               </div>
             )}

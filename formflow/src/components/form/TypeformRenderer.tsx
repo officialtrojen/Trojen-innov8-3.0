@@ -320,7 +320,7 @@ export default function TypeformRenderer({
             Response Submitted!
           </h2>
           <p style={{ color: '#94A3B8', fontSize: 15, lineHeight: 1.6, marginBottom: 32 }}>
-            {schema.settings.successMessage || 'Thank you! Your response has been recorded successfully.'}
+            {schema.settings?.successMessage || 'Thank you! Your response has been recorded successfully.'}
           </p>
 
           <button
