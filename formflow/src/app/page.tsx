@@ -640,34 +640,17 @@ export default function ParallaxDeepSpaceLandingPage() {
         <footer
           style={{
             borderTop: '1px solid rgba(255, 255, 255, 0.06)',
-            padding: '36px 40px',
+            padding: '32px 40px',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'space-between',
+            justifyContent: 'center',
             maxWidth: 1300,
             margin: '0 auto',
             fontSize: 13,
             color: '#64748B',
-            flexWrap: 'wrap',
-            gap: 16,
           }}
         >
           <div>© 2026 FormFlow. Built with ❤️ by team trojen</div>
-
-          <div style={{ display: 'flex', gap: 24 }}>
-            <Link href="/builder" style={{ color: '#94A3B8', textDecoration: 'none' }}>
-              Form Studio
-            </Link>
-            <Link href="/dashboard" style={{ color: '#94A3B8', textDecoration: 'none' }}>
-              Dashboard
-            </Link>
-            <Link href="/login" style={{ color: '#94A3B8', textDecoration: 'none' }}>
-              Login
-            </Link>
-            <Link href="/signup" style={{ color: '#94A3B8', textDecoration: 'none' }}>
-              Create Account
-            </Link>
-          </div>
         </footer>
       </div>
 
