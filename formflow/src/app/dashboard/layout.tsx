@@ -286,53 +286,7 @@ function Sidebar() {
         </Link>
       </div>
 
-      {/* Primary CTA - Create Form Button matching Landing Page primary button */}
-      <div style={{ padding: '0 12px', marginBottom: 18 }}>
-        <button
-          type="button"
-          onClick={() => {
-            setMobileOpen(false);
-            setCreateModalOpen(true);
-          }}
-          className="create-form-btn-glow"
-          style={{
-            width: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '10px 14px',
-            borderRadius: 9,
-            background: '#FFFFFF',
-            color: '#000000',
-            border: '1px solid #FFFFFF',
-            cursor: 'pointer',
-            fontSize: 13.5,
-            fontWeight: 600,
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <PlusCircle size={16} color="#000000" />
-            <span style={{ color: '#000000', fontWeight: 600 }}>Create Form</span>
-          </div>
 
-          <span
-            style={{
-              fontSize: 11,
-              fontWeight: 700,
-              padding: '2px 7px',
-              borderRadius: 6,
-              background: '#000000',
-              color: '#FFFFFF',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 3,
-            }}
-          >
-            <Sparkles size={11} color="#FFFFFF" />
-            <span>New</span>
-          </span>
-        </button>
-      </div>
 
       {/* Nav links grouped into clean sections */}
       <div style={{ flex: 1, paddingBottom: 16 }}>
