@@ -116,7 +116,12 @@ function BuilderCanvasInner() {
       try {
         const saved = localStorage.getItem('formflow_builder_draft');
         if (saved) {
-          return JSON.parse(saved);
+          const parsed = JSON.parse(saved);
+          return {
+            ...parsed,
+            fields: Array.isArray(parsed.fields) ? parsed.fields : [],
+            logic: Array.isArray(parsed.logic) ? parsed.logic : [],
+          };
         }
       } catch {
         // Ignore parse error
@@ -361,7 +366,12 @@ function BuilderCanvasInner() {
       try {
         const saved = localStorage.getItem('formflow_builder_draft');
         if (saved) {
-          setSchema(JSON.parse(saved));
+          const parsed = JSON.parse(saved);
+          setSchema({
+            ...parsed,
+            fields: Array.isArray(parsed.fields) ? parsed.fields : [],
+            logic: Array.isArray(parsed.logic) ? parsed.logic : [],
+          });
         }
       } catch {
         // Ignore parse errors
@@ -399,7 +409,12 @@ function BuilderCanvasInner() {
         try {
           const savedDraft = localStorage.getItem('formflow_builder_draft');
           if (savedDraft) {
-            targetSchema = JSON.parse(savedDraft);
+            const parsedDraft = JSON.parse(savedDraft);
+            targetSchema = {
+              ...parsedDraft,
+              fields: Array.isArray(parsedDraft.fields) ? parsedDraft.fields : [],
+              logic: Array.isArray(parsedDraft.logic) ? parsedDraft.logic : [],
+            };
             setSchema(targetSchema);
           }
         } catch {}
@@ -518,55 +533,57 @@ function BuilderCanvasInner() {
   const deleteField = useCallback((fieldId: string) => {
     setSchema((prev) => ({
       ...prev,
-      fields: prev.fields.filter((f) => f.id !== fieldId),
-      logic: prev.logic.filter(
+      fields: (prev.fields || []).filter((f) => f.id !== fieldId),
+      logic: (prev.logic || []).filter(
         (r) => r.condition.questionId !== fieldId && r.action.targetQuestionId !== fieldId
       ),
     }));
-    if (selectedFieldId === fieldId) setSelectedFieldId(null);
-  }, [selectedFieldId]);
+    setSelectedFieldId((prev) => (prev === fieldId ? null : prev));
+  }, []);
 
   const duplicateField = useCallback((fieldId: string) => {
     setSchema((prev) => {
-      const field = prev.fields.find((f) => f.id === fieldId);
+      const fields = prev.fields || [];
+      const field = fields.find((f) => f.id === fieldId);
       if (!field) return prev;
       const newField = { ...field, id: generateId('q'), label: `${field.label} (Copy)` };
-      const idx = prev.fields.findIndex((f) => f.id === fieldId);
-      const fields = [...prev.fields];
-      fields.splice(idx + 1, 0, newField);
-      return { ...prev, fields };
+      const idx = fields.findIndex((f) => f.id === fieldId);
+      const nextFields = [...fields];
+      nextFields.splice(idx + 1, 0, newField);
+      return { ...prev, fields: nextFields, logic: prev.logic || [] };
     });
   }, []);
 
   const moveField = useCallback((fieldId: string, direction: 'up' | 'down') => {
     setSchema((prev) => {
-      const index = prev.fields.findIndex((f) => f.id === fieldId);
+      const fields = prev.fields || [];
+      const index = fields.findIndex((f) => f.id === fieldId);
       if (index === -1) return prev;
       const targetIndex = direction === 'up' ? index - 1 : index + 1;
-      if (targetIndex < 0 || targetIndex >= prev.fields.length) return prev;
+      if (targetIndex < 0 || targetIndex >= fields.length) return prev;
       return {
         ...prev,
-        fields: arrayMove(prev.fields, index, targetIndex),
+        fields: arrayMove(fields, index, targetIndex),
       };
     });
   }, []);
 
   // --- Logic rules ---
   const addRule = useCallback((rule: LogicRule) => {
-    setSchema((prev) => ({ ...prev, logic: [...prev.logic, rule] }));
+    setSchema((prev) => ({ ...prev, logic: [...(prev.logic || []), rule] }));
   }, []);
 
   const updateRule = useCallback((ruleId: string, updates: Partial<LogicRule>) => {
     setSchema((prev) => ({
       ...prev,
-      logic: prev.logic.map((r) => (r.id === ruleId ? { ...r, ...updates } : r)),
+      logic: (prev.logic || []).map((r) => (r.id === ruleId ? { ...r, ...updates } : r)),
     }));
   }, []);
 
   const deleteRule = useCallback((ruleId: string) => {
     setSchema((prev) => ({
       ...prev,
-      logic: prev.logic.filter((r) => r.id !== ruleId),
+      logic: (prev.logic || []).filter((r) => r.id !== ruleId),
     }));
   }, []);
 
@@ -1223,6 +1240,7 @@ function BuilderCanvasInner() {
                   field={selectedField}
                   onUpdate={(updates) => updateField(selectedField.id, updates)}
                   onEditFormSettings={() => setSelectedFieldId(null)}
+                  onDelete={() => deleteField(selectedField.id)}
                 />
               )}
 
@@ -1336,9 +1354,14 @@ function BuilderCanvasInner() {
       <AiFormAssistant
         currentSchema={schema}
         onApplySchema={(newSchema) => {
-          setSchema(newSchema);
-          if (newSchema.fields.length > 0) {
-            setSelectedFieldId(newSchema.fields[0].id);
+          const sanitizedSchema = {
+            ...newSchema,
+            fields: Array.isArray(newSchema.fields) ? newSchema.fields : [],
+            logic: Array.isArray(newSchema.logic) ? newSchema.logic : [],
+          };
+          setSchema(sanitizedSchema);
+          if (sanitizedSchema.fields.length > 0) {
+            setSelectedFieldId(sanitizedSchema.fields[0].id);
           }
         }}
         isOpen={isAiOpen}

@@ -218,35 +218,37 @@ export default function FormBuilder({
   const deleteField = useCallback((fieldId: string) => {
     setSchema((prev) => ({
       ...prev,
-      fields: prev.fields.filter((f) => f.id !== fieldId),
-      logic: prev.logic.filter(
+      fields: (prev.fields || []).filter((f) => f.id !== fieldId),
+      logic: (prev.logic || []).filter(
         (r) => r.condition.questionId !== fieldId && r.action.targetQuestionId !== fieldId
       ),
     }));
-    if (selectedFieldId === fieldId) setSelectedFieldId(null);
-  }, [selectedFieldId]);
+    setSelectedFieldId((prev) => (prev === fieldId ? null : prev));
+  }, []);
 
   const duplicateField = useCallback((fieldId: string) => {
     setSchema((prev) => {
-      const field = prev.fields.find((f) => f.id === fieldId);
+      const fields = prev.fields || [];
+      const field = fields.find((f) => f.id === fieldId);
       if (!field) return prev;
       const newField = { ...field, id: generateId('q'), label: `${field.label} (Copy)` };
-      const idx = prev.fields.findIndex((f) => f.id === fieldId);
-      const fields = [...prev.fields];
-      fields.splice(idx + 1, 0, newField);
-      return { ...prev, fields };
+      const idx = fields.findIndex((f) => f.id === fieldId);
+      const nextFields = [...fields];
+      nextFields.splice(idx + 1, 0, newField);
+      return { ...prev, fields: nextFields, logic: prev.logic || [] };
     });
   }, []);
 
   const moveField = useCallback((fieldId: string, direction: 'up' | 'down') => {
     setSchema((prev) => {
-      const index = prev.fields.findIndex((f) => f.id === fieldId);
+      const fields = prev.fields || [];
+      const index = fields.findIndex((f) => f.id === fieldId);
       if (index === -1) return prev;
       const targetIndex = direction === 'up' ? index - 1 : index + 1;
-      if (targetIndex < 0 || targetIndex >= prev.fields.length) return prev;
+      if (targetIndex < 0 || targetIndex >= fields.length) return prev;
       return {
         ...prev,
-        fields: arrayMove(prev.fields, index, targetIndex),
+        fields: arrayMove(fields, index, targetIndex),
       };
     });
   }, []);
@@ -255,21 +257,21 @@ export default function FormBuilder({
   const addRule = useCallback((rule: LogicRule) => {
     setSchema((prev) => ({
       ...prev,
-      logic: [...prev.logic, rule],
+      logic: [...(prev.logic || []), rule],
     }));
   }, []);
 
   const updateRule = useCallback((ruleId: string, updates: Partial<LogicRule>) => {
     setSchema((prev) => ({
       ...prev,
-      logic: prev.logic.map((r) => (r.id === ruleId ? { ...r, ...updates } : r)),
+      logic: (prev.logic || []).map((r) => (r.id === ruleId ? { ...r, ...updates } : r)),
     }));
   }, []);
 
   const deleteRule = useCallback((ruleId: string) => {
     setSchema((prev) => ({
       ...prev,
-      logic: prev.logic.filter((r) => r.id !== ruleId),
+      logic: (prev.logic || []).filter((r) => r.id !== ruleId),
     }));
   }, []);
 
@@ -446,6 +448,7 @@ export default function FormBuilder({
               <PropertiesPanel
                 field={selectedField}
                 onUpdate={(updates) => updateField(selectedField.id, updates)}
+                onDelete={() => deleteField(selectedField.id)}
               />
             )}
             {activePanel === 'properties' && !selectedField && (
@@ -568,7 +571,13 @@ export default function FormBuilder({
       {/* Floating AI Form Builder Assistant Chatbox */}
       <AiFormAssistant
         currentSchema={schema}
-        onApplySchema={setSchema}
+        onApplySchema={(newSchema) =>
+          setSchema({
+            ...newSchema,
+            fields: Array.isArray(newSchema.fields) ? newSchema.fields : [],
+            logic: Array.isArray(newSchema.logic) ? newSchema.logic : [],
+          })
+        }
         isOpen={isAiOpen}
         onClose={() => setIsAiOpen(false)}
         onOpen={() => setIsAiOpen(true)}

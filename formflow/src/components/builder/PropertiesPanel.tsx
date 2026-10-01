@@ -8,9 +8,15 @@ interface PropertiesPanelProps {
   field: FormField;
   onUpdate: (updates: Partial<FormField>) => void;
   onEditFormSettings?: () => void;
+  onDelete?: () => void;
 }
 
-export default function PropertiesPanel({ field, onUpdate, onEditFormSettings }: PropertiesPanelProps) {
+export default function PropertiesPanel({
+  field,
+  onUpdate,
+  onEditFormSettings,
+  onDelete,
+}: PropertiesPanelProps) {
   return (
     <div style={{ padding: 20 }}>
       <div
@@ -343,6 +349,36 @@ export default function PropertiesPanel({ field, onUpdate, onEditFormSettings }:
               }
             />
           </div>
+        </div>
+      )}
+
+      {onDelete && (
+        <div style={{ marginTop: 28, paddingTop: 18, borderTop: '1px solid #B8CECF' }}>
+          <button
+            type="button"
+            onClick={onDelete}
+            className="btn btn-ghost btn-sm"
+            style={{
+              width: '100%',
+              color: '#EF4444',
+              borderColor: 'rgba(239, 68, 68, 0.35)',
+              background: 'rgba(239, 68, 68, 0.06)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+              padding: '10px 14px',
+              borderRadius: 8,
+              fontWeight: 600,
+              fontSize: 13,
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+            }}
+            title="Delete this question"
+          >
+            <Trash2 size={15} />
+            <span>Delete Question</span>
+          </button>
         </div>
       )}
     </div>

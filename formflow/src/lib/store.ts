@@ -108,7 +108,7 @@ export const useFormStore = create<FormBuilderState>((set) => ({
 
   deleteField: (id) =>
     set((state) => {
-      const remaining = state.schema.fields.filter((f) => f.id !== id);
+      const remaining = (state.schema.fields || []).filter((f) => f.id !== id);
       const nextSelected =
         state.selectedFieldId === id
           ? remaining.length > 0
@@ -120,7 +120,7 @@ export const useFormStore = create<FormBuilderState>((set) => ({
         schema: {
           ...state.schema,
           fields: remaining,
-          logic: state.schema.logic.filter(
+          logic: (state.schema.logic || []).filter(
             (r) =>
               r.condition.questionId !== id &&
               r.action.targetQuestionId !== id

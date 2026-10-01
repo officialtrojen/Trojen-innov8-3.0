@@ -255,6 +255,7 @@ You MUST return ONLY a JSON object matching this exact structure:
                 parsed.schema.title = parsed.schema.title || 'Generated Form';
                 parsed.schema.description = parsed.schema.description || '';
 
+                parsed.schema.logic = Array.isArray(parsed.schema.logic) ? parsed.schema.logic : [];
                 const mergedTheme: FormTheme = {
                   ...DEFAULT_THEME,
                   ...(currentSchema?.theme || {}),
