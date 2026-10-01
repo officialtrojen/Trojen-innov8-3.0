@@ -23,6 +23,10 @@ import {
   Settings,
   LayoutDashboard,
   Check,
+  Camera,
+  Upload,
+  Trash2,
+  Loader2,
 } from 'lucide-react';
 import { useAuth, AuthProvider } from '@/components/AuthProvider';
 import ReorderingFeatures from '@/components/ReorderingFeatures';
@@ -41,7 +45,10 @@ function ParallaxDeepSpaceLandingPageInner() {
   const [editName, setEditName] = useState('');
   const [savingProfile, setSavingProfile] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [uploadingModalAvatar, setUploadingModalAvatar] = useState(false);
+  const [isDraggingModalAvatar, setIsDraggingModalAvatar] = useState(false);
   const profileDropdownRef = useRef<HTMLDivElement | null>(null);
+  const modalAvatarInputRef = useRef<HTMLInputElement>(null);
 
   // Sync edit name with current profile/user info
   useEffect(() => {
@@ -90,6 +97,9 @@ function ParallaxDeepSpaceLandingPageInner() {
         email: user.email?.toLowerCase(),
         updated_at: new Date().toISOString(),
       });
+      await supabase.auth.updateUser({
+        data: { name: editName.trim(), full_name: editName.trim() },
+      });
       await refreshProfile();
       setSaveSuccess(true);
       setTimeout(() => {
@@ -100,6 +110,59 @@ function ParallaxDeepSpaceLandingPageInner() {
       console.error('Failed to update profile:', err);
     } finally {
       setSavingProfile(false);
+    }
+  };
+
+  const handleModalAvatarUpload = async (file: File) => {
+    if (!user) return;
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file (PNG, JPG, WEBP, or GIF).');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Avatar image exceeds 5MB. Please choose a smaller file.');
+      return;
+    }
+
+    setUploadingModalAvatar(true);
+    try {
+      const supabase = createClient();
+      const fileExt = file.name.split('.').pop() || 'png';
+      const filePath = `${user.id}/avatar-${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, { cacheControl: '3600', upsert: true });
+
+      let publicUrl = '';
+      if (uploadError) {
+        const reader = new FileReader();
+        publicUrl = await new Promise<string>((resolve) => {
+          reader.onload = (e) => resolve(e.target?.result as string);
+          reader.readAsDataURL(file);
+        });
+      } else {
+        const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
+        publicUrl = urlData.publicUrl;
+      }
+
+      await supabase.from('profiles').upsert({
+        id: user.id,
+        name: (editName || profile?.name || 'User').trim(),
+        email: user.email?.toLowerCase(),
+        avatar_url: publicUrl,
+        updated_at: new Date().toISOString(),
+      });
+
+      await supabase.auth.updateUser({
+        data: { avatar_url: publicUrl },
+      });
+
+      await refreshProfile();
+    } catch (err) {
+      console.error('Failed to upload avatar from landing modal:', err);
+    } finally {
+      setUploadingModalAvatar(false);
     }
   };
 
@@ -1281,6 +1344,136 @@ function ParallaxDeepSpaceLandingPageInner() {
             </div>
 
             <form onSubmit={handleSaveProfile}>
+              {/* Profile Avatar Upload with Drag & Drop */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20, padding: 12, borderRadius: 12, background: 'rgba(255, 255, 255, 0.03)', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                <input
+                  ref={modalAvatarInputRef}
+                  type="file"
+                  accept="image/png, image/jpeg, image/jpg, image/webp, image/gif"
+                  style={{ display: 'none' }}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleModalAvatarUpload(file);
+                    e.target.value = '';
+                  }}
+                />
+
+                <div
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setIsDraggingModalAvatar(true);
+                  }}
+                  onDragEnter={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setIsDraggingModalAvatar(true);
+                  }}
+                  onDragLeave={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setIsDraggingModalAvatar(false);
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setIsDraggingModalAvatar(false);
+                    const file = e.dataTransfer.files?.[0];
+                    if (file) handleModalAvatarUpload(file);
+                  }}
+                  onClick={() => modalAvatarInputRef.current?.click()}
+                  title="Click or drag & drop to change avatar picture"
+                  style={{
+                    position: 'relative',
+                    width: 60,
+                    height: 60,
+                    borderRadius: '50%',
+                    background: 'linear-gradient(135deg, #6366F1, #8B5CF6)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#FFFFFF',
+                    fontWeight: 700,
+                    fontSize: 20,
+                    overflow: 'hidden',
+                    cursor: 'pointer',
+                    flexShrink: 0,
+                    border: isDraggingModalAvatar ? '2px dashed #38BDF8' : '2px solid rgba(255, 255, 255, 0.2)',
+                    boxShadow: isDraggingModalAvatar ? '0 0 0 4px rgba(56, 189, 248, 0.3)' : 'none',
+                    transform: isDraggingModalAvatar ? 'scale(1.06)' : 'scale(1)',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  {avatarUrl ? (
+                    <img src={avatarUrl} alt={displayName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    initialLetter
+                  )}
+
+                  <div
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      background: 'rgba(15, 23, 42, 0.65)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      opacity: uploadingModalAvatar || isDraggingModalAvatar ? 1 : 0,
+                      transition: 'opacity 0.2s',
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!uploadingModalAvatar && !isDraggingModalAvatar) e.currentTarget.style.opacity = '1';
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!uploadingModalAvatar && !isDraggingModalAvatar) e.currentTarget.style.opacity = '0';
+                    }}
+                  >
+                    {uploadingModalAvatar ? (
+                      <Loader2 size={16} className="animate-spin" style={{ color: '#38BDF8' }} />
+                    ) : (
+                      <Camera size={16} style={{ color: '#FFFFFF' }} />
+                    )}
+                  </div>
+                </div>
+
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: '#F8FAFC', marginBottom: 4 }}>Profile Picture</div>
+                  <button
+                    type="button"
+                    onClick={() => modalAvatarInputRef.current?.click()}
+                    disabled={uploadingModalAvatar}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 5,
+                      padding: '5px 10px',
+                      fontSize: 11,
+                      fontWeight: 600,
+                      borderRadius: 6,
+                      background: 'rgba(99, 102, 241, 0.15)',
+                      color: '#818CF8',
+                      border: '1px solid rgba(99, 102, 241, 0.3)',
+                      cursor: uploadingModalAvatar ? 'not-allowed' : 'pointer',
+                    }}
+                  >
+                    {uploadingModalAvatar ? (
+                      <>
+                        <Loader2 size={11} className="animate-spin" />
+                        <span>Uploading...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Upload size={11} />
+                        <span>Upload Photo</span>
+                      </>
+                    )}
+                  </button>
+                  <span style={{ display: 'block', fontSize: 10.5, color: '#64748B', marginTop: 4 }}>
+                    Drag & drop or click. PNG, JPG or WEBP.
+                  </span>
+                </div>
+              </div>
+
               <div style={{ marginBottom: 16 }}>
                 <label
                   style={{
