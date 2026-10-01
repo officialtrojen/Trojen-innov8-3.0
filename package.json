@@ -1,0 +1,9 @@
+{
+  "name": "trojen-innov8-root",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "cd formflow && npm install && npm run build",
+    "start": "cd formflow && npm run start"
+  }
+}
