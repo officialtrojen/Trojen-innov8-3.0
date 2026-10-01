@@ -1003,22 +1003,23 @@ function BuilderCanvasInner() {
                     type="button"
                     onClick={() => setActivePanel(tab.id as typeof activePanel)}
                     style={{
-                      padding: '5px 12px',
+                      padding: '6px 14px',
                       borderRadius: 6,
                       fontSize: 12,
-                      fontWeight: 600,
-                      border: 'none',
+                      fontWeight: isSelected ? 700 : 600,
+                      border: isSelected ? '1px solid rgba(184,206,207,0.8)' : '1px solid transparent',
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
                       gap: 6,
-                      background: isSelected ? 'white' : 'transparent',
-                      color: isSelected ? 'var(--primary)' : '#52796F',
-                      boxShadow: isSelected ? '0 1px 3px rgba(0,0,0,0.08)' : 'none',
+                      background: isSelected ? '#FFFFFF' : 'transparent',
+                      color: isSelected ? '#0F766E' : '#475569',
+                      boxShadow: isSelected ? '0 2px 5px rgba(0,0,0,0.08)' : 'none',
+                      transition: 'all 0.15s ease',
                     }}
                   >
-                    <tab.icon size={13} />
-                    {tab.label}
+                    <tab.icon size={13} style={{ color: isSelected ? '#0F766E' : '#64748B' }} />
+                    <span style={{ color: isSelected ? '#0F766E' : '#475569' }}>{tab.label}</span>
                   </button>
                 );
               })}

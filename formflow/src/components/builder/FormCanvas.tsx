@@ -604,8 +604,27 @@ export default function FormCanvas({
                     <button
                       type="button"
                       onClick={onOpenThemePanel}
-                      className="btn btn-secondary btn-sm"
-                      style={{ fontSize: 12, borderRadius: 8 }}
+                      style={{
+                        fontSize: 12,
+                        fontWeight: 600,
+                        borderRadius: 8,
+                        padding: '8px 16px',
+                        background: '#0F766E',
+                        color: '#FFFFFF',
+                        border: 'none',
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        boxShadow: '0 2px 8px rgba(15, 118, 110, 0.3)',
+                        transition: 'all 0.2s ease',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = '#115E59';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = '#0F766E';
+                      }}
                     >
                       🎨 Customize Appearance
                     </button>
