@@ -191,10 +191,14 @@ export default function DashboardPage() {
         <div className="card" style={{ padding: 48, textAlign: 'center' }}>
           <FileText size={40} style={{ color: '#64748B', marginBottom: 16 }} />
           <h3 style={{ fontSize: 18, fontWeight: 600, color: '#F8FAFC', marginBottom: 8 }}>No forms yet</h3>
-          <p style={{ color: '#94A3B8', fontSize: 14, marginBottom: 24 }}>Create your first form to get started.</p>
-          <Link href="/builder?new=true" className="btn btn-primary">
+          <button
+            type="button"
+            onClick={() => window.dispatchEvent(new CustomEvent('open-create-form-modal'))}
+            className="btn btn-primary"
+            style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 8 }}
+          >
             <PlusCircle size={18} /> Create Your First Form
-          </Link>
+          </button>
         </div>
       ) : (
         <div className="card" style={{ overflow: 'hidden' }}>

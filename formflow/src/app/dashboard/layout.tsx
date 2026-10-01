@@ -105,6 +105,25 @@ function Sidebar() {
     primaryActionText: 'Change Name',
   });
 
+  React.useEffect(() => {
+    const handleOpen = () => {
+      setFormName('');
+      setFormDesc('');
+      setFormNameError(null);
+      setCreateModalOpen(true);
+    };
+    window.addEventListener('open-create-form-modal', handleOpen);
+
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('new') === 'true') {
+        handleOpen();
+      }
+    }
+
+    return () => window.removeEventListener('open-create-form-modal', handleOpen);
+  }, []);
+
   const handleSignOut = () => {
     setSigningOut(true);
     signOut('/login');
@@ -286,7 +305,38 @@ function Sidebar() {
         </Link>
       </div>
 
-
+      {/* New Form Button in Sidebar */}
+      <div style={{ padding: '0 12px 14px' }}>
+        <button
+          type="button"
+          onClick={() => {
+            setFormName('');
+            setFormDesc('');
+            setFormNameError(null);
+            setCreateModalOpen(true);
+          }}
+          style={{
+            width: '100%',
+            padding: '10px 14px',
+            borderRadius: 10,
+            background: 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)',
+            border: '1px solid rgba(255, 255, 255, 0.15)',
+            color: '#FFFFFF',
+            fontSize: 13,
+            fontWeight: 700,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 8,
+            cursor: 'pointer',
+            boxShadow: '0 4px 14px rgba(79, 70, 229, 0.35)',
+            transition: 'all 0.2s ease',
+          }}
+        >
+          <PlusCircle size={16} />
+          <span>New Form</span>
+        </button>
+      </div>
 
       {/* Nav links grouped into clean sections */}
       <div style={{ flex: 1, paddingBottom: 16 }}>

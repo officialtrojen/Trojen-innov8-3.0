@@ -96,7 +96,14 @@ export default function MyFormsPage() {
           <p style={{ color: '#94A3B8', fontSize: 16 }}>Manage, edit, and organize all your forms in one place.</p>
         </div>
         
-
+        <button
+          type="button"
+          onClick={() => window.dispatchEvent(new CustomEvent('open-create-form-modal'))}
+          className="btn btn-primary"
+          style={{ padding: '10px 20px', borderRadius: 10, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}
+        >
+          <Plus size={16} /> Create Form
+        </button>
       </motion.div>
 
       {!hasData ? (
@@ -120,9 +127,14 @@ export default function MyFormsPage() {
               You haven&apos;t created any forms. Click the button below to start building your first one.
             </p>
             <div style={{ display: 'flex', gap: 16, justifyContent: 'center' }}>
-              <Link href="/builder" className="btn btn-primary" style={{ padding: '10px 24px', borderRadius: 8 }}>
+              <button
+                type="button"
+                onClick={() => window.dispatchEvent(new CustomEvent('open-create-form-modal'))}
+                className="btn btn-primary"
+                style={{ padding: '10px 24px', borderRadius: 8, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 8 }}
+              >
                 <Plus size={16} /> Create Form
-              </Link>
+              </button>
               <Link href="/builder" className="btn btn-secondary" style={{ padding: '10px 24px', borderRadius: 8, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}>
                 <LayoutTemplate size={16} /> Studio Templates
               </Link>

@@ -7,7 +7,7 @@ export default function NewFormPage() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace('/builder');
+    router.replace('/dashboard/forms?new=true');
   }, [router]);
 
   return (
