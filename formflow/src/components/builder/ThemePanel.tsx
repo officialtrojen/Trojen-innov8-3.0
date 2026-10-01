@@ -51,36 +51,30 @@ export default function ThemePanel({ theme, onUpdate, initialTab }: ThemePanelPr
   const bgFileInputRef = useRef<HTMLInputElement>(null);
   const logoFileInputRef = useRef<HTMLInputElement>(null);
 
-  // Handle local logo file upload (PNG/SVG/etc) as base64
-  const handleLogoFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  // Drag-and-drop states
+  const [isDraggingBg, setIsDraggingBg] = useState(false);
+  const [isDraggingLogo, setIsDraggingLogo] = useState(false);
+  const [isDraggingPoster, setIsDraggingPoster] = useState(false);
 
+  // Generic file processors for both click picker and drag & drop
+  const processLogoFile = (file: File) => {
     if (file.size > 5 * 1024 * 1024) {
-      alert('File size exceeds 5MB. Please choose a smaller logo.');
+      alert('Logo file exceeds 5MB. Please choose a smaller logo.');
       return;
     }
-
     const reader = new FileReader();
     reader.onload = (event) => {
       const result = event.target?.result as string;
-      onUpdate({
-        logoUrl: result,
-      });
+      onUpdate({ logoUrl: result });
     };
     reader.readAsDataURL(file);
   };
 
-  // Handle local poster file upload as base64
-  const handlePosterFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+  const processPosterFile = (file: File) => {
     if (file.size > 5 * 1024 * 1024) {
-      alert('File size exceeds 5MB. Please choose a smaller image.');
+      alert('Poster image exceeds 5MB. Please choose a smaller image.');
       return;
     }
-
     const reader = new FileReader();
     reader.onload = (event) => {
       const result = event.target?.result as string;
@@ -94,16 +88,11 @@ export default function ThemePanel({ theme, onUpdate, initialTab }: ThemePanelPr
     reader.readAsDataURL(file);
   };
 
-  // Handle local background image upload as base64
-  const handleBgFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+  const processBgFile = (file: File) => {
     if (file.size > 5 * 1024 * 1024) {
-      alert('File size exceeds 5MB. Please choose a smaller image.');
+      alert('Background image exceeds 5MB. Please choose a smaller image.');
       return;
     }
-
     const reader = new FileReader();
     reader.onload = (event) => {
       const result = event.target?.result as string;
@@ -113,6 +102,27 @@ export default function ThemePanel({ theme, onUpdate, initialTab }: ThemePanelPr
       });
     };
     reader.readAsDataURL(file);
+  };
+
+  // Handle local logo file upload (PNG/SVG/etc) as base64
+  const handleLogoFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) processLogoFile(file);
+    e.target.value = '';
+  };
+
+  // Handle local poster file upload as base64
+  const handlePosterFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) processPosterFile(file);
+    e.target.value = '';
+  };
+
+  // Handle local background image upload as base64
+  const handleBgFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) processBgFile(file);
+    e.target.value = '';
   };
 
   const currentPoster = theme.posterUrl || theme.bannerUrl;
@@ -746,7 +756,7 @@ export default function ThemePanel({ theme, onUpdate, initialTab }: ThemePanelPr
                 )}
               </div>
 
-              {/* Upload trigger */}
+              {/* Upload trigger with Drag & Drop */}
               <input
                 ref={bgFileInputRef}
                 type="file"
@@ -755,30 +765,58 @@ export default function ThemePanel({ theme, onUpdate, initialTab }: ThemePanelPr
                 style={{ display: 'none' }}
               />
 
-              <button
-                type="button"
+              <div
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setIsDraggingBg(true);
+                }}
+                onDragEnter={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setIsDraggingBg(true);
+                }}
+                onDragLeave={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setIsDraggingBg(false);
+                }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setIsDraggingBg(false);
+                  const file = e.dataTransfer.files?.[0];
+                  if (file && (file.type.startsWith('image/') || /\.(png|jpe?g|webp|gif|svg)$/i.test(file.name))) {
+                    processBgFile(file);
+                  }
+                }}
                 onClick={() => bgFileInputRef.current?.click()}
-                className="btn btn-secondary"
                 style={{
                   width: '100%',
                   display: 'flex',
+                  flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  gap: 8,
+                  gap: 6,
                   marginBottom: 14,
-                  fontSize: 12,
-                  fontWeight: 700,
-                  padding: '10px 14px',
-                  background: '#FFFFFF',
+                  padding: '14px 14px',
+                  background: isDraggingBg ? 'rgba(15, 118, 110, 0.12)' : '#FFFFFF',
                   color: '#0F172A',
-                  border: '1.5px solid #0F766E',
-                  borderRadius: 8,
+                  border: isDraggingBg ? '2px dashed #0F766E' : '1.5px dashed rgba(15, 118, 110, 0.6)',
+                  borderRadius: 10,
                   cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  transform: isDraggingBg ? 'scale(1.02)' : 'scale(1)',
                 }}
               >
-                <Upload size={15} style={{ color: '#0F766E' }} />
-                <span style={{ color: '#0F172A' }}>Upload Background Image</span>
-              </button>
+                <Upload size={18} style={{ color: '#0F766E' }} />
+                <span style={{ fontSize: 12, fontWeight: 700, color: '#0F766E' }}>
+                  {isDraggingBg ? 'Drop Background Photo Here!' : 'Upload or Drag & Drop Photo'}
+                </span>
+                <span style={{ fontSize: 10.5, color: '#64748B' }}>
+                  PNG, JPG, WEBP up to 5MB
+                </span>
+              </div>
 
               {/* Curated Presets Grid */}
               <div style={{ marginBottom: 16 }}>
@@ -1085,13 +1123,39 @@ export default function ThemePanel({ theme, onUpdate, initialTab }: ThemePanelPr
       {/* ======================================================== */}
       {activeTab === 'poster' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-          {/* Logo (PNG) in Poster Area */}
+          {/* Logo (PNG) in Poster Area with Drag & Drop */}
           <div
+            onDragOver={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsDraggingLogo(true);
+            }}
+            onDragEnter={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsDraggingLogo(true);
+            }}
+            onDragLeave={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsDraggingLogo(false);
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsDraggingLogo(false);
+              const file = e.dataTransfer.files?.[0];
+              if (file && (file.type.startsWith('image/') || /\.(png|jpe?g|webp|gif|svg)$/i.test(file.name))) {
+                processLogoFile(file);
+              }
+            }}
             style={{
               padding: '12px 14px',
               borderRadius: 10,
-              background: 'rgba(207,229,227,0.3)',
-              border: '1.5px dashed rgba(79,124,122,0.4)',
+              background: isDraggingLogo ? 'rgba(15, 118, 110, 0.15)' : 'rgba(207,229,227,0.3)',
+              border: isDraggingLogo ? '2px dashed #0F766E' : '1.5px dashed rgba(79,124,122,0.4)',
+              transition: 'all 0.2s ease',
+              transform: isDraggingLogo ? 'scale(1.02)' : 'scale(1)',
             }}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
@@ -1120,7 +1184,7 @@ export default function ThemePanel({ theme, onUpdate, initialTab }: ThemePanelPr
             </div>
 
             <p style={{ fontSize: 11, color: '#52796F', margin: '0 0 10px 0', lineHeight: 1.4 }}>
-              Appears in dedicated space on the left side of the poster. Transparent PNGs recommended.
+              Appears in dedicated space on the left side of the poster. Drag & drop or click to upload.
             </p>
 
             <input
@@ -1170,7 +1234,7 @@ export default function ThemePanel({ theme, onUpdate, initialTab }: ThemePanelPr
                       cursor: 'pointer',
                     }}
                   >
-                    Change Logo PNG
+                    {isDraggingLogo ? 'Drop PNG Here' : 'Change Logo PNG'}
                   </button>
                 </div>
               </div>
@@ -1187,16 +1251,17 @@ export default function ThemePanel({ theme, onUpdate, initialTab }: ThemePanelPr
                   gap: 8,
                   fontSize: 12,
                   fontWeight: 600,
-                  padding: '8px 12px',
-                  background: '#FFFFFF',
+                  padding: '10px 12px',
+                  background: isDraggingLogo ? 'rgba(15, 118, 110, 0.2)' : '#FFFFFF',
                   color: '#263B3B',
-                  border: '1.5px solid #4F7C7A',
+                  border: isDraggingLogo ? '2px dashed #0F766E' : '1.5px solid #4F7C7A',
                   borderRadius: 8,
                   cursor: 'pointer',
+                  transition: 'all 0.15s ease',
                 }}
               >
                 <Upload size={14} style={{ color: '#4F7C7A' }} />
-                Upload Logo PNG
+                {isDraggingLogo ? 'Drop PNG Logo Here!' : 'Upload or Drag & Drop PNG'}
               </button>
             )}
 
@@ -1246,11 +1311,33 @@ export default function ThemePanel({ theme, onUpdate, initialTab }: ThemePanelPr
               style={{ display: 'none' }}
             />
 
-            {/* Upload Button */}
-            <button
-              type="button"
+            {/* Upload Button with Drag & Drop */}
+            <div
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setIsDraggingPoster(true);
+              }}
+              onDragEnter={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setIsDraggingPoster(true);
+              }}
+              onDragLeave={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setIsDraggingPoster(false);
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setIsDraggingPoster(false);
+                const file = e.dataTransfer.files?.[0];
+                if (file && (file.type.startsWith('image/') || /\.(png|jpe?g|webp|gif|svg)$/i.test(file.name))) {
+                  processPosterFile(file);
+                }
+              }}
               onClick={() => posterFileInputRef.current?.click()}
-              className="btn btn-primary"
               style={{
                 width: '100%',
                 display: 'flex',
@@ -1258,12 +1345,22 @@ export default function ThemePanel({ theme, onUpdate, initialTab }: ThemePanelPr
                 justifyContent: 'center',
                 gap: 8,
                 fontSize: 13,
+                fontWeight: 700,
                 marginBottom: 12,
+                padding: '12px 14px',
+                borderRadius: 8,
+                cursor: 'pointer',
+                background: isDraggingPoster ? '#0D9488' : '#0F766E',
+                color: '#FFFFFF',
+                border: isDraggingPoster ? '2px dashed #FFFFFF' : 'none',
+                boxShadow: isDraggingPoster ? '0 0 0 4px rgba(15,118,110,0.3)' : '0 2px 6px rgba(15,118,110,0.25)',
+                transition: 'all 0.15s ease',
+                transform: isDraggingPoster ? 'scale(1.02)' : 'scale(1)',
               }}
             >
               <Upload size={15} />
-              Upload Poster Image
-            </button>
+              {isDraggingPoster ? 'Drop Poster Image Here!' : 'Upload or Drag & Drop Poster'}
+            </div>
 
             {/* Poster URL fallback */}
             <div style={{ marginBottom: 16 }}>

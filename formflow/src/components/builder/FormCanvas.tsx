@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -289,17 +289,16 @@ export default function FormCanvas({
 }: FormCanvasProps) {
   const { setNodeRef, isOver } = useDroppable({ id: 'canvas-drop-zone' });
   const posterFileInputRef = useRef<HTMLInputElement>(null);
+  const [isDraggingPoster, setIsDraggingPoster] = useState(false);
+  const [isDraggingLogo, setIsDraggingLogo] = useState(false);
+  const [isDraggingCanvasPoster, setIsDraggingCanvasPoster] = useState(false);
 
-  // Handle local poster file upload directly from canvas
-  const handlePosterUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+  // Common helper to handle poster file (from picker or drag & drop)
+  const handlePosterFile = (file: File) => {
     if (file.size > 5 * 1024 * 1024) {
       alert('Poster image exceeds 5MB. Please choose a smaller file.');
       return;
     }
-
     const reader = new FileReader();
     reader.onload = (ev) => {
       const result = ev.target?.result as string;
@@ -323,7 +322,39 @@ export default function FormCanvas({
       }
     };
     reader.readAsDataURL(file);
-    // Reset input so same file can be re-selected if needed
+  };
+
+  // Common helper to handle logo file (from picker or drag & drop)
+  const handleLogoFile = (file: File) => {
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Logo file exceeds 5MB. Please choose a smaller image.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const result = ev.target?.result as string;
+      if (result && onUpdateTheme) {
+        onUpdateTheme({
+          ...(theme || {
+            background: '#EAF4F4',
+            primary: '#8B5CF6',
+            secondary: '#475569',
+            text: '#0F172A',
+            fontFamily: 'Inter',
+            fontSize: 'medium',
+            layout: 'single-page',
+          }),
+          logoUrl: result,
+        });
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Handle local poster file upload directly from canvas file picker
+  const handlePosterUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) handlePosterFile(file);
     e.target.value = '';
   };
 
@@ -361,17 +392,66 @@ export default function FormCanvas({
                 : cardStyle.border,
             }}
           >
-            {/* POSTER / BANNER DISPLAY IN FORM HEADER */}
+            {/* POSTER / BANNER DISPLAY IN FORM HEADER WITH DRAG & DROP */}
             {(currentPoster || theme?.bannerColor || theme?.posterColor || theme?.posterTitle) && (
               <div
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setIsDraggingPoster(true);
+                }}
+                onDragEnter={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setIsDraggingPoster(true);
+                }}
+                onDragLeave={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setIsDraggingPoster(false);
+                }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setIsDraggingPoster(false);
+                  const file = e.dataTransfer.files?.[0];
+                  if (file && (file.type.startsWith('image/') || /\.(png|jpe?g|webp|gif|svg)$/i.test(file.name))) {
+                    handlePosterFile(file);
+                  }
+                }}
                 style={{
                   position: 'relative',
                   width: '100%',
                   height: posterHeight,
                   overflow: 'hidden',
                   background: theme?.bannerColor || theme?.posterColor || `linear-gradient(135deg, ${theme?.primary || '#8B5CF6'} 0%, #0F172A 100%)`,
+                  outline: isDraggingPoster ? '3px dashed #38BDF8' : 'none',
+                  outlineOffset: -3,
+                  transition: 'all 0.2s ease',
                 }}
               >
+                {/* Drag over overlay hint */}
+                {isDraggingPoster && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      zIndex: 35,
+                      background: 'rgba(15, 23, 42, 0.8)',
+                      backdropFilter: 'blur(4px)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 8,
+                      color: '#FFFFFF',
+                      pointerEvents: 'none',
+                    }}
+                  >
+                    <Upload size={32} style={{ color: '#38BDF8' }} />
+                    <span style={{ fontSize: 14, fontWeight: 700 }}>Drop image here to update poster!</span>
+                  </div>
+                )}
                 {currentPoster && (
                   <img
                     src={currentPoster}
@@ -400,8 +480,39 @@ export default function FormCanvas({
                     color: 'white',
                   }}
                 >
-                  {/* Left Side: Logo (PNG) Space */}
-                  <div style={{ position: 'relative', flexShrink: 0 }}>
+                  {/* Left Side: Logo (PNG) Space with Drag & Drop */}
+                  <div
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setIsDraggingLogo(true);
+                    }}
+                    onDragEnter={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setIsDraggingLogo(true);
+                    }}
+                    onDragLeave={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setIsDraggingLogo(false);
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setIsDraggingLogo(false);
+                      const file = e.dataTransfer.files?.[0];
+                      if (file && (file.type.startsWith('image/') || /\.(png|jpe?g|webp|gif|svg)$/i.test(file.name))) {
+                        handleLogoFile(file);
+                      }
+                    }}
+                    style={{
+                      position: 'relative',
+                      flexShrink: 0,
+                      transform: isDraggingLogo ? 'scale(1.08)' : 'scale(1)',
+                      transition: 'transform 0.15s ease',
+                    }}
+                  >
                     <input
                       type="file"
                       id="canvas-logo-upload"
@@ -409,18 +520,8 @@ export default function FormCanvas({
                       style={{ display: 'none' }}
                       onChange={(e) => {
                         const file = e.target.files?.[0];
-                        if (file && onUpdateTheme) {
-                          const reader = new FileReader();
-                          reader.onload = (ev) => {
-                            if (ev.target?.result) {
-                              onUpdateTheme({
-                                ...(theme || { background: '#EAF4F4', primary: '#8B5CF6', secondary: '#475569', text: '#0F172A', fontFamily: 'Inter', fontSize: 'medium', layout: 'single-page' }),
-                                logoUrl: ev.target.result as string,
-                              });
-                            }
-                          };
-                          reader.readAsDataURL(file);
-                        }
+                        if (file) handleLogoFile(file);
+                        e.target.value = '';
                       }}
                     />
 
@@ -431,18 +532,21 @@ export default function FormCanvas({
                           width: 68,
                           height: 68,
                           borderRadius: 14,
-                          background: 'rgba(255, 255, 255, 0.95)',
-                          border: '2px solid rgba(255, 255, 255, 0.6)',
-                          boxShadow: '0 8px 24px rgba(0, 0, 0, 0.35)',
+                          background: isDraggingLogo ? 'rgba(255, 255, 255, 1)' : 'rgba(255, 255, 255, 0.95)',
+                          border: isDraggingLogo ? '2.5px solid #0F766E' : '2px solid rgba(255, 255, 255, 0.6)',
+                          boxShadow: isDraggingLogo
+                            ? '0 0 0 4px rgba(15, 118, 110, 0.35), 0 8px 24px rgba(0, 0, 0, 0.35)'
+                            : '0 8px 24px rgba(0, 0, 0, 0.35)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
                           padding: 6,
                           overflow: 'hidden',
                           cursor: 'pointer',
+                          transition: 'all 0.15s ease',
                         }}
                         onClick={() => document.getElementById('canvas-logo-upload')?.click()}
-                        title="Click to replace logo PNG"
+                        title="Click or drag & drop to replace logo PNG"
                       >
                         <img
                           src={theme.logoUrl}
@@ -488,16 +592,18 @@ export default function FormCanvas({
                       <button
                         type="button"
                         onClick={() => document.getElementById('canvas-logo-upload')?.click()}
-                        title="Click to add a PNG logo in this space"
+                        title="Click or drag & drop a PNG logo here"
                         style={{
                           width: 68,
                           height: 68,
                           borderRadius: 14,
-                          background: 'rgba(255, 255, 255, 0.15)',
+                          background: isDraggingLogo ? 'rgba(255, 255, 255, 0.4)' : 'rgba(255, 255, 255, 0.15)',
                           backdropFilter: 'blur(12px)',
                           WebkitBackdropFilter: 'blur(12px)',
-                          border: '2px dashed rgba(255, 255, 255, 0.5)',
-                          boxShadow: '0 4px 14px rgba(0, 0, 0, 0.25)',
+                          border: isDraggingLogo ? '2.5px dashed #FFFFFF' : '2px dashed rgba(255, 255, 255, 0.5)',
+                          boxShadow: isDraggingLogo
+                            ? '0 0 0 4px rgba(255,255,255,0.4), 0 4px 14px rgba(0, 0, 0, 0.25)'
+                            : '0 4px 14px rgba(0, 0, 0, 0.25)',
                           display: 'flex',
                           flexDirection: 'column',
                           alignItems: 'center',
@@ -521,7 +627,7 @@ export default function FormCanvas({
                       >
                         <Upload size={16} />
                         <span style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.02em', textTransform: 'uppercase', textAlign: 'center', lineHeight: 1.1 }}>
-                          Add Logo
+                          {isDraggingLogo ? 'Drop PNG' : 'Add Logo'}
                         </span>
                       </button>
                     )}
@@ -594,8 +700,44 @@ export default function FormCanvas({
                   )}
                 </div>
 
-                {/* Quick Poster trigger & actions */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                {/* Quick Poster trigger & actions with Drag & Drop */}
+                <div
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setIsDraggingCanvasPoster(true);
+                  }}
+                  onDragEnter={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setIsDraggingCanvasPoster(true);
+                  }}
+                  onDragLeave={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setIsDraggingCanvasPoster(false);
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setIsDraggingCanvasPoster(false);
+                    const file = e.dataTransfer.files?.[0];
+                    if (file && (file.type.startsWith('image/') || /\.(png|jpe?g|webp|gif|svg)$/i.test(file.name))) {
+                      handlePosterFile(file);
+                    }
+                  }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    flexShrink: 0,
+                    padding: '3px 4px',
+                    borderRadius: 10,
+                    border: isDraggingCanvasPoster ? '2px dashed #0F766E' : '2px dashed transparent',
+                    background: isDraggingCanvasPoster ? 'rgba(15, 118, 110, 0.12)' : 'transparent',
+                    transition: 'all 0.2s ease',
+                  }}
+                >
                   <input
                     ref={posterFileInputRef}
                     type="file"
@@ -615,17 +757,29 @@ export default function FormCanvas({
                       gap: 6,
                       padding: '6px 12px',
                       borderRadius: 8,
-                      border: isDarkCard ? '1px solid rgba(255,255,255,0.2)' : '1px solid #B8CECF',
-                      background: isDarkCard ? 'rgba(255,255,255,0.1)' : '#FFFFFF',
+                      border: isDraggingCanvasPoster
+                        ? '1.5px solid #0F766E'
+                        : isDarkCard
+                        ? '1px solid rgba(255,255,255,0.2)'
+                        : '1px solid #B8CECF',
+                      background: isDraggingCanvasPoster
+                        ? 'rgba(15, 118, 110, 0.2)'
+                        : isDarkCard
+                        ? 'rgba(255,255,255,0.1)'
+                        : '#FFFFFF',
                       color: isDarkCard ? '#F8FAFC' : '#0F766E',
                       cursor: 'pointer',
                       boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
                       transition: 'all 0.15s ease',
                     }}
-                    title="Upload poster image from your device"
+                    title="Click or drag & drop an image file here"
                   >
                     <ImageIcon size={14} />
-                    {currentPoster ? 'Change Poster' : '+ Add Poster'}
+                    {isDraggingCanvasPoster
+                      ? 'Drop Poster Here!'
+                      : currentPoster
+                      ? 'Change Poster'
+                      : '+ Add Poster'}
                   </button>
 
                   {onOpenThemePanel && (
