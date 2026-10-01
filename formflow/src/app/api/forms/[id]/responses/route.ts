@@ -125,25 +125,50 @@ export async function POST(
     }
 
     const body = await request.json();
-    const newResponse = {
-      form_id: dbForm.id,
-      answers: body.answers || {},
-      respondent_meta: {
-        device: body.respondentMeta?.device || 'desktop',
-        durationSeconds: body.respondentMeta?.durationSeconds || 0,
-        userAgent: body.respondentMeta?.userAgent || 'Browser',
-      },
+    const meta = {
+      device: body.respondentMeta?.device || 'desktop',
+      durationSeconds: body.respondentMeta?.durationSeconds || 0,
+      userAgent: body.respondentMeta?.userAgent || 'Browser',
     };
 
-    const { data: saved, error } = await supabase
-      .from('responses')
-      .insert(newResponse)
-      .select('*')
-      .single();
+    let saved = null;
+    let error = null;
 
-    if (error) {
-      console.error('Supabase insert error:', error);
-      return NextResponse.json({ error: 'Failed to submit response to database' }, { status: 500 });
+    // 1. Try insert with metadata and respondent_meta
+    const tryBoth = await supabase
+      .from('responses')
+      .insert({
+        form_id: dbForm.id,
+        answers: body.answers || {},
+        metadata: meta,
+        respondent_meta: meta,
+        submitted_at: new Date().toISOString(),
+      })
+      .select('*')
+      .maybeSingle();
+
+    if (!tryBoth.error && tryBoth.data) {
+      saved = tryBoth.data;
+    } else if (tryBoth.error) {
+      // 2. Fallback to just metadata if respondent_meta doesn't exist
+      const tryMeta = await supabase
+        .from('responses')
+        .insert({
+          form_id: dbForm.id,
+          answers: body.answers || {},
+          metadata: meta,
+          submitted_at: new Date().toISOString(),
+        })
+        .select('*')
+        .maybeSingle();
+
+      if (!tryMeta.error && tryMeta.data) {
+        saved = tryMeta.data;
+      } else {
+        error = tryMeta.error || tryBoth.error;
+        console.error('Supabase insert error:', error);
+        return NextResponse.json({ error: error?.message || 'Failed to submit response to database' }, { status: 500 });
+      }
     }
 
     // Trigger registered webhooks asynchronously

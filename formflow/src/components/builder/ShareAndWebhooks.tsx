@@ -14,7 +14,12 @@ import {
   Send, 
   CheckCircle2, 
   AlertCircle,
-  Code
+  Code,
+  Eye,
+  EyeOff,
+  FileSpreadsheet,
+  Terminal,
+  Radio
 } from 'lucide-react';
 // @ts-ignore
 import QRCode from 'qrcode';
@@ -37,6 +42,77 @@ export const ShareAndWebhooks: React.FC<ShareAndWebhooksProps> = ({
   const [editingUrl, setEditingUrl] = useState('');
   const [testingWebhookId, setTestingWebhookId] = useState<string | null>(null);
   const [testResult, setTestResult] = useState<{ id: string; success: boolean; msg: string } | null>(null);
+  
+  // Live Payload Previewer State (FR-6)
+  const [showPayloadPreview, setShowPayloadPreview] = useState(false);
+  const [previewFormat, setPreviewFormat] = useState<'json' | 'discord' | 'slack'>('json');
+  const [copiedPayload, setCopiedPayload] = useState(false);
+
+  // Dynamic responses mock from current form's fields
+  const mockResponses = React.useMemo(() => {
+    const res: Record<string, any> = {};
+    if (form.fields && form.fields.length > 0) {
+      form.fields.forEach((field) => {
+        if (field.type === 'rating') res[field.label] = 5;
+        else if (field.type === 'multiple_choice') res[field.label] = field.options?.[0] || 'Option Selected';
+        else if (field.type === 'date') res[field.label] = '2026-10-01';
+        else if (field.type === 'file_upload') res[field.label] = 'https://storage.supabase.co/uploads/submission.pdf';
+        else res[field.label] = 'Sample respondent answer';
+      });
+    } else {
+      res['Full Name'] = 'Alex Morgan';
+      res['Email'] = 'alex@example.com';
+      res['Feedback'] = 'Excellent form experience!';
+    }
+    return res;
+  }, [form.fields]);
+
+  const previewPayloadString = React.useMemo(() => {
+    const timestamp = new Date().toISOString();
+    if (previewFormat === 'discord') {
+      return JSON.stringify({
+        username: 'FormFlow Bot',
+        avatar_url: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
+        embeds: [
+          {
+            title: `🎉 New Form Submission`,
+            description: `A new response was submitted for form \`${form.id}\`.`,
+            color: 0x8b5cf6,
+            fields: Object.entries(mockResponses).map(([k, v]) => ({
+              name: String(k),
+              value: String(v),
+              inline: false,
+            })),
+            timestamp,
+          },
+        ],
+      }, null, 2);
+    } else if (previewFormat === 'slack') {
+      const formattedLines = Object.entries(mockResponses).map(([k, v]) => `• *${k}*: ${v}`).join('\n');
+      return JSON.stringify({
+        text: `🎉 *New Form Submission (${form.id})*\n${formattedLines}`,
+      }, null, 2);
+    } else {
+      return JSON.stringify({
+        event: 'form_submission',
+        formId: form.id,
+        submissionId: 'resp_demo_109283',
+        submittedAt: timestamp,
+        responses: mockResponses,
+        metadata: {
+          device: 'desktop',
+          durationSeconds: 45,
+          referrer: 'https://formflow.app/form/' + form.id,
+        },
+      }, null, 2);
+    }
+  }, [previewFormat, mockResponses, form.id]);
+
+  const handleCopyPayload = () => {
+    navigator.clipboard.writeText(previewPayloadString);
+    setCopiedPayload(true);
+    setTimeout(() => setCopiedPayload(false), 2000);
+  };
 
   const handleSaveEdit = (id: string) => {
     if (!editingUrl) return;
@@ -363,9 +439,56 @@ export const ShareAndWebhooks: React.FC<ShareAndWebhooksProps> = ({
 
             {/* Add Webhook Form */}
             <div className="pt-4 border-t border-zinc-800 space-y-3">
-              <span className="text-xs font-semibold text-zinc-300 block">
-                Connect New Webhook
-              </span>
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-zinc-300 block">
+                  Connect New Webhook
+                </span>
+                <span className="text-[10px] text-zinc-500">Quick Presets:</span>
+              </div>
+
+              {/* Quick Presets */}
+              <div className="grid grid-cols-4 gap-1.5 pb-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setNewWebhookName('Discord #submissions');
+                    setNewWebhookUrl('https://discord.com/api/webhooks/');
+                  }}
+                  className="py-1 px-2 rounded-lg bg-[#5865F2]/10 hover:bg-[#5865F2]/20 border border-[#5865F2]/30 text-[#818CF8] text-[10px] font-semibold transition-all text-center"
+                >
+                  Discord
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setNewWebhookName('Slack #notifications');
+                    setNewWebhookUrl('https://hooks.slack.com/services/');
+                  }}
+                  className="py-1 px-2 rounded-lg bg-[#E01E5A]/10 hover:bg-[#E01E5A]/20 border border-[#E01E5A]/30 text-[#FB7185] text-[10px] font-semibold transition-all text-center"
+                >
+                  Slack
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setNewWebhookName('Google Sheets Sync');
+                    setNewWebhookUrl('https://script.google.com/macros/s/');
+                  }}
+                  className="py-1 px-2 rounded-lg bg-[#34A853]/10 hover:bg-[#34A853]/20 border border-[#34A853]/30 text-[#4ADE80] text-[10px] font-semibold transition-all text-center"
+                >
+                  Sheets API
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setNewWebhookName('Custom REST Endpoint');
+                    setNewWebhookUrl('https://api.yourdomain.com/webhook');
+                  }}
+                  className="py-1 px-2 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 text-[10px] font-semibold transition-all text-center"
+                >
+                  REST API
+                </button>
+              </div>
 
               <input
                 type="text"
@@ -379,7 +502,7 @@ export const ShareAndWebhooks: React.FC<ShareAndWebhooksProps> = ({
                 type="url"
                 value={newWebhookUrl}
                 onChange={(e) => setNewWebhookUrl(e.target.value)}
-                placeholder="https://discord.com/api/webhooks/... or https://hooks.slack.com/..."
+                placeholder="https://discord.com/api/webhooks/... or https://script.google.com/..."
                 className="w-full bg-zinc-950 border border-zinc-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
 
@@ -392,6 +515,87 @@ export const ShareAndWebhooks: React.FC<ShareAndWebhooksProps> = ({
                 Add Webhook Endpoint
               </button>
             </div>
+          </div>
+
+          {/* FR-6 Live Webhook Payload Previewer Card */}
+          <div className="p-6 rounded-2xl bg-zinc-900/70 border border-zinc-800 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Terminal className="w-4 h-4 text-emerald-400" />
+                <span className="text-xs font-semibold text-zinc-300 uppercase tracking-wider">
+                  Live Webhook Payload Inspector
+                </span>
+              </div>
+              <button
+                onClick={() => setShowPayloadPreview(!showPayloadPreview)}
+                className="px-2.5 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs font-medium text-zinc-300 flex items-center gap-1.5 transition-colors cursor-pointer"
+              >
+                {showPayloadPreview ? <EyeOff className="w-3.5 h-3.5 text-zinc-400" /> : <Eye className="w-3.5 h-3.5 text-indigo-400" />}
+                {showPayloadPreview ? 'Hide Payload' : 'Inspect Payload'}
+              </button>
+            </div>
+
+            <p className="text-xs text-zinc-400">
+              Real-time JSON schema generated dynamically from this form&apos;s fields and inputs.
+            </p>
+
+            {showPayloadPreview && (
+              <div className="space-y-3 pt-2 border-t border-zinc-800">
+                {/* Format switcher tabs */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1 bg-zinc-950 p-1 rounded-lg border border-zinc-800">
+                    <button
+                      onClick={() => setPreviewFormat('json')}
+                      className={`px-2.5 py-1 rounded text-[11px] font-semibold transition-all ${
+                        previewFormat === 'json'
+                          ? 'bg-indigo-600 text-white'
+                          : 'text-zinc-400 hover:text-white'
+                      }`}
+                    >
+                      JSON / Google Sheets
+                    </button>
+                    <button
+                      onClick={() => setPreviewFormat('discord')}
+                      className={`px-2.5 py-1 rounded text-[11px] font-semibold transition-all ${
+                        previewFormat === 'discord'
+                          ? 'bg-[#5865F2] text-white'
+                          : 'text-zinc-400 hover:text-white'
+                      }`}
+                    >
+                      Discord Embed
+                    </button>
+                    <button
+                      onClick={() => setPreviewFormat('slack')}
+                      className={`px-2.5 py-1 rounded text-[11px] font-semibold transition-all ${
+                        previewFormat === 'slack'
+                          ? 'bg-[#E01E5A] text-white'
+                          : 'text-zinc-400 hover:text-white'
+                      }`}
+                    >
+                      Slack Block
+                    </button>
+                  </div>
+
+                  <button
+                    onClick={handleCopyPayload}
+                    className="px-2.5 py-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs text-zinc-300 flex items-center gap-1 transition-colors cursor-pointer"
+                  >
+                    {copiedPayload ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                    {copiedPayload ? 'Copied JSON!' : 'Copy JSON'}
+                  </button>
+                </div>
+
+                {/* Code viewer */}
+                <div className="relative">
+                  <pre className="p-4 rounded-xl bg-zinc-950 border border-zinc-800/80 font-mono text-[11px] text-emerald-400/90 overflow-x-auto max-h-72 leading-relaxed">
+                    {previewPayloadString}
+                  </pre>
+                  <div className="absolute top-2 right-2 px-2 py-0.5 rounded bg-zinc-900/80 border border-zinc-800 text-[9px] font-mono text-zinc-400">
+                    application/json
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

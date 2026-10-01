@@ -10,36 +10,49 @@ export async function POST(request: Request) {
 
     const isDiscord = url.includes('discord.com/api/webhooks');
     const isSlack = url.includes('hooks.slack.com');
+    const isGoogleSheets = url.includes('script.google.com') || url.includes('script.googleusercontent.com');
 
     let samplePayload: any;
 
     if (isDiscord) {
       samplePayload = {
-        username: 'FlowForm Test Bot',
+        username: 'FormFlow Test Bot',
         avatar_url: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
         embeds: [
           {
-            title: '✅ FlowForm Webhook Test Successful!',
+            title: '✅ FormFlow Webhook Test Successful!',
             description: 'Your webhook connection has been successfully established and verified.',
             color: 0x10b981, // emerald
             fields: [
               { name: 'Timestamp', value: new Date().toISOString(), inline: true },
               { name: 'Status', value: 'Connected (200 OK)', inline: true },
             ],
-            footer: { text: 'FlowForm Workflow Builder • SBIT Hackathon 2026' },
+            footer: { text: 'FormFlow Workflow Builder • BBIT Hackathon 2026' },
           },
         ],
       };
     } else if (isSlack) {
       samplePayload = {
-        text: '✅ *FlowForm Webhook Test*: Webhook connection successfully verified!',
+        text: '✅ *FormFlow Webhook Test*: Webhook connection successfully verified!',
+      };
+    } else if (isGoogleSheets) {
+      samplePayload = {
+        event: 'test_ping',
+        status: 'success',
+        timestamp: new Date().toISOString(),
+        formId: 'test_form',
+        responses: {
+          'Name': 'Test Respondent',
+          'Email': 'test@example.com',
+          'Feedback': 'FormFlow webhook connection is live and working!',
+        },
       };
     } else {
       samplePayload = {
         event: 'test_ping',
         status: 'success',
         timestamp: new Date().toISOString(),
-        message: 'FlowForm webhook integration ping verified.',
+        message: 'FormFlow webhook integration ping verified.',
       };
     }
 
@@ -51,6 +64,7 @@ export async function POST(request: Request) {
         ...(headers || {}),
       },
       body: JSON.stringify(samplePayload),
+      redirect: 'follow',
     });
     const duration = Date.now() - startTime;
 

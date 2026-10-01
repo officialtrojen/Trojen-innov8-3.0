@@ -15,32 +15,71 @@ export async function POST(request: Request) {
 
     const supabase = await createServerSupabaseClient();
 
+    // Resolve form_id to the actual forms table UUID if needed
+    let dbFormId = form_id;
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(form_id));
+    if (!isUuid) {
+      const { data: matchedForm } = await supabase
+        .from('forms')
+        .select('id')
+        .or(`public_slug.eq.${form_id},id.eq.${form_id}`)
+        .maybeSingle();
+
+      if (matchedForm?.id) {
+        dbFormId = matchedForm.id;
+      }
+    }
+
     // Insert response into Supabase database
     let responseData = null;
-    try {
-      const { data, error } = await supabase
-        .from('responses')
-        .insert({
-          form_id,
-          answers,
-          metadata: metadata || {},
-          submitted_at: new Date().toISOString(),
-        })
-        .select()
-        .single();
+    const submittedAt = new Date().toISOString();
+    const meta = metadata || {};
 
-      if (!error) {
-        responseData = data;
-      }
-    } catch {
-      // Development mode fallback response object
-      responseData = {
-        id: 'resp_' + Date.now(),
-        form_id,
+    // 1. Try inserting with metadata and respondent_meta
+    const { data: insertData, error: insertError } = await supabase
+      .from('responses')
+      .insert({
+        form_id: dbFormId,
         answers,
-        metadata,
-        submitted_at: new Date().toISOString(),
-      };
+        metadata: meta,
+        respondent_meta: meta,
+        submitted_at: submittedAt,
+      })
+      .select()
+      .maybeSingle();
+
+    if (!insertError && insertData) {
+      responseData = insertData;
+    } else if (insertError) {
+      // 2. If respondent_meta column doesn't exist, retry with just metadata
+      if (insertError.code === '42703' || insertError.message?.includes('respondent_meta')) {
+        const { data: retryData, error: retryError } = await supabase
+          .from('responses')
+          .insert({
+            form_id: dbFormId,
+            answers,
+            metadata: meta,
+            submitted_at: submittedAt,
+          })
+          .select()
+          .maybeSingle();
+
+        if (!retryError && retryData) {
+          responseData = retryData;
+        } else if (retryError) {
+          console.error('[Submit API Error] Supabase insert failed:', retryError);
+          return NextResponse.json(
+            { error: `Database insert failed: ${retryError.message}` },
+            { status: 500 }
+          );
+        }
+      } else {
+        console.error('[Submit API Error] Supabase insert failed:', insertError);
+        return NextResponse.json(
+          { error: `Database insert failed: ${insertError.message}` },
+          { status: 500 }
+        );
+      }
     }
 
     // FR-6: Trigger external webhooks AFTER successful submission
@@ -71,7 +110,7 @@ export async function POST(request: Request) {
 
       if (integrations && integrations.length > 0) {
         for (const integration of integrations) {
-          if (integration.type === 'webhook' && integration.configuration?.url) {
+          if (integration.configuration?.url) {
             webhooksToTrigger.push({
               url: integration.configuration.url as string,
               headers: integration.configuration.headers as Record<string, string> | undefined,
@@ -129,6 +168,7 @@ export async function POST(request: Request) {
             ...(target.headers || {}),
           },
           body: JSON.stringify(payload),
+          redirect: 'follow',
         }).catch((err) => {
           console.warn(`[FR-6 Webhook] Delivery failed for ${target.url}:`, err.message);
         });

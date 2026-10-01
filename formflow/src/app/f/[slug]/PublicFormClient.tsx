@@ -10,7 +10,7 @@ interface PublicFormClientProps {
 
 export default function PublicFormClient({ form }: PublicFormClientProps) {
   const handleSubmit = async (answers: Record<string, unknown>) => {
-    const res = await fetch('/api/submit', {
+    const res = await fetch('/api/forms/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
