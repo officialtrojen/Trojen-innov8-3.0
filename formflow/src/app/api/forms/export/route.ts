@@ -1,9 +1,26 @@
 import { NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import * as XLSX from 'xlsx';
+import {
+  checkRateLimit,
+  getClientIp,
+  logSecurityEvent,
+  sanitizeFilename,
+  sanitizeSpreadsheetCell,
+} from '@/lib/security';
 
 export async function GET(request: Request) {
   try {
+    const clientIp = getClientIp(request);
+    const rateLimit = checkRateLimit(`export:${clientIp}`, 10, 60);
+    if (!rateLimit.allowed) {
+      logSecurityEvent('RATE_LIMIT_EXCEEDED', { endpoint: '/api/forms/export' }, clientIp);
+      return NextResponse.json(
+        { error: 'Too many export requests. Please try again later.' },
+        { status: 429, headers: { 'Retry-After': String(rateLimit.resetSeconds) } }
+      );
+    }
+
     const { searchParams } = new URL(request.url);
     const formId = searchParams.get('form_id');
 
@@ -12,6 +29,16 @@ export async function GET(request: Request) {
     }
 
     const supabase = await createServerSupabaseClient();
+
+    // Authenticate user (A01 - Broken Access Control)
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
     // Fetch the form
     const { data: form, error: formError } = await supabase
@@ -22,6 +49,16 @@ export async function GET(request: Request) {
 
     if (formError || !form) {
       return NextResponse.json({ error: 'Form not found' }, { status: 404 });
+    }
+
+    // Verify ownership (A01 - IDOR Prevention)
+    if (form.owner_id && form.owner_id !== user.id) {
+      logSecurityEvent(
+        'UNAUTHORIZED_ACCESS_ATTEMPT',
+        { formId, userId: user.id, action: 'export' },
+        clientIp
+      );
+      return NextResponse.json({ error: 'Forbidden: You do not own this form' }, { status: 403 });
     }
 
     // Fetch all responses
@@ -38,30 +75,35 @@ export async function GET(request: Request) {
     const fields = form.schema?.fields || [];
     const respData = responses || [];
 
-    // Build header row
-    const headers = ['#', 'Response ID', 'Submission Date', ...fields.map((f: { label: string }) => f.label)];
+    // Build header row with sanitized labels (A03 - Formula Injection)
+    const headers = [
+      '#',
+      'Response ID',
+      'Submission Date',
+      ...fields.map((f: { label: string }) => sanitizeSpreadsheetCell(f.label)),
+    ];
 
-    // Build data rows
-    const data = respData.map((r: { id: string; submitted_at: string; answers: Record<string, unknown> }, idx: number) => {
-      return [
-        idx + 1,
-        r.id,
-        new Date(r.submitted_at).toLocaleString('en-US'),
-        ...fields.map((f: { id: string }) => {
-          const val = r.answers?.[f.id];
-          if (val === null || val === undefined) return '';
-          if (Array.isArray(val)) return val.join(', ');
-          return String(val);
-        }),
-      ];
-    });
+    // Build data rows with formula sanitization (A03 - Formula Injection / CSV Injection)
+    const data = respData.map(
+      (r: { id: string; submitted_at: string; answers: Record<string, unknown> }, idx: number) => {
+        return [
+          idx + 1,
+          sanitizeSpreadsheetCell(r.id),
+          new Date(r.submitted_at).toLocaleString('en-US'),
+          ...fields.map((f: { id: string }) => {
+            const val = r.answers?.[f.id];
+            return sanitizeSpreadsheetCell(val);
+          }),
+        ];
+      }
+    );
 
     // Create worksheet
     const ws = XLSX.utils.aoa_to_sheet([headers, ...data]);
 
     // Auto-fit column widths
     ws['!cols'] = headers.map((h: string, colIdx: number) => {
-      let maxLen = h.length;
+      let maxLen = String(h ?? '').length;
       data.forEach((row: (string | number)[]) => {
         const cellLen = String(row[colIdx] ?? '').length;
         if (cellLen > maxLen) maxLen = cellLen;
@@ -73,20 +115,23 @@ export async function GET(request: Request) {
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Responses');
 
-    // Summary sheet
+    // Summary sheet with sanitized cells
     const summaryData = [
-      ['Form Title', form.title],
+      ['Form Title', sanitizeSpreadsheetCell(form.title)],
       ['Total Responses', respData.length],
       ['Export Date', new Date().toLocaleString('en-US')],
-      ['Status', form.status],
+      ['Status', sanitizeSpreadsheetCell(form.status)],
       [''],
       ['Field Summary'],
       ['Field Name', 'Field Type', 'Responses Answered'],
       ...fields.map((f: { id: string; label: string; type?: string }) => [
-        f.label,
-        f.type || 'unknown',
-        respData.filter((r: { answers: Record<string, unknown> }) =>
-          r.answers?.[f.id] !== null && r.answers?.[f.id] !== undefined && r.answers?.[f.id] !== ''
+        sanitizeSpreadsheetCell(f.label),
+        sanitizeSpreadsheetCell(f.type || 'unknown'),
+        respData.filter(
+          (r: { answers: Record<string, unknown> }) =>
+            r.answers?.[f.id] !== null &&
+            r.answers?.[f.id] !== undefined &&
+            r.answers?.[f.id] !== ''
         ).length,
       ]),
     ];
@@ -97,13 +142,16 @@ export async function GET(request: Request) {
     // Generate Excel buffer
     const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'buffer' });
 
-    const filename = `${(form.title || 'form').replace(/\s+/g, '_')}_responses.xlsx`;
+    // Safe filename to prevent header injection (A03/A05)
+    const safeTitle = sanitizeFilename(form.title || 'form');
+    const filename = `${safeTitle}_responses.xlsx`;
 
     return new NextResponse(excelBuffer, {
       status: 200,
       headers: {
         'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         'Content-Disposition': `attachment; filename="${filename}"`,
+        'X-Content-Type-Options': 'nosniff',
       },
     });
   } catch (err: unknown) {
@@ -111,3 +159,4 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
+

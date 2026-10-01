@@ -50,7 +50,7 @@ export default function ResponsesPage() {
     // Realtime subscription
     const channel = supabase
       .channel(`responses-${formId}`)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'responses', filter: `form_id=eq.${formId}` }, (payload) => {
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'responses', filter: `form_id=eq.${formId}` }, (payload: any) => {
         setResponses((prev) => [payload.new as DBResponse, ...prev]);
       })
       .subscribe();

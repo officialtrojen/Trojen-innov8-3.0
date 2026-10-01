@@ -36,7 +36,7 @@ export default function GlobalResponsesPage() {
         return;
       }
 
-      const formIds = formsData.map(f => f.id);
+      const formIds = formsData.map((f: any) => f.id);
       let allForms: FormWithStats[] = formsData.map((f: any) => ({ ...f, responseCount: 0 }));
 
       // Fetch response counts manually to ensure reliability

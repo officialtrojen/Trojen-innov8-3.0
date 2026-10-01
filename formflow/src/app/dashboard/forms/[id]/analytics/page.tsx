@@ -51,7 +51,7 @@ export default function AnalyticsPage() {
     // Realtime
     const channel = supabase
       .channel(`analytics-${formId}`)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'responses', filter: `form_id=eq.${formId}` }, (payload) => {
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'responses', filter: `form_id=eq.${formId}` }, (payload: any) => {
         setResponses((prev) => [...prev, payload.new as DBResponse]);
       })
       .subscribe();

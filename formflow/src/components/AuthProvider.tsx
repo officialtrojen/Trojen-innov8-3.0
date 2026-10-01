@@ -66,7 +66,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // onAuthStateChange fires immediately from local storage cache — no network wait
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((_event: any, session: any) => {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user?.id) {

@@ -308,7 +308,7 @@ function BuilderCanvasInner() {
           .select('*')
           .eq('id', urlId)
           .single()
-          .then(({ data, error }) => {
+          .then(({ data, error }: any) => {
             if (data && !error) {
               let parsedSchema = data.schema;
               if (typeof parsedSchema === 'string') {
@@ -379,7 +379,7 @@ function BuilderCanvasInner() {
     }
 
     const supabase = createClient();
-    supabase.auth.getUser().then(({ data }) => {
+    supabase.auth.getUser().then(({ data }: any) => {
       if (data?.user) {
         setUser({ id: data.user.id, email: data.user.email });
       }

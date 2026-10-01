@@ -1,21 +1,40 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
+import { generateSecureOtp, escapeHtml, checkRateLimit, getClientIp, logSecurityEvent } from '@/lib/security';
 
-// In-memory OTP storage for direct OTP mode (expires in 10 minutes)
-const otpStore = new Map<string, { code: string; expiresAt: number }>();
+// In-memory OTP storage for direct OTP mode (expires in 10 minutes, max 5 attempts)
+const otpStore = new Map<string, { code: string; expiresAt: number; attempts: number }>();
+
+const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 export async function POST(request: Request) {
+  const clientIp = getClientIp(request);
+
   try {
-    const { email } = await request.json();
-    if (!email || !email.includes('@')) {
-      return NextResponse.json({ error: 'Valid email is required' }, { status: 400 });
+    const body = await request.json().catch(() => ({}));
+    const rawEmail = typeof body.email === 'string' ? body.email.trim() : '';
+
+    if (!rawEmail || !EMAIL_REGEX.test(rawEmail) || rawEmail.length > 254) {
+      logSecurityEvent('INJECTION_ATTEMPT', { endpoint: '/api/auth/send-otp', input: rawEmail }, clientIp);
+      return NextResponse.json({ error: 'Valid email address is required' }, { status: 400 });
     }
 
-    // Generate secure 6-digit numeric OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
-    otpStore.set(email.toLowerCase().trim(), { code: otp, expiresAt });
+    // OWASP A04: Rate Limiting (max 5 OTP requests per 10 minutes per IP or email)
+    const rateLimit = checkRateLimit(`otp_${clientIp}_${rawEmail.toLowerCase()}`, 5, 600);
+    if (!rateLimit.allowed) {
+      logSecurityEvent('RATE_LIMIT_EXCEEDED', { endpoint: '/api/auth/send-otp', email: rawEmail }, clientIp);
+      return NextResponse.json(
+        { error: `Too many verification requests. Please wait ${rateLimit.resetSeconds}s before retrying.` },
+        { status: 429 }
+      );
+    }
 
+    // OWASP A02 & A07: Cryptographically Secure Random Number Generator (CSPRNG)
+    const otp = generateSecureOtp(6);
+    const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
+    otpStore.set(rawEmail.toLowerCase(), { code: otp, expiresAt, attempts: 0 });
+
+    const safeEmail = escapeHtml(rawEmail);
     const gmailUser = process.env.GMAIL_USER || 'official.trojen@gmail.com';
     const gmailPass = process.env.GMAIL_APP_PASSWORD;
 
@@ -70,7 +89,7 @@ export async function POST(request: Request) {
               </h1>
               <p style="margin: 0 0 24px 0; font-size: 14px; line-height: 1.6; color: #475569;">
                 Hello,<br>
-                We received a request to verify your identity for your FormFlow account (<strong style="color: #1E293B;">${email}</strong>). Use the secure 6-digit code below to complete your authentication:
+                We received a request to verify your identity for your FormFlow account (<strong style="color: #1E293B;">${safeEmail}</strong>). Use the secure 6-digit code below to complete your authentication:
               </p>
 
               <!-- OTP Code Display Card -->
@@ -145,7 +164,7 @@ export async function POST(request: Request) {
 
       await transporter.sendMail({
         from: `"FormFlow Security" <${gmailUser}>`,
-        to: email,
+        to: rawEmail,
         subject: `Your FormFlow Verification Code: ${otp}`,
         html: htmlContent,
       });

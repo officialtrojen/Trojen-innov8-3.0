@@ -1,8 +1,26 @@
 import { NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
+import {
+  checkRateLimit,
+  getClientIp,
+  isSafeWebhookUrl,
+  logSecurityEvent,
+} from '@/lib/security';
 
 export async function POST(request: Request) {
   try {
+    const clientIp = getClientIp(request);
+
+    // OWASP A04: Rate limiting on submissions to prevent DoS / form spam
+    const rateLimit = checkRateLimit(`submit:${clientIp}`, 40, 60);
+    if (!rateLimit.allowed) {
+      logSecurityEvent('RATE_LIMIT_EXCEEDED', { endpoint: '/api/forms/submit' }, clientIp);
+      return NextResponse.json(
+        { error: 'Too many submissions. Please wait before trying again.' },
+        { status: 429, headers: { 'Retry-After': String(rateLimit.resetSeconds) } }
+      );
+    }
+
     const body = await request.json();
     const { form_id, answers, metadata } = body;
 
@@ -119,9 +137,17 @@ export async function POST(request: Request) {
         }
       }
 
-      // 3. Dispatch HTTP POST payloads asynchronously (failures isolated)
+      // 3. Dispatch HTTP POST payloads asynchronously with OWASP A10 SSRF validation
       const submittedAt = new Date().toISOString();
       for (const target of webhooksToTrigger) {
+        // OWASP A10: Validate webhook URL against SSRF
+        const urlCheck = isSafeWebhookUrl(target.url);
+        if (!urlCheck.safe) {
+          logSecurityEvent('SSRF_BLOCKED', { url: target.url, reason: urlCheck.reason }, clientIp);
+          console.warn(`[OWASP A10 SSRF Blocked] Submit webhook rejected: ${target.url} (${urlCheck.reason})`);
+          continue;
+        }
+
         const isDiscord = target.url.includes('discord.com/api/webhooks');
         const isSlack = target.url.includes('hooks.slack.com');
 
@@ -135,7 +161,7 @@ export async function POST(request: Request) {
                 description: `A new response was submitted for form \`${form_id}\`.`,
                 color: 0x8b5cf6,
                 fields: Object.entries(answers || {}).slice(0, 25).map(([k, v]) => ({
-                  name: String(k),
+                  name: String(k).slice(0, 256),
                   value: String(v ?? 'N/A').slice(0, 1024),
                   inline: false,
                 })),
@@ -161,18 +187,25 @@ export async function POST(request: Request) {
           };
         }
 
-        // Send POST request - safe catch so errors NEVER invalidate successful form submission
+        // Send POST request with 6s timeout - safe catch so errors NEVER invalidate successful form submission
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 6000);
+
         fetch(target.url, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             ...(target.headers || {}),
           },
-          body: JSON.stringify(payload),
           redirect: 'follow',
-        }).catch((err) => {
-          console.warn(`[FR-6 Webhook] Delivery failed for ${target.url}:`, err.message);
-        });
+          signal: controller.signal,
+        })
+          .catch((err) => {
+            console.warn(`[FR-6 Webhook] Delivery failed for ${target.url}:`, err.message);
+          })
+          .finally(() => {
+            clearTimeout(timeoutId);
+          });
       }
     } catch (err) {
       console.warn('[FR-6 Webhook] Integration dispatch error:', err);
@@ -188,4 +221,5 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
+
 

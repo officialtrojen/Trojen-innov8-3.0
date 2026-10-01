@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { FormField, FormSchema, FormTheme, DEFAULT_THEME, DEFAULT_SETTINGS } from '@/lib/types';
 import { generateId } from '@/lib/utils';
+import { checkRateLimit, getClientIp, logSecurityEvent } from '@/lib/security';
 
 function normalizeFieldType(rawType: string): FormField['type'] {
   const t = (rawType || '').toLowerCase().trim();
@@ -51,11 +52,32 @@ function normalizeFieldType(rawType: string): FormField['type'] {
 
 export async function POST(req: Request) {
   try {
+    const clientIp = getClientIp(req);
+
+    // OWASP A04: Rate limiting on expensive AI generation (20 req / min)
+    const rateLimit = checkRateLimit(`ai_gen:${clientIp}`, 20, 60);
+    if (!rateLimit.allowed) {
+      logSecurityEvent('RATE_LIMIT_EXCEEDED', { endpoint: '/api/ai/generate-form' }, clientIp);
+      return NextResponse.json(
+        { error: 'AI generation rate limit exceeded. Please wait a moment.' },
+        { status: 429, headers: { 'Retry-After': String(rateLimit.resetSeconds) } }
+      );
+    }
+
+    // 1. Read request body EXACTLY ONCE to avoid "body used already" stream errors
     const body = await req.json().catch(() => ({}));
     const { prompt, currentSchema, chatHistory = [] } = body;
 
     if (!prompt || typeof prompt !== 'string' || !prompt.trim()) {
       return NextResponse.json({ error: 'Prompt is required' }, { status: 400 });
+    }
+
+    // OWASP A03 / A04: Restrict prompt length to prevent resource exhaustion / buffer spam
+    if (prompt.length > 3000) {
+      return NextResponse.json(
+        { error: 'Prompt is too long (maximum 3,000 characters permitted).' },
+        { status: 400 }
+      );
     }
 
     const trimmedPrompt = prompt.trim();

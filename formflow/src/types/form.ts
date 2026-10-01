@@ -1,10 +1,14 @@
 export type FieldType = 
+  | 'welcome_screen'
   | 'short_text' 
   | 'paragraph' 
   | 'multiple_choice' 
+  | 'yes_no'
   | 'rating' 
   | 'file_upload' 
-  | 'date';
+  | 'date'
+  | 'date_picker';
+
 
 export type LayoutMode = 'single_page' | 'conversational';
 

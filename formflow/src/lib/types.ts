@@ -11,6 +11,7 @@ export type FieldType =
   | 'yes_no'
   | 'rating'
   | 'file_upload'
+  | 'date'
   | 'date_picker';
 
 // ---------- Field Configuration ----------

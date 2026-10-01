@@ -1,14 +1,32 @@
 import { NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 import { FormResponse } from '@/types/form';
+import {
+  checkRateLimit,
+  getClientIp,
+  isSafeWebhookUrl,
+  logSecurityEvent,
+} from '@/lib/security';
 
-async function triggerWebhooks(form: any, response: FormResponse) {
+async function triggerWebhooks(form: any, response: FormResponse, clientIp?: string) {
   if (!form.webhooks || !Array.isArray(form.webhooks)) return;
 
   const enabledWebhooks = form.webhooks.filter((w: any) => w.enabled && w.url);
-  
+
   for (const wh of enabledWebhooks) {
     try {
+      // OWASP A10: Server-Side Request Forgery (SSRF) Protection
+      const urlCheck = isSafeWebhookUrl(wh.url);
+      if (!urlCheck.safe) {
+        logSecurityEvent(
+          'SSRF_BLOCKED',
+          { url: wh.url, reason: urlCheck.reason },
+          clientIp
+        );
+        console.warn(`[OWASP A10 Blocked] Webhook URL rejected: ${wh.url} (${urlCheck.reason})`);
+        continue;
+      }
+
       const isDiscord = wh.url.includes('discord.com/api/webhooks');
       const isSlack = wh.url.includes('hooks.slack.com');
 
@@ -19,7 +37,7 @@ async function triggerWebhooks(form: any, response: FormResponse) {
           const formField = form.fields.find((f: any) => f.id === key);
           const name = formField ? formField.label : key;
           return {
-            name: name.slice(0, 256),
+            name: String(name).slice(0, 256),
             value: String(val ?? 'N/A').slice(0, 1024),
             inline: false,
           };
@@ -58,7 +76,10 @@ async function triggerWebhooks(form: any, response: FormResponse) {
         };
       }
 
-      // Non-blocking trigger with timeout
+      // Non-blocking trigger with 6s timeout (OWASP A04 Denial of Service prevention)
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 6000);
+
       fetch(wh.url, {
         method: 'POST',
         headers: {
@@ -66,9 +87,14 @@ async function triggerWebhooks(form: any, response: FormResponse) {
           ...(wh.headers || {}),
         },
         body: JSON.stringify(payload),
-      }).catch((err) => {
-        console.warn(`Webhook ${wh.url} delivery failed:`, err.message);
-      });
+        signal: controller.signal,
+      })
+        .catch((err) => {
+          console.warn(`Webhook ${wh.url} delivery failed:`, err.message);
+        })
+        .finally(() => {
+          clearTimeout(timeoutId);
+        });
     } catch (e) {
       console.warn('Webhook dispatch error:', e);
     }
@@ -80,18 +106,42 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const clientIp = getClientIp(request);
     const { id } = await params;
     const supabase = await createServerSupabaseClient();
-    
-    // The ID in the URL might be the schema ID, so we find the real form UUID
+
+    // OWASP A01: Broken Access Control - Authenticate requester
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Find the real form
     const { data: dbForm } = await supabase
       .from('forms')
-      .select('id')
+      .select('id, owner_id')
       .contains('schema', { id: id })
       .single();
 
     if (!dbForm) {
       return NextResponse.json({ error: 'Form not found' }, { status: 404 });
+    }
+
+    // OWASP A01: Enforce ownership check (IDOR protection)
+    if (dbForm.owner_id && dbForm.owner_id !== user.id) {
+      logSecurityEvent(
+        'UNAUTHORIZED_ACCESS_ATTEMPT',
+        { formId: dbForm.id, userId: user.id, action: 'read_responses' },
+        clientIp
+      );
+      return NextResponse.json(
+        { error: 'Forbidden: You do not have permission to view these responses' },
+        { status: 403 }
+      );
     }
 
     const { data: responses } = await supabase
@@ -110,6 +160,18 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const clientIp = getClientIp(request);
+
+    // OWASP A04: Rate limiting on public submissions (40/minute per IP)
+    const rateLimit = checkRateLimit(`submit:${clientIp}`, 40, 60);
+    if (!rateLimit.allowed) {
+      logSecurityEvent('RATE_LIMIT_EXCEEDED', { endpoint: '/api/forms/[id]/responses' }, clientIp);
+      return NextResponse.json(
+        { error: 'Too many submissions. Please slow down.' },
+        { status: 429, headers: { 'Retry-After': String(rateLimit.resetSeconds) } }
+      );
+    }
+
     const { id } = await params;
     const supabase = await createServerSupabaseClient();
 
@@ -171,8 +233,8 @@ export async function POST(
       }
     }
 
-    // Trigger registered webhooks asynchronously
-    triggerWebhooks(dbForm.schema, saved);
+    // Trigger registered webhooks asynchronously with SSRF validation
+    triggerWebhooks(dbForm.schema, saved, clientIp);
 
     return NextResponse.json(saved, { status: 201 });
   } catch (error) {
@@ -180,3 +242,4 @@ export async function POST(
     return NextResponse.json({ error: 'Failed to submit response' }, { status: 500 });
   }
 }
+
