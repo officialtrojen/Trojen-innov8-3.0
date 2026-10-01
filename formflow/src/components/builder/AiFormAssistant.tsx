@@ -15,6 +15,7 @@ import {
   RefreshCw,
   Zap,
   RotateCcw,
+  Globe,
 } from 'lucide-react';
 
 interface AiFormAssistantProps {
@@ -42,38 +43,22 @@ export default function AiFormAssistant({
   onOpen,
   onToggle,
 }: AiFormAssistantProps) {
-  const [messages, setMessages] = useState<ChatMessage[]>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const saved = localStorage.getItem('formflow_ai_chat_messages');
-        if (saved) {
-          const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            return parsed;
-          }
-        }
-      } catch {
-        // Ignore parse error
-      }
-    }
-    return [
-      {
-        id: 'welcome',
-        sender: 'ai',
-        text: '👋 Hi! I am your AI Form Builder Assistant. Tell me what kind of form you want to create or edit (e.g. "Build a Job Application form" or "Add a 5-star rating question").',
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      },
-    ];
-  });
+  const [messages, setMessages] = useState<ChatMessage[]>(() => [
+    {
+      id: 'welcome',
+      sender: 'ai',
+      text: '👋 Hi! Describe the form you want to create (e.g., "Create a math test for class 10 with 10 questions" or "Create a hackathon registration form with name, phone, college, and address"). Gemini will dynamically generate the complete form structure for you.',
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    },
+  ]);
 
-  // Auto-save chat messages to localStorage
   useEffect(() => {
     try {
-      localStorage.setItem('formflow_ai_chat_messages', JSON.stringify(messages));
+      localStorage.removeItem('formflow_ai_chat_messages');
     } catch {
       // Ignore quota error
     }
-  }, [messages]);
+  }, []);
 
   const [inputPrompt, setInputPrompt] = useState('');
   const [loading, setLoading] = useState(false);
@@ -85,7 +70,7 @@ export default function AiFormAssistant({
       {
         id: 'welcome_' + Date.now(),
         sender: 'ai',
-        text: '👋 Chat cleared! How can I help you build or customize your form today?',
+        text: '👋 Chat cleared! Enter what form you want to create.',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       },
     ];
@@ -96,15 +81,6 @@ export default function AiFormAssistant({
       // ignore
     }
   };
-
-  const [userMemory, setUserMemory] = useState<any>(() => {
-    try {
-      const saved = localStorage.getItem('formflow_ai_user_memory');
-      return saved ? JSON.parse(saved) : null;
-    } catch {
-      return null;
-    }
-  });
 
   useEffect(() => {
     if (isOpen && !isMinimized) {
@@ -171,7 +147,6 @@ export default function AiFormAssistant({
           prompt: textToSend,
           currentSchema,
           chatHistory: updatedMessages,
-          userMemory,
         }),
       });
 
@@ -179,15 +154,6 @@ export default function AiFormAssistant({
 
       if (data.error) {
         throw new Error(data.error);
-      }
-
-      if (data.learnedMemory) {
-        setUserMemory(data.learnedMemory);
-        try {
-          localStorage.setItem('formflow_ai_user_memory', JSON.stringify(data.learnedMemory));
-        } catch {
-          // ignore quota
-        }
       }
 
       const aiMsg: ChatMessage = {
@@ -200,7 +166,7 @@ export default function AiFormAssistant({
 
       setMessages((prev) => [...prev, aiMsg]);
 
-      // Automatically update the live form schema!
+      // Automatically update the live form schema
       if (data.schema) {
         onApplySchema(data.schema);
       }
@@ -218,14 +184,6 @@ export default function AiFormAssistant({
       setLoading(false);
     }
   };
-
-  const quickPrompts = [
-    '🚀 Job Application Form',
-    '⭐ Customer Feedback Survey',
-    '📅 Event Registration',
-    '🎨 Dark Cyberpunk Theme',
-    '📎 File Upload Question',
-  ];
 
   return (
     <div
@@ -281,14 +239,14 @@ export default function AiFormAssistant({
             <div style={{ fontSize: 14, fontWeight: 800, color: '#FFFFFF', display: 'flex', alignItems: 'center', gap: 6 }}>
               AI Form Assistant
               <span style={{ fontSize: 10, background: 'rgba(139, 92, 246, 0.3)', border: '1px solid rgba(139, 92, 246, 0.5)', padding: '1px 6px', borderRadius: 99, color: '#C084FC' }}>
-                LIVE
+                GEMINI
               </span>
             </div>
             {!isMinimized && (
               <div style={{ fontSize: 11, color: '#94A3B8', display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
-                <span style={{ color: '#6EE7B7', fontWeight: 600 }}>🌐 Web Search</span>
-                <span>•</span>
-                <span style={{ color: '#C084FC', fontWeight: 600 }}>🧠 Learned Memory</span>
+                <span style={{ color: '#6EE7B7', fontWeight: 600, display: 'flex', alignItems: 'center', gap: 3 }}>
+                  <Globe size={11} /> Dynamic Gemini Engine
+                </span>
               </div>
             )}
           </div>
@@ -408,12 +366,20 @@ export default function AiFormAssistant({
             ))}
 
             {loading && (
-              <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-                <div style={{ width: 28, height: 28, borderRadius: 8, background: 'rgba(139, 92, 246, 0.25)', border: '1px solid rgba(139, 92, 246, 0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <Wand2 size={15} color="#C084FC" className="animate-spin" />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: 12, background: 'rgba(15, 23, 42, 0.95)', border: '1px solid rgba(139, 92, 246, 0.4)', borderRadius: 14 }}>
+                <div style={{ fontSize: 12, fontWeight: 800, color: '#C084FC', display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <Wand2 size={15} color="#C084FC" className="animate-spin" /> Gemini AI Form Engine Processing...
                 </div>
-                <div style={{ padding: '8px 14px', background: '#0F172A', borderRadius: 12, fontSize: 12, color: '#C084FC', display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <RefreshCw size={13} className="animate-spin" /> AI is crafting your form...
+                <div style={{ fontSize: 11, color: '#94A3B8', display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#6EE7B7' }}>
+                    <RefreshCw size={12} className="animate-spin" /> Interpreting user intent & form requirements...
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#38BDF8' }}>
+                    <Globe size={12} /> Grounding web search for current domain details...
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#F472B6' }}>
+                    <Zap size={12} /> Structuring fields, choices, and options...
+                  </div>
                 </div>
               </div>
             )}
@@ -421,43 +387,7 @@ export default function AiFormAssistant({
             <div ref={chatEndRef} />
           </div>
 
-          {/* Quick Prompt Pills */}
-          <div
-            style={{
-              padding: '8px 14px',
-              borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-              display: 'flex',
-              gap: 6,
-              overflowX: 'auto',
-              whiteSpace: 'nowrap',
-              background: '#0B0F19',
-            }}
-          >
-            {quickPrompts.map((prompt, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => handleSendPrompt(prompt)}
-                disabled={loading}
-                style={{
-                  padding: '4px 10px',
-                  borderRadius: 99,
-                  background: 'rgba(139, 92, 246, 0.15)',
-                  border: '1px solid rgba(139, 92, 246, 0.3)',
-                  color: '#C084FC',
-                  fontSize: 11,
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  flexShrink: 0,
-                  transition: 'all 0.15s ease',
-                }}
-              >
-                {prompt}
-              </button>
-            ))}
-          </div>
-
-          {/* Input Bar */}
+          {/* Single General-Purpose Input Bar */}
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -476,7 +406,7 @@ export default function AiFormAssistant({
               type="text"
               value={inputPrompt}
               onChange={(e) => setInputPrompt(e.target.value)}
-              placeholder="Prompt AI to add fields, survey, rating..."
+              placeholder="Describe the form you want to create..."
               disabled={loading}
               style={{
                 flex: 1,
@@ -493,21 +423,24 @@ export default function AiFormAssistant({
               type="submit"
               disabled={loading || !inputPrompt.trim()}
               style={{
-                width: 36,
+                padding: '0 14px',
                 height: 36,
                 borderRadius: 10,
                 background: 'linear-gradient(135deg, #8B5CF6, #7C3AED)',
                 border: 'none',
                 color: 'white',
+                fontWeight: 700,
+                fontSize: 13,
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center',
+                gap: 6,
                 cursor: loading || !inputPrompt.trim() ? 'not-allowed' : 'pointer',
                 opacity: loading || !inputPrompt.trim() ? 0.5 : 1,
                 boxShadow: '0 2px 8px rgba(139, 92, 246, 0.4)',
               }}
             >
-              <Send size={15} />
+              <span>Generate</span>
+              <Send size={14} />
             </button>
           </form>
         </>
