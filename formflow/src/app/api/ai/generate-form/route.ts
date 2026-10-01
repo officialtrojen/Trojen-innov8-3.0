@@ -82,7 +82,8 @@ export async function POST(req: Request) {
 
     const trimmedPrompt = prompt.trim();
     const lowerPrompt = trimmedPrompt.toLowerCase();
-    const apiKey = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+    const rawKey = process.env.GEMINI_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+    const apiKey = rawKey ? rawKey.trim().replace(/^["']|["']$/g, '') : '';
 
     if (!apiKey) {
       return NextResponse.json(
@@ -103,9 +104,9 @@ export async function POST(req: Request) {
 
     const modelsToTry = [
       'gemini-3.8-flash',
-      'gemini-3.5-flash',
-      'gemini-flash-lite-latest',
-      'gemini-flash-latest'
+      'gemini-2.5-flash',
+      'gemini-flash-latest',
+      'gemini-1.5-flash'
     ];
 
     const systemInstructionText = `You are an expert AI Form Builder Assistant for FormFlow.
