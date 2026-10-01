@@ -209,7 +209,7 @@ export default function IntegrationsPage() {
         }
 
         const enriched = cleanRecords.map((item: any) => {
-          const matched = loadedForms.find((f) => f.id === item.form_id);
+          const matched = loadedForms.find((f: any) => f.id === item.form_id);
           return {
             ...item,
             form_title: matched?.title || 'Form esdvs',
