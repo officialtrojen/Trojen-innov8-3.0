@@ -17,15 +17,91 @@ import {
   X,
   PlusCircle,
   AlertCircle,
+  User,
+  LogOut,
+  Pencil,
+  Settings,
+  LayoutDashboard,
+  Check,
 } from 'lucide-react';
+import { useAuth, AuthProvider } from '@/components/AuthProvider';
 import ReorderingFeatures from '@/components/ReorderingFeatures';
 
-export default function ParallaxDeepSpaceLandingPage() {
+function ParallaxDeepSpaceLandingPageInner() {
   const router = useRouter();
   const [scrollY, setScrollY] = useState(0);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [activeSection, setActiveSection] = useState('hero');
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  // Auth & Profile state
+  const { user, profile, refreshProfile, signOut } = useAuth();
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [editProfileOpen, setEditProfileOpen] = useState(false);
+  const [editName, setEditName] = useState('');
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const profileDropdownRef = useRef<HTMLDivElement | null>(null);
+
+  // Sync edit name with current profile/user info
+  useEffect(() => {
+    if (profile?.name) {
+      setEditName(profile.name);
+    } else if (user?.user_metadata?.name || user?.user_metadata?.full_name) {
+      setEditName(user.user_metadata.name || user.user_metadata.full_name);
+    } else if (user?.email) {
+      setEditName(user.email.split('@')[0]);
+    }
+  }, [profile, user]);
+
+  // Click-outside listener for profile dropdown
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        profileDropdownRef.current &&
+        !profileDropdownRef.current.contains(event.target as Node)
+      ) {
+        setProfileMenuOpen(false);
+      }
+    }
+    if (profileMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [profileMenuOpen]);
+
+  const displayName =
+    profile?.name ||
+    user?.user_metadata?.name ||
+    user?.user_metadata?.full_name ||
+    (user?.email ? user.email.split('@')[0] : 'User');
+  const avatarUrl = profile?.avatar_url || user?.user_metadata?.avatar_url;
+  const initialLetter = displayName.charAt(0).toUpperCase();
+
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user || !editName.trim() || savingProfile) return;
+    setSavingProfile(true);
+    try {
+      const supabase = createClient();
+      await supabase.from('profiles').upsert({
+        id: user.id,
+        name: editName.trim(),
+        email: user.email?.toLowerCase(),
+        updated_at: new Date().toISOString(),
+      });
+      await refreshProfile();
+      setSaveSuccess(true);
+      setTimeout(() => {
+        setSaveSuccess(false);
+        setEditProfileOpen(false);
+      }, 900);
+    } catch (err) {
+      console.error('Failed to update profile:', err);
+    } finally {
+      setSavingProfile(false);
+    }
+  };
 
   // Form creation modal state
   const [createModalOpen, setCreateModalOpen] = useState(false);
@@ -336,18 +412,23 @@ export default function ParallaxDeepSpaceLandingPage() {
 
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-            <Link
-              href="/login"
-              style={{
-                fontSize: 13,
-                fontWeight: 600,
-                color: '#CBD5E1',
-                textDecoration: 'none',
-                padding: '8px 16px',
-              }}
-            >
-              Sign In
-            </Link>
+            {!user ? (
+              <Link
+                href="/login"
+                style={{
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: '#CBD5E1',
+                  textDecoration: 'none',
+                  padding: '8px 16px',
+                  borderRadius: 8,
+                  transition: 'color 0.15s ease',
+                }}
+              >
+                Sign In
+              </Link>
+            ) : null}
+
             <button
               type="button"
               onClick={() => {
@@ -373,6 +454,249 @@ export default function ParallaxDeepSpaceLandingPage() {
             >
               Launch Studio →
             </button>
+
+            {user && (
+              <div style={{ position: 'relative' }} ref={profileDropdownRef}>
+                <button
+                  type="button"
+                  onClick={() => setProfileMenuOpen((prev) => !prev)}
+                  title={displayName}
+                  aria-label="User Profile Menu"
+                  style={{
+                    width: 38,
+                    height: 38,
+                    borderRadius: '50%',
+                    background: avatarUrl
+                      ? 'transparent'
+                      : 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)',
+                    border: profileMenuOpen
+                      ? '2px solid #818CF8'
+                      : '2px solid rgba(255, 255, 255, 0.25)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    color: '#FFFFFF',
+                    fontWeight: 700,
+                    fontSize: 14,
+                    padding: 0,
+                    overflow: 'hidden',
+                    transition: 'all 0.2s ease',
+                    boxShadow: profileMenuOpen
+                      ? '0 0 16px rgba(99, 102, 241, 0.5)'
+                      : '0 2px 8px rgba(0, 0, 0, 0.4)',
+                  }}
+                >
+                  {avatarUrl ? (
+                    <img
+                      src={avatarUrl}
+                      alt={displayName}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                  ) : (
+                    <span>{initialLetter}</span>
+                  )}
+                </button>
+
+                {/* Profile Dropdown Menu */}
+                {profileMenuOpen && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: 'calc(100% + 10px)',
+                      right: 0,
+                      width: 260,
+                      background: 'rgba(15, 23, 42, 0.96)',
+                      backdropFilter: 'blur(20px)',
+                      WebkitBackdropFilter: 'blur(20px)',
+                      border: '1px solid rgba(255, 255, 255, 0.12)',
+                      borderRadius: 14,
+                      padding: 12,
+                      boxShadow: '0 20px 40px -10px rgba(0, 0, 0, 0.7), 0 0 1px 1px rgba(255, 255, 255, 0.1)',
+                      zIndex: 1000,
+                    }}
+                  >
+                    {/* User Summary Header */}
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 12,
+                        padding: '6px 8px 12px',
+                        borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: 40,
+                          height: 40,
+                          borderRadius: '50%',
+                          background: avatarUrl
+                            ? 'transparent'
+                            : 'linear-gradient(135deg, #6366F1, #8B5CF6)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          color: '#FFFFFF',
+                          fontWeight: 700,
+                          fontSize: 16,
+                          overflow: 'hidden',
+                          flexShrink: 0,
+                        }}
+                      >
+                        {avatarUrl ? (
+                          <img
+                            src={avatarUrl}
+                            alt={displayName}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          />
+                        ) : (
+                          initialLetter
+                        )}
+                      </div>
+                      <div style={{ overflow: 'hidden', flex: 1 }}>
+                        <div
+                          style={{
+                            fontSize: 14,
+                            fontWeight: 700,
+                            color: '#F8FAFC',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                          }}
+                        >
+                          {displayName}
+                        </div>
+                        <div
+                          style={{
+                            fontSize: 12,
+                            color: '#94A3B8',
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            marginTop: 1,
+                          }}
+                        >
+                          {user.email}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div style={{ paddingTop: 8, display: 'flex', flexDirection: 'column', gap: 4 }}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setProfileMenuOpen(false);
+                          setEditName(displayName);
+                          setEditProfileOpen(true);
+                        }}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 10,
+                          width: '100%',
+                          padding: '9px 12px',
+                          borderRadius: 8,
+                          background: 'transparent',
+                          border: 'none',
+                          color: '#E2E8F0',
+                          fontSize: 13,
+                          fontWeight: 500,
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                          transition: 'background 0.15s ease',
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255, 255, 255, 0.07)')}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                      >
+                        <Pencil size={15} style={{ color: '#818CF8' }} />
+                        <span>Edit Profile</span>
+                      </button>
+
+                      <Link
+                        href="/dashboard"
+                        onClick={() => setProfileMenuOpen(false)}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 10,
+                          width: '100%',
+                          padding: '9px 12px',
+                          borderRadius: 8,
+                          background: 'transparent',
+                          color: '#E2E8F0',
+                          fontSize: 13,
+                          fontWeight: 500,
+                          textDecoration: 'none',
+                          transition: 'background 0.15s ease',
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255, 255, 255, 0.07)')}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                      >
+                        <LayoutDashboard size={15} style={{ color: '#38BDF8' }} />
+                        <span>Dashboard</span>
+                      </Link>
+
+                      <Link
+                        href="/dashboard/settings"
+                        onClick={() => setProfileMenuOpen(false)}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 10,
+                          width: '100%',
+                          padding: '9px 12px',
+                          borderRadius: 8,
+                          background: 'transparent',
+                          color: '#E2E8F0',
+                          fontSize: 13,
+                          fontWeight: 500,
+                          textDecoration: 'none',
+                          transition: 'background 0.15s ease',
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255, 255, 255, 0.07)')}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                      >
+                        <Settings size={15} style={{ color: '#94A3B8' }} />
+                        <span>Account Settings</span>
+                      </Link>
+
+                      <div style={{ height: 1, background: 'rgba(255, 255, 255, 0.08)', margin: '4px 0' }} />
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setProfileMenuOpen(false);
+                          signOut('/');
+                        }}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 10,
+                          width: '100%',
+                          padding: '9px 12px',
+                          borderRadius: 8,
+                          background: 'transparent',
+                          border: 'none',
+                          color: '#F87171',
+                          fontSize: 13,
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          textAlign: 'left',
+                          transition: 'background 0.15s ease',
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(239, 68, 68, 0.12)')}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                      >
+                        <LogOut size={15} style={{ color: '#F87171' }} />
+                        <span>Log Out</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </header>
 
@@ -869,6 +1193,230 @@ export default function ParallaxDeepSpaceLandingPage() {
         </div>
       )}
 
+      {/* EDIT PROFILE MODAL */}
+      {editProfileOpen && user && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(2, 6, 23, 0.8)',
+            backdropFilter: 'blur(8px)',
+            WebkitBackdropFilter: 'blur(8px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999,
+            padding: 20,
+          }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget && !savingProfile) {
+              setEditProfileOpen(false);
+            }
+          }}
+        >
+          <div
+            style={{
+              background: '#0F172A',
+              border: '1px solid rgba(255, 255, 255, 0.15)',
+              borderRadius: 16,
+              width: '100%',
+              maxWidth: 440,
+              padding: 28,
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.75)',
+              position: 'relative',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: 20,
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div
+                  style={{
+                    width: 34,
+                    height: 34,
+                    borderRadius: 8,
+                    background: 'rgba(99, 102, 241, 0.15)',
+                    color: '#818CF8',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Pencil size={18} />
+                </div>
+                <h3
+                  style={{
+                    fontSize: 18,
+                    fontWeight: 700,
+                    color: '#FFFFFF',
+                    margin: 0,
+                  }}
+                >
+                  Edit Profile
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEditProfileOpen(false)}
+                disabled={savingProfile}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: '#94A3B8',
+                  cursor: 'pointer',
+                  padding: 4,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: 6,
+                }}
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveProfile}>
+              <div style={{ marginBottom: 16 }}>
+                <label
+                  style={{
+                    display: 'block',
+                    fontSize: 12,
+                    fontWeight: 600,
+                    color: '#94A3B8',
+                    marginBottom: 6,
+                    textTransform: 'uppercase',
+                    letterSpacing: 0.5,
+                  }}
+                >
+                  Email Address
+                </label>
+                <input
+                  type="text"
+                  disabled
+                  value={user.email || ''}
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    borderRadius: 8,
+                    background: 'rgba(255, 255, 255, 0.04)',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                    color: '#64748B',
+                    fontSize: 14,
+                    cursor: 'not-allowed',
+                    outline: 'none',
+                  }}
+                />
+              </div>
+
+              <div style={{ marginBottom: 24 }}>
+                <label
+                  style={{
+                    display: 'block',
+                    fontSize: 12,
+                    fontWeight: 600,
+                    color: '#CBD5E1',
+                    marginBottom: 6,
+                    textTransform: 'uppercase',
+                    letterSpacing: 0.5,
+                  }}
+                >
+                  Full Name <span style={{ color: '#F87171' }}>*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  placeholder="e.g. Alex Morgan"
+                  autoFocus
+                  style={{
+                    width: '100%',
+                    padding: '10px 14px',
+                    borderRadius: 8,
+                    background: 'rgba(255, 255, 255, 0.06)',
+                    border: '1px solid rgba(255, 255, 255, 0.18)',
+                    color: '#FFFFFF',
+                    fontSize: 14,
+                    outline: 'none',
+                  }}
+                />
+              </div>
+
+              {saveSuccess && (
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    padding: '8px 12px',
+                    borderRadius: 8,
+                    background: 'rgba(16, 185, 129, 0.12)',
+                    border: '1px solid rgba(16, 185, 129, 0.3)',
+                    color: '#34D399',
+                    fontSize: 13,
+                    marginBottom: 16,
+                  }}
+                >
+                  <Check size={16} />
+                  <span>Profile updated successfully!</span>
+                </div>
+              )}
+
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'flex-end',
+                  gap: 10,
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => setEditProfileOpen(false)}
+                  disabled={savingProfile}
+                  style={{
+                    padding: '9px 16px',
+                    borderRadius: 8,
+                    background: 'rgba(255, 255, 255, 0.06)',
+                    border: '1px solid rgba(255, 255, 255, 0.12)',
+                    color: '#CBD5E1',
+                    fontSize: 13,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingProfile || !editName.trim()}
+                  style={{
+                    padding: '9px 20px',
+                    borderRadius: 8,
+                    background: '#6366F1',
+                    border: 'none',
+                    color: '#FFFFFF',
+                    fontSize: 13,
+                    fontWeight: 600,
+                    cursor: savingProfile || !editName.trim() ? 'not-allowed' : 'pointer',
+                    opacity: savingProfile || !editName.trim() ? 0.7 : 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                  }}
+                >
+                  {savingProfile ? 'Saving...' : 'Save Changes'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       <style>{`
         @keyframes bounce {
           0%, 100% { transform: translateY(0); }
@@ -879,5 +1427,13 @@ export default function ParallaxDeepSpaceLandingPage() {
         }
       `}</style>
     </div>
+  );
+}
+
+export default function ParallaxDeepSpaceLandingPage() {
+  return (
+    <AuthProvider>
+      <ParallaxDeepSpaceLandingPageInner />
+    </AuthProvider>
   );
 }
