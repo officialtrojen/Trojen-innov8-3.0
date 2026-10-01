@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { FormTheme } from '@/lib/types';
 import {
   Palette,
@@ -27,6 +27,7 @@ import {
 interface ThemePanelProps {
   theme: FormTheme;
   onUpdate: (updates: Partial<FormTheme>) => void;
+  initialTab?: 'background' | 'page' | 'poster' | 'colors';
 }
 
 const fontOptions = ['Inter', 'Roboto', 'Open Sans', 'Lato', 'Poppins', 'Outfit', 'Space Grotesk'];
@@ -36,8 +37,16 @@ const sizeOptions: { value: 'small' | 'medium' | 'large'; label: string }[] = [
   { value: 'large', label: 'Large' },
 ];
 
-export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
-  const [activeTab, setActiveTab] = useState<'background' | 'page' | 'poster' | 'colors'>('background');
+export default function ThemePanel({ theme, onUpdate, initialTab }: ThemePanelProps) {
+  const [activeTab, setActiveTab] = useState<'background' | 'page' | 'poster' | 'colors'>(initialTab || 'background');
+
+  // Synchronize when initialTab changes externally (e.g. from canvas "Presets" button)
+  useEffect(() => {
+    if (initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [initialTab]);
+
   const posterFileInputRef = useRef<HTMLInputElement>(null);
   const bgFileInputRef = useRef<HTMLInputElement>(null);
   const logoFileInputRef = useRef<HTMLInputElement>(null);

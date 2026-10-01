@@ -131,6 +131,7 @@ function BuilderCanvasInner() {
   });
   const [selectedFieldId, setSelectedFieldId] = useState<string | null>('q_name');
   const [activePanel, setActivePanel] = useState<'properties' | 'logic' | 'theme'>('theme');
+  const [themeInitialTab, setThemeInitialTab] = useState<'background' | 'page' | 'poster' | 'colors'>('background');
   const [activeId, setActiveId] = useState<string | null>(null);
   const [mode, setMode] = useState<'edit' | 'preview'>('edit');
   const [copied, setCopied] = useState(false);
@@ -1220,7 +1221,10 @@ function BuilderCanvasInner() {
                   theme={schema.theme}
                   title={schema.title}
                   description={schema.description}
-                  onOpenThemePanel={() => setActivePanel('theme')}
+                  onOpenThemePanel={(tab) => {
+                    if (tab) setThemeInitialTab(tab);
+                    setActivePanel('theme');
+                  }}
                   onUpdateTheme={updateTheme}
                 />
               </div>
@@ -1292,6 +1296,7 @@ function BuilderCanvasInner() {
                 <ThemePanel
                   theme={schema.theme}
                   onUpdate={updateTheme}
+                  initialTab={themeInitialTab}
                 />
               )}
 

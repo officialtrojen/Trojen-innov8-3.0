@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import {
   SortableContext,
@@ -9,7 +9,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { FormField, FormTheme } from '@/lib/types';
-import { GripVertical, Trash2, Copy, Star, Image as ImageIcon, Plus, Upload, X } from 'lucide-react';
+import { GripVertical, Trash2, Copy, Star, Image as ImageIcon, Plus, Upload, X, Sparkles } from 'lucide-react';
 import { getBackgroundStyle, getCardStyle, isDarkColor } from '@/lib/theme-presets';
 
 // ---------- Sortable Field Card ----------
@@ -271,7 +271,7 @@ interface FormCanvasProps {
   theme?: FormTheme;
   title?: string;
   description?: string;
-  onOpenThemePanel?: () => void;
+  onOpenThemePanel?: (tab?: 'background' | 'page' | 'poster' | 'colors') => void;
   onUpdateTheme?: (theme: FormTheme) => void;
 }
 
@@ -288,6 +288,44 @@ export default function FormCanvas({
   onUpdateTheme,
 }: FormCanvasProps) {
   const { setNodeRef, isOver } = useDroppable({ id: 'canvas-drop-zone' });
+  const posterFileInputRef = useRef<HTMLInputElement>(null);
+
+  // Handle local poster file upload directly from canvas
+  const handlePosterUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Poster image exceeds 5MB. Please choose a smaller file.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const result = ev.target?.result as string;
+      if (result && onUpdateTheme) {
+        onUpdateTheme({
+          ...(theme || {
+            background: '#EAF4F4',
+            primary: '#8B5CF6',
+            secondary: '#475569',
+            text: '#0F172A',
+            fontFamily: 'Inter',
+            fontSize: 'medium',
+            layout: 'single-page',
+          }),
+          posterUrl: result,
+          bannerUrl: result,
+          posterStyle: theme?.posterStyle || 'card-top',
+          posterHeight: theme?.posterHeight || 180,
+        });
+        onOpenThemePanel?.('poster');
+      }
+    };
+    reader.readAsDataURL(file);
+    // Reset input so same file can be re-selected if needed
+    e.target.value = '';
+  };
 
   const currentPoster = theme?.posterUrl || theme?.bannerUrl;
   const posterHeight = theme?.posterHeight || 180;
@@ -556,25 +594,93 @@ export default function FormCanvas({
                   )}
                 </div>
 
-                {/* Quick theme trigger button */}
-                {onOpenThemePanel && (
+                {/* Quick Poster trigger & actions */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                  <input
+                    ref={posterFileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handlePosterUpload}
+                    style={{ display: 'none' }}
+                  />
+
                   <button
                     type="button"
-                    onClick={onOpenThemePanel}
-                    className="btn btn-ghost btn-sm"
+                    onClick={() => posterFileInputRef.current?.click()}
                     style={{
                       fontSize: 12,
+                      fontWeight: 600,
                       display: 'flex',
                       alignItems: 'center',
                       gap: 6,
-                      flexShrink: 0,
-                      color: isDarkCard ? '#94A3B8' : '#52796F',
+                      padding: '6px 12px',
+                      borderRadius: 8,
+                      border: isDarkCard ? '1px solid rgba(255,255,255,0.2)' : '1px solid #B8CECF',
+                      background: isDarkCard ? 'rgba(255,255,255,0.1)' : '#FFFFFF',
+                      color: isDarkCard ? '#F8FAFC' : '#0F766E',
+                      cursor: 'pointer',
+                      boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+                      transition: 'all 0.15s ease',
                     }}
-                    title="Customize background, page color & poster"
+                    title="Upload poster image from your device"
                   >
-                    <ImageIcon size={14} /> {currentPoster ? 'Edit Poster' : '+ Add Poster'}
+                    <ImageIcon size={14} />
+                    {currentPoster ? 'Change Poster' : '+ Add Poster'}
                   </button>
-                )}
+
+                  {onOpenThemePanel && (
+                    <button
+                      type="button"
+                      onClick={() => onOpenThemePanel('poster')}
+                      style={{
+                        fontSize: 12,
+                        fontWeight: 500,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 4,
+                        padding: '6px 10px',
+                        borderRadius: 8,
+                        border: '1px solid transparent',
+                        background: 'transparent',
+                        color: isDarkCard ? '#94A3B8' : '#52796F',
+                        cursor: 'pointer',
+                        transition: 'all 0.15s ease',
+                      }}
+                      title="Browse curated poster presets, styles, and dimensions"
+                    >
+                      <Sparkles size={13} />
+                      Presets
+                    </button>
+                  )}
+
+                  {currentPoster && onUpdateTheme && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onUpdateTheme({
+                          ...(theme as any),
+                          posterUrl: undefined,
+                          bannerUrl: undefined,
+                        });
+                      }}
+                      style={{
+                        fontSize: 11,
+                        color: '#EF4444',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        padding: '4px 6px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 3,
+                        borderRadius: 6,
+                      }}
+                      title="Remove current poster"
+                    >
+                      <Trash2 size={13} />
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
 

@@ -73,6 +73,7 @@ export default function FormBuilder({
   }, [initialSchema]);
   const [selectedFieldId, setSelectedFieldId] = useState<string | null>(null);
   const [activePanel, setActivePanel] = useState<'properties' | 'logic' | 'theme'>('properties');
+  const [themeInitialTab, setThemeInitialTab] = useState<'background' | 'page' | 'poster' | 'colors'>('background');
   const [activeId, setActiveId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [isAiOpen, setIsAiOpen] = useState(true);
@@ -428,7 +429,10 @@ export default function FormBuilder({
                 theme={schema.theme}
                 title={schema.title}
                 description={schema.description}
-                onOpenThemePanel={() => setActivePanel('theme')}
+                onOpenThemePanel={(tab) => {
+                  if (tab) setThemeInitialTab(tab);
+                  setActivePanel('theme');
+                }}
                 onUpdateTheme={updateTheme}
               />
             </div>
@@ -470,6 +474,7 @@ export default function FormBuilder({
               <ThemePanel
                 theme={schema.theme}
                 onUpdate={updateTheme}
+                initialTab={themeInitialTab}
               />
             )}
           </div>
