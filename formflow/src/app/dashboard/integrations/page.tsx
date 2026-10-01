@@ -82,14 +82,22 @@ const APPS = [
 ];
 
 const GOOGLE_APPS_SCRIPT = `// ==========================================
-// FormFlow -> Google Sheets Webhook Connector
+// FormFlow -> Permanent Master Google Sheet
+// Automatically creates a new tab for each form!
 // ==========================================
 function doPost(e) {
   try {
-    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
     var data = JSON.parse(e.postData.contents);
     
-    // Auto-create header row on first submission
+    // 1. Get or create a separate tab for each form
+    var sheetName = (data.formTitle || data.formId || "Responses").toString().substring(0, 30);
+    var sheet = ss.getSheetByName(sheetName);
+    if (!sheet) {
+      sheet = ss.insertSheet(sheetName);
+    }
+    
+    // 2. Auto-create headers on first submission for this form
     if (sheet.getLastRow() === 0) {
       var headers = ["Timestamp", "Form ID", "Submission ID"];
       if (data.responses) {
@@ -101,7 +109,7 @@ function doPost(e) {
       sheet.getRange(1, 1, 1, headers.length).setFontWeight("bold").setBackground("#EEF2FF");
     }
     
-    // Append submission row
+    // 3. Append response row
     var row = [
       data.submittedAt || new Date().toISOString(),
       data.formId || "Unknown",
@@ -114,7 +122,7 @@ function doPost(e) {
     }
     sheet.appendRow(row);
     
-    return ContentService.createTextOutput(JSON.stringify({ status: "success", rowAppended: true }))
+    return ContentService.createTextOutput(JSON.stringify({ status: "success", tab: sheetName }))
       .setMimeType(ContentService.MimeType.JSON);
   } catch (err) {
     return ContentService.createTextOutput(JSON.stringify({ status: "error", message: err.toString() }))

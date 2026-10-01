@@ -153,6 +153,7 @@ export async function POST(request: Request) {
           payload = {
             event: 'form_submission',
             formId: form_id,
+            formTitle: dbForm?.title || 'Form Responses',
             submissionId: responseData?.id || `resp_${Date.now()}`,
             submittedAt,
             responses: answers,
