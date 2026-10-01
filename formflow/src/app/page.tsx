@@ -7,7 +7,6 @@ import { createClient } from '@/lib/supabase/client';
 import {
   Layers,
   ArrowRight,
-  Compass,
   Radio,
   Eye,
   Send,
@@ -348,14 +347,13 @@ export default function ParallaxDeepSpaceLandingPage() {
           </div>
         </header>
 
-        {/* SECTION 1: HERO VIEWPORT (Vast Calm Black Space) */}
+        {/* SECTION 1: HERO VIEWPORT */}
         <section
           style={{
-            minHeight: '100vh',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
-            padding: '140px 8vw 60px',
+            padding: '160px 8vw 48px',
             maxWidth: 1200,
           }}
         >
@@ -380,70 +378,20 @@ export default function ParallaxDeepSpaceLandingPage() {
               color: '#94A3B8',
               lineHeight: 1.7,
               maxWidth: 580,
-              margin: '0 0 44px',
+              margin: 0,
               fontWeight: 400,
             }}
           >
             Drag-and-drop form builder with conditional logic, real-time analytics,
             and beautiful themes — no code required.
           </p>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
-            <button
-              type="button"
-              onClick={() => {
-                setFormName('');
-                setFormDesc('');
-                setFormNameError(null);
-                setCreateModalOpen(true);
-              }}
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 10,
-                background: '#FFFFFF',
-                color: '#020306',
-                padding: '14px 28px',
-                borderRadius: 10,
-                fontWeight: 700,
-                fontSize: 14,
-                border: 'none',
-                boxShadow: '0 4px 24px rgba(255, 255, 255, 0.18)',
-                cursor: 'pointer',
-              }}
-            >
-              Build New Form <ArrowRight size={16} />
-            </button>
-
-            <Link
-              href="/dashboard"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 8,
-                background: 'rgba(255, 255, 255, 0.03)',
-                color: '#E2E8F0',
-                border: '1px solid rgba(255, 255, 255, 0.12)',
-                padding: '14px 24px',
-                borderRadius: 10,
-                fontWeight: 600,
-                fontSize: 14,
-                textDecoration: 'none',
-              }}
-            >
-              <Compass size={16} style={{ color: '#94A3B8' }} /> Explore Workspace
-            </Link>
-          </div>
         </section>
 
-        {/* GENEROUS CALM BLACK SPACE VOID */}
-        <div style={{ height: '35vh' }} />
-
-        {/* SECTION 2: DEPTH ARCHITECTURE (MIDGROUND PARALLAX ENCOUNTER) */}
+        {/* SECTION 2: DEPTH ARCHITECTURE */}
         <section
           id="architecture"
           style={{
-            padding: '80px 8vw',
+            padding: '48px 8vw 60px',
             maxWidth: 1240,
             margin: '0 auto',
           }}
@@ -588,14 +536,11 @@ export default function ParallaxDeepSpaceLandingPage() {
           </div>
         </section>
 
-        {/* GENEROUS CALM BLACK SPACE VOID */}
-        <div style={{ height: '40vh' }} />
-
-        {/* SECTION 3: REORDERING 4-BOX WEBSITE FEATURES (Motion Spring Physics) */}
+        {/* SECTION 3: REORDERING 4-BOX WEBSITE FEATURES */}
         <section
           id="features"
           style={{
-            padding: '80px 4vw',
+            padding: '48px 4vw 60px',
             maxWidth: 1280,
             margin: '0 auto',
             position: 'relative',
@@ -605,14 +550,11 @@ export default function ParallaxDeepSpaceLandingPage() {
           <ReorderingFeatures />
         </section>
 
-        {/* GENEROUS CALM BLACK SPACE VOID */}
-        <div style={{ height: '45vh' }} />
-
         {/* SECTION 4: CALL TO ACTION IN DEEP SPACE */}
         <section
           id="telemetry"
           style={{
-            padding: '100px 8vw 140px',
+            padding: '60px 8vw 100px',
             textAlign: 'center',
             maxWidth: 820,
             margin: '0 auto',
