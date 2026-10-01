@@ -699,7 +699,7 @@ export default function FormRenderer({ schema, onSubmit, readOnly = false }: For
           }}
         >
           {/* POSTER / BANNER DISPLAY */}
-          {(currentPoster || schema.theme.bannerColor || schema.theme.posterColor || schema.theme.posterTitle) && (
+          {(currentPoster || schema.theme.bannerColor || schema.theme.posterColor || schema.theme.posterTitle || schema.theme.logoUrl) && (
             <div
               style={{
                 position: 'relative',
@@ -729,22 +729,57 @@ export default function FormRenderer({ schema, onSubmit, readOnly = false }: For
                     ? `linear-gradient(to top, rgba(0,0,0, ${Math.max(0.4, overlayOpacity + 0.2)}), rgba(0,0,0, ${overlayOpacity}))`
                     : 'transparent',
                   display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'flex-end',
-                  padding: '28px 36px',
+                  flexDirection: 'row',
+                  alignItems: 'flex-end',
+                  gap: 16,
+                  padding: '24px 32px',
                   color: 'white',
                 }}
               >
-                {schema.theme.posterTitle && (
-                  <h2 style={{ fontSize: 24, fontWeight: 800, margin: '0 0 6px 0', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
-                    {schema.theme.posterTitle}
-                  </h2>
+                {/* Left Side: Brand Logo PNG */}
+                {schema.theme.logoUrl && (
+                  <div
+                    style={{
+                      position: 'relative',
+                      flexShrink: 0,
+                      width: 68,
+                      height: 68,
+                      borderRadius: 14,
+                      background: 'rgba(255, 255, 255, 0.95)',
+                      border: '2px solid rgba(255, 255, 255, 0.6)',
+                      boxShadow: '0 8px 24px rgba(0, 0, 0, 0.35)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: 6,
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <img
+                      src={schema.theme.logoUrl}
+                      alt="Form logo"
+                      style={{
+                        maxWidth: '100%',
+                        maxHeight: '100%',
+                        objectFit: 'contain',
+                        display: 'block',
+                      }}
+                    />
+                  </div>
                 )}
-                {schema.theme.posterSubtitle && (
-                  <p style={{ fontSize: 14, margin: 0, opacity: 0.9, textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}>
-                    {schema.theme.posterSubtitle}
-                  </p>
-                )}
+
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  {schema.theme.posterTitle && (
+                    <h2 style={{ fontSize: 24, fontWeight: 800, margin: '0 0 6px 0', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
+                      {schema.theme.posterTitle}
+                    </h2>
+                  )}
+                  {schema.theme.posterSubtitle && (
+                    <p style={{ fontSize: 14, margin: 0, opacity: 0.9, textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}>
+                      {schema.theme.posterSubtitle}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
           )}

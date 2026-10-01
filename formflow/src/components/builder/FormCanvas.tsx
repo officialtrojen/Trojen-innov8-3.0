@@ -9,7 +9,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { FormField, FormTheme } from '@/lib/types';
-import { GripVertical, Trash2, Copy, Star, Image as ImageIcon, Plus } from 'lucide-react';
+import { GripVertical, Trash2, Copy, Star, Image as ImageIcon, Plus, Upload, X } from 'lucide-react';
 import { getBackgroundStyle, getCardStyle, isDarkColor } from '@/lib/theme-presets';
 
 // ---------- Sortable Field Card ----------
@@ -272,6 +272,7 @@ interface FormCanvasProps {
   title?: string;
   description?: string;
   onOpenThemePanel?: () => void;
+  onUpdateTheme?: (theme: FormTheme) => void;
 }
 
 export default function FormCanvas({
@@ -284,6 +285,7 @@ export default function FormCanvas({
   title,
   description,
   onOpenThemePanel,
+  onUpdateTheme,
 }: FormCanvasProps) {
   const { setNodeRef, isOver } = useDroppable({ id: 'canvas-drop-zone' });
 
@@ -353,25 +355,156 @@ export default function FormCanvas({
                       ? `linear-gradient(to top, rgba(0,0,0, ${Math.max(0.4, overlayOpacity + 0.2)}), rgba(0,0,0, ${overlayOpacity}))`
                       : 'transparent',
                     display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'flex-end',
-                    padding: '24px 28px',
+                    flexDirection: 'row',
+                    alignItems: 'flex-end',
+                    gap: 16,
+                    padding: '20px 24px',
                     color: 'white',
                   }}
                 >
-                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.25)', backdropFilter: 'blur(8px)', padding: '4px 12px', borderRadius: 999, fontSize: 11, fontWeight: 700, width: 'fit-content', marginBottom: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.2)' }}>
-                    <ImageIcon size={12} /> {currentPoster ? 'Poster Image' : 'Banner Color Active'}
+                  {/* Left Side: Logo (PNG) Space */}
+                  <div style={{ position: 'relative', flexShrink: 0 }}>
+                    <input
+                      type="file"
+                      id="canvas-logo-upload"
+                      accept="image/png, image/jpeg, image/webp, image/svg+xml"
+                      style={{ display: 'none' }}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file && onUpdateTheme) {
+                          const reader = new FileReader();
+                          reader.onload = (ev) => {
+                            if (ev.target?.result) {
+                              onUpdateTheme({
+                                ...(theme || { background: '#EAF4F4', primary: '#8B5CF6', secondary: '#475569', text: '#0F172A', fontFamily: 'Inter', fontSize: 'medium', layout: 'single-page' }),
+                                logoUrl: ev.target.result as string,
+                              });
+                            }
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                    />
+
+                    {theme?.logoUrl ? (
+                      <div
+                        style={{
+                          position: 'relative',
+                          width: 68,
+                          height: 68,
+                          borderRadius: 14,
+                          background: 'rgba(255, 255, 255, 0.95)',
+                          border: '2px solid rgba(255, 255, 255, 0.6)',
+                          boxShadow: '0 8px 24px rgba(0, 0, 0, 0.35)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          padding: 6,
+                          overflow: 'hidden',
+                          cursor: 'pointer',
+                        }}
+                        onClick={() => document.getElementById('canvas-logo-upload')?.click()}
+                        title="Click to replace logo PNG"
+                      >
+                        <img
+                          src={theme.logoUrl}
+                          alt="Logo"
+                          style={{
+                            maxWidth: '100%',
+                            maxHeight: '100%',
+                            objectFit: 'contain',
+                            display: 'block',
+                          }}
+                        />
+                        {/* Remove button */}
+                        <button
+                          type="button"
+                          onClick={(ev) => {
+                            ev.stopPropagation();
+                            if (onUpdateTheme) {
+                              onUpdateTheme({ ...(theme as any), logoUrl: undefined });
+                            }
+                          }}
+                          title="Remove logo"
+                          style={{
+                            position: 'absolute',
+                            top: 2,
+                            right: 2,
+                            width: 18,
+                            height: 18,
+                            borderRadius: '50%',
+                            background: 'rgba(0, 0, 0, 0.65)',
+                            border: 'none',
+                            color: '#FFF',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: 'pointer',
+                            padding: 0,
+                          }}
+                        >
+                          <X size={10} />
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => document.getElementById('canvas-logo-upload')?.click()}
+                        title="Click to add a PNG logo in this space"
+                        style={{
+                          width: 68,
+                          height: 68,
+                          borderRadius: 14,
+                          background: 'rgba(255, 255, 255, 0.15)',
+                          backdropFilter: 'blur(12px)',
+                          WebkitBackdropFilter: 'blur(12px)',
+                          border: '2px dashed rgba(255, 255, 255, 0.5)',
+                          boxShadow: '0 4px 14px rgba(0, 0, 0, 0.25)',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: 4,
+                          cursor: 'pointer',
+                          color: '#FFFFFF',
+                          transition: 'all 0.2s ease',
+                          padding: 4,
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = 'rgba(255, 255, 255, 0.28)';
+                          e.currentTarget.style.borderColor = '#FFFFFF';
+                          e.currentTarget.style.transform = 'scale(1.03)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
+                          e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.5)';
+                          e.currentTarget.style.transform = 'scale(1)';
+                        }}
+                      >
+                        <Upload size={16} />
+                        <span style={{ fontSize: 9.5, fontWeight: 700, letterSpacing: '0.02em', textTransform: 'uppercase', textAlign: 'center', lineHeight: 1.1 }}>
+                          Add Logo
+                        </span>
+                      </button>
+                    )}
                   </div>
-                  {theme?.posterTitle && (
-                    <h2 style={{ fontSize: 22, fontWeight: 800, margin: '0 0 4px 0', textShadow: '0 2px 4px rgba(0,0,0,0.5)' }}>
-                      {theme.posterTitle}
-                    </h2>
-                  )}
-                  {theme?.posterSubtitle && (
-                    <p style={{ fontSize: 13, margin: 0, opacity: 0.9, textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}>
-                      {theme.posterSubtitle}
-                    </p>
-                  )}
+
+                  {/* Right of Logo: Poster details */}
+                  <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(255,255,255,0.25)', backdropFilter: 'blur(8px)', padding: '4px 12px', borderRadius: 999, fontSize: 11, fontWeight: 700, width: 'fit-content', marginBottom: 6, boxShadow: '0 2px 8px rgba(0,0,0,0.2)' }}>
+                      <ImageIcon size={12} /> {currentPoster ? 'Poster Image' : 'Banner Color Active'}
+                    </div>
+                    {theme?.posterTitle && (
+                      <h2 style={{ fontSize: 22, fontWeight: 800, margin: '0 0 4px 0', textShadow: '0 2px 4px rgba(0,0,0,0.5)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {theme.posterTitle}
+                      </h2>
+                    )}
+                    {theme?.posterSubtitle && (
+                      <p style={{ fontSize: 13, margin: 0, opacity: 0.9, textShadow: '0 1px 3px rgba(0,0,0,0.5)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {theme.posterSubtitle}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             )}

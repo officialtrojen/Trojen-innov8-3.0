@@ -1220,6 +1220,7 @@ function BuilderCanvasInner() {
                   title={schema.title}
                   description={schema.description}
                   onOpenThemePanel={() => setActivePanel('theme')}
+                  onUpdateTheme={updateTheme}
                 />
               </div>
             </div>

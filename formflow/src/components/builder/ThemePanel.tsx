@@ -40,6 +40,27 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
   const [activeTab, setActiveTab] = useState<'background' | 'page' | 'poster' | 'colors'>('background');
   const posterFileInputRef = useRef<HTMLInputElement>(null);
   const bgFileInputRef = useRef<HTMLInputElement>(null);
+  const logoFileInputRef = useRef<HTMLInputElement>(null);
+
+  // Handle local logo file upload (PNG/SVG/etc) as base64
+  const handleLogoFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File size exceeds 5MB. Please choose a smaller logo.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const result = event.target?.result as string;
+      onUpdate({
+        logoUrl: result,
+      });
+    };
+    reader.readAsDataURL(file);
+  };
 
   // Handle local poster file upload as base64
   const handlePosterFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1055,6 +1076,132 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
       {/* ======================================================== */}
       {activeTab === 'poster' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+          {/* Logo (PNG) in Poster Area */}
+          <div
+            style={{
+              padding: '12px 14px',
+              borderRadius: 10,
+              background: 'rgba(207,229,227,0.3)',
+              border: '1.5px dashed rgba(79,124,122,0.4)',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <label className="label" style={{ fontSize: 12, fontWeight: 700, color: '#263B3B', margin: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
+                Brand Logo (PNG)
+              </label>
+              {theme.logoUrl && (
+                <button
+                  type="button"
+                  onClick={() => onUpdate({ logoUrl: undefined })}
+                  style={{
+                    border: 'none',
+                    background: 'transparent',
+                    color: '#f87171',
+                    fontSize: 11,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 3,
+                  }}
+                >
+                  <Trash2 size={11} /> Remove Logo
+                </button>
+              )}
+            </div>
+
+            <p style={{ fontSize: 11, color: '#52796F', margin: '0 0 10px 0', lineHeight: 1.4 }}>
+              Appears in dedicated space on the left side of the poster. Transparent PNGs recommended.
+            </p>
+
+            <input
+              ref={logoFileInputRef}
+              type="file"
+              accept="image/png, image/jpeg, image/webp, image/svg+xml"
+              onChange={handleLogoFileUpload}
+              style={{ display: 'none' }}
+            />
+
+            {theme.logoUrl ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                <div
+                  style={{
+                    width: 54,
+                    height: 54,
+                    borderRadius: 10,
+                    background: '#FFFFFF',
+                    border: '1.5px solid rgba(184,206,207,0.8)',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: 4,
+                    overflow: 'hidden',
+                  }}
+                >
+                  <img
+                    src={theme.logoUrl}
+                    alt="Logo preview"
+                    style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <button
+                    type="button"
+                    onClick={() => logoFileInputRef.current?.click()}
+                    style={{
+                      width: '100%',
+                      padding: '6px 10px',
+                      fontSize: 11,
+                      fontWeight: 600,
+                      borderRadius: 6,
+                      border: '1px solid #4F7C7A',
+                      background: 'white',
+                      color: '#4F7C7A',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Change Logo PNG
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => logoFileInputRef.current?.click()}
+                className="btn btn-secondary"
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                  fontSize: 12,
+                  fontWeight: 600,
+                  padding: '8px 12px',
+                  background: '#FFFFFF',
+                  color: '#263B3B',
+                  border: '1.5px solid #4F7C7A',
+                  borderRadius: 8,
+                  cursor: 'pointer',
+                }}
+              >
+                <Upload size={14} style={{ color: '#4F7C7A' }} />
+                Upload Logo PNG
+              </button>
+            )}
+
+            <div style={{ marginTop: 8 }}>
+              <input
+                className="input"
+                value={theme.logoUrl || ''}
+                onChange={(e) => onUpdate({ logoUrl: e.target.value })}
+                placeholder="Or paste Logo PNG URL..."
+                style={{ fontSize: 11, padding: '5px 8px' }}
+              />
+            </div>
+          </div>
+
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
               <label className="label" style={{ fontSize: 12, fontWeight: 600, margin: 0 }}>
