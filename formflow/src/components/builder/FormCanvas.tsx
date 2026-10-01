@@ -148,34 +148,34 @@ function SortableFieldCard({
               </div>
             )}
             {field.type === 'short_text' && (
-              <div style={{ padding: '8px 12px', border: '1px solid var(--input-border)', borderRadius: 8, fontSize: 13, color: '#94A3B8', background: 'white' }}>
+              <div style={{ padding: '9px 12px', border: '1.5px solid #94A3B8', borderRadius: 8, fontSize: 13, color: '#000000', fontWeight: 600, background: '#FFFFFF' }}>
                 {field.placeholder || 'Type your answer...'}
               </div>
             )}
             {field.type === 'paragraph' && (
-              <div style={{ padding: '8px 12px', border: '1px solid var(--input-border)', borderRadius: 8, fontSize: 13, color: '#94A3B8', background: 'white', minHeight: 46 }}>
+              <div style={{ padding: '9px 12px', border: '1.5px solid #94A3B8', borderRadius: 8, fontSize: 13, color: '#000000', fontWeight: 600, background: '#FFFFFF', minHeight: 48 }}>
                 {field.placeholder || 'Type your detailed answer...'}
               </div>
             )}
             {field.type === 'multiple_choice' && field.options && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {field.options.slice(0, 4).map((opt, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#263B3B' }}>
-                    <div style={{ width: 15, height: 15, borderRadius: field.selectionMode === 'multiple' ? 4 : 8, border: '1.5px solid var(--input-border)' }} />
-                    <span>{opt}</span>
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#000000', fontWeight: 600 }}>
+                    <div style={{ width: 16, height: 16, borderRadius: field.selectionMode === 'multiple' ? 4 : 8, border: '1.5px solid #64748B', background: '#FFFFFF' }} />
+                    <span style={{ color: '#000000' }}>{opt}</span>
                   </div>
                 ))}
                 {field.options.length > 4 && (
-                  <span style={{ fontSize: 11, color: '#94A3B8' }}>+{field.options.length - 4} more options</span>
+                  <span style={{ fontSize: 11, color: '#000000', fontWeight: 600 }}>+{field.options.length - 4} more options</span>
                 )}
               </div>
             )}
             {field.type === 'yes_no' && (
               <div style={{ display: 'flex', gap: 8 }}>
-                <span style={{ padding: '4px 12px', borderRadius: 6, border: '1px solid var(--input-border)', fontSize: 12, fontWeight: 600, color: '#263B3B', background: 'white' }}>
+                <span style={{ padding: '6px 14px', borderRadius: 6, border: '1.5px solid #94A3B8', fontSize: 12, fontWeight: 700, color: '#000000', background: '#FFFFFF' }}>
                   [Y] Yes
                 </span>
-                <span style={{ padding: '4px 12px', borderRadius: 6, border: '1px solid var(--input-border)', fontSize: 12, fontWeight: 600, color: '#263B3B', background: 'white' }}>
+                <span style={{ padding: '6px 14px', borderRadius: 6, border: '1.5px solid #94A3B8', fontSize: 12, fontWeight: 700, color: '#000000', background: '#FFFFFF' }}>
                   [N] No
                 </span>
               </div>
@@ -216,18 +216,18 @@ function SortableFieldCard({
                     );
                   })}
                 </div>
-                <div style={{ fontSize: 11, color: '#365F5D', fontWeight: 600 }}>
+                <div style={{ fontSize: 11, color: '#000000', fontWeight: 600 }}>
                   Tap on the stars to rate (1 - 5 stars)
                 </div>
               </div>
             )}
             {field.type === 'file_upload' && (
-              <div style={{ padding: '12px 14px', border: '1.5px dashed var(--input-border)', borderRadius: 8, fontSize: 12, color: '#64748B', textAlign: 'center', background: '#F8FAFC' }}>
+              <div style={{ padding: '12px 14px', border: '1.5px dashed #94A3B8', borderRadius: 8, fontSize: 13, color: '#000000', fontWeight: 600, textAlign: 'center', background: '#FFFFFF' }}>
                 📎 Drag and drop file or browse
               </div>
             )}
-            {field.type === 'date_picker' && (
-              <div style={{ padding: '8px 12px', border: '1px solid var(--input-border)', borderRadius: 8, fontSize: 13, color: '#94A3B8', background: 'white' }}>
+            {(field.type === 'date_picker' || field.type === 'date') && (
+              <div style={{ padding: '9px 12px', border: '1.5px solid #94A3B8', borderRadius: 8, fontSize: 13, color: '#000000', fontWeight: 600, background: '#FFFFFF' }}>
                 {'📅 mm / dd / yyyy'}
               </div>
             )}

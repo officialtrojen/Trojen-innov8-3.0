@@ -2,7 +2,45 @@
 
 import React from 'react';
 import { FormField } from '@/lib/types';
-import { Plus, Trash2, GripVertical, Settings2 } from 'lucide-react';
+import { Plus, Trash2, GripVertical, Settings2, Type, Check } from 'lucide-react';
+
+export const FIELD_FONT_OPTIONS = [
+  {
+    name: 'Inter',
+    label: 'Inter',
+    category: 'Modern Sans',
+    sample: 'Ag',
+    family: "'Inter', sans-serif",
+  },
+  {
+    name: 'Poppins',
+    label: 'Poppins',
+    category: 'Geometric Rounded',
+    sample: 'Ag',
+    family: "'Poppins', sans-serif",
+  },
+  {
+    name: 'Outfit',
+    label: 'Outfit',
+    category: 'Clean Display',
+    sample: 'Ag',
+    family: "'Outfit', sans-serif",
+  },
+  {
+    name: 'Playfair Display',
+    label: 'Playfair Display',
+    category: 'Editorial Serif',
+    sample: 'Ag',
+    family: "'Playfair Display', serif",
+  },
+  {
+    name: 'Space Grotesk',
+    label: 'Space Grotesk',
+    category: 'Neo-Brutalist',
+    sample: 'Ag',
+    family: "'Space Grotesk', sans-serif",
+  },
+];
 
 interface PropertiesPanelProps {
   field: FormField;
@@ -29,11 +67,11 @@ export default function PropertiesPanel({
       >
         <div
           style={{
-            fontSize: 11,
-            fontWeight: 600,
-            color: '#52796F',
+            fontSize: 12,
+            fontWeight: 800,
+            color: '#0F766E',
             textTransform: 'uppercase',
-            letterSpacing: 1,
+            letterSpacing: 1.2,
           }}
         >
           Field Properties
@@ -83,6 +121,117 @@ export default function PropertiesPanel({
         />
       </div>
 
+      {/* Field Font Typography (5 Font Options) */}
+      <div style={{ marginBottom: 18 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+          <label className="label" style={{ marginBottom: 0, display: 'flex', alignItems: 'center', gap: 6 }}>
+            <Type size={14} style={{ color: '#0F766E' }} />
+            <span>Field Font (5 Options)</span>
+          </label>
+          {field.fontFamily && (
+            <button
+              onClick={() => onUpdate({ fontFamily: undefined })}
+              type="button"
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#0F766E',
+                fontSize: 11,
+                fontWeight: 600,
+                cursor: 'pointer',
+                textDecoration: 'underline',
+                padding: 0,
+              }}
+              title="Reset to default theme font"
+            >
+              Reset to default
+            </button>
+          )}
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {FIELD_FONT_OPTIONS.map((font) => {
+            const isSelected = field.fontFamily === font.name;
+            return (
+              <button
+                key={font.name}
+                type="button"
+                onClick={() => onUpdate({ fontFamily: font.name })}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '9px 12px',
+                  borderRadius: 8,
+                  border: isSelected ? '2px solid #0F766E' : '1.5px solid #CBD5E1',
+                  background: isSelected ? '#F0FDFA' : '#FFFFFF',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  transition: 'all 0.15s ease',
+                  boxShadow: isSelected ? '0 1px 4px rgba(15,118,110,0.15)' : 'none',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <div
+                    style={{
+                      width: 30,
+                      height: 30,
+                      borderRadius: 6,
+                      background: isSelected ? '#0F766E' : '#F1F5F9',
+                      color: isSelected ? '#FFFFFF' : '#0F172A',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontWeight: 700,
+                      fontSize: 13,
+                      fontFamily: font.family,
+                      flexShrink: 0,
+                      border: '1px solid rgba(0,0,0,0.08)',
+                    }}
+                  >
+                    {font.sample}
+                  </div>
+                  <div>
+                    <div
+                      style={{
+                        fontFamily: font.family,
+                        fontSize: 13,
+                        fontWeight: 700,
+                        color: '#0F172A',
+                        lineHeight: 1.2,
+                      }}
+                    >
+                      {font.label}
+                    </div>
+                    <div style={{ fontSize: 10, color: '#475569', fontWeight: 500, marginTop: 2 }}>
+                      {font.category}
+                    </div>
+                  </div>
+                </div>
+
+                {isSelected && (
+                  <div
+                    style={{
+                      width: 20,
+                      height: 20,
+                      borderRadius: 10,
+                      background: '#0F766E',
+                      color: 'white',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <Check size={12} strokeWidth={3} />
+                  </div>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Welcome Screen Button Text */}
       {field.type === 'welcome_screen' && (
         <div style={{ marginBottom: 16 }}>
@@ -99,13 +248,14 @@ export default function PropertiesPanel({
       <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <label className="label" style={{ marginBottom: 0 }}>Required</label>
         <button
+          type="button"
           onClick={() => onUpdate({ required: !field.required })}
           style={{
-            width: 44,
-            height: 24,
-            borderRadius: 12,
+            width: 46,
+            height: 26,
+            borderRadius: 13,
             border: 'none',
-            background: field.required ? 'var(--primary)' : '#B8CECF',
+            background: field.required ? '#0F766E' : '#94A3B8',
             cursor: 'pointer',
             position: 'relative',
             transition: 'background 0.2s ease',
@@ -113,15 +263,15 @@ export default function PropertiesPanel({
         >
           <div
             style={{
-              width: 18,
-              height: 18,
-              borderRadius: 9,
+              width: 20,
+              height: 20,
+              borderRadius: 10,
               background: 'white',
               position: 'absolute',
               top: 3,
               left: field.required ? 23 : 3,
               transition: 'left 0.2s ease',
-              boxShadow: '0 1px 3px rgba(0,0,0,0.15)',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.25)',
             }}
           />
         </button>
@@ -205,16 +355,18 @@ export default function PropertiesPanel({
               {(['single', 'multiple'] as const).map((mode) => (
                 <button
                   key={mode}
+                  type="button"
                   onClick={() => onUpdate({ selectionMode: mode })}
                   className="btn btn-sm"
                   style={{
-                    background: field.selectionMode === mode ? 'var(--primary)' : 'transparent',
-                    color: field.selectionMode === mode ? 'white' : 'var(--text-main)',
-                    border: `1px solid ${field.selectionMode === mode ? 'var(--primary)' : 'var(--input-border)'}`,
+                    background: field.selectionMode === mode ? '#0F766E' : '#FFFFFF',
+                    color: field.selectionMode === mode ? '#FFFFFF' : '#0F172A',
+                    border: `1.5px solid ${field.selectionMode === mode ? '#0F766E' : '#94A3B8'}`,
+                    fontWeight: 700,
                     flex: 1,
                   }}
                 >
-                  {mode === 'single' ? 'Single' : 'Multiple'}
+                  {mode === 'single' ? 'Single Choice' : 'Multiple Choice'}
                 </button>
               ))}
             </div>
@@ -225,8 +377,8 @@ export default function PropertiesPanel({
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               {(field.options || []).map((opt, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <div style={{ color: '#B8CECF', cursor: 'grab', padding: 2 }}>
-                    <GripVertical size={12} />
+                  <div style={{ color: '#64748B', cursor: 'grab', padding: 2 }}>
+                    <GripVertical size={14} />
                   </div>
                   <input
                     className="input"
@@ -239,24 +391,26 @@ export default function PropertiesPanel({
                     style={{ flex: 1 }}
                   />
                   <button
+                    type="button"
                     onClick={() => {
                       const newOpts = (field.options || []).filter((_, j) => j !== i);
                       onUpdate({ options: newOpts });
                     }}
                     className="btn btn-ghost btn-sm"
-                    style={{ padding: 4, color: '#f87171' }}
+                    style={{ padding: 4, color: '#DC2626' }}
                     disabled={(field.options || []).length <= 1}
                   >
-                    <Trash2 size={13} />
+                    <Trash2 size={14} />
                   </button>
                 </div>
               ))}
               <button
+                type="button"
                 onClick={() => onUpdate({ options: [...(field.options || []), `Option ${(field.options?.length || 0) + 1}`] })}
                 className="btn btn-ghost btn-sm"
-                style={{ justifyContent: 'flex-start', color: 'var(--primary)' }}
+                style={{ justifyContent: 'flex-start', color: '#0F766E', fontWeight: 700 }}
               >
-                <Plus size={14} /> Add Option
+                <Plus size={15} /> Add Option
               </button>
             </div>
           </div>
@@ -270,14 +424,14 @@ export default function PropertiesPanel({
             marginBottom: 16,
             padding: '12px 14px',
             borderRadius: 10,
-            background: '#EAF4F4',
-            border: '1.5px solid #B8CECF',
+            background: '#F0FDFA',
+            border: '1.5px solid #99F6E4',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#263B3B', fontWeight: 700, fontSize: 13, marginBottom: 4 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#0F766E', fontWeight: 800, fontSize: 13, marginBottom: 4 }}>
             <span>⭐ Standard 5-Star Rating</span>
           </div>
-          <p style={{ margin: 0, fontSize: 12, color: '#365F5D', lineHeight: 1.5 }}>
+          <p style={{ margin: 0, fontSize: 12, color: '#134E4A', lineHeight: 1.5, fontWeight: 500 }}>
             Fixed to standard 5 stars. Respondents tap directly on any of the 5 interactive stars to submit their rating.
           </p>
         </div>

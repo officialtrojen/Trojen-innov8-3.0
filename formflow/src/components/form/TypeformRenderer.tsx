@@ -17,6 +17,7 @@ import {
   ArrowRight,
   RotateCcw,
   Sparkles,
+  Calendar,
 } from 'lucide-react';
 import { getBackgroundStyle } from '@/lib/theme-presets';
 
@@ -430,7 +431,7 @@ export default function TypeformRenderer({
             initial="enter"
             animate="center"
             exit="exit"
-            style={{ width: '100%' }}
+            style={{ width: '100%', fontFamily: currentField.fontFamily || undefined }}
           >
             {/* 1. WELCOME SCREEN */}
             {currentField.type === 'welcome_screen' && (
@@ -494,15 +495,15 @@ export default function TypeformRenderer({
               </div>
             )}
 
-            {/* 2. SHORT TEXT QUESTION */}
-            {currentField.type === 'short_text' && (
+            {/* 2. SHORT TEXT & PARAGRAPH QUESTION */}
+            {(currentField.type === 'short_text' || currentField.type === 'paragraph') && (
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
                   <span style={{ color: primaryColor, fontWeight: 700, fontSize: 16 }}>
                     {currentIndex + 1} →
                   </span>
                   <span style={{ fontSize: 13, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: 1, fontWeight: 600 }}>
-                    Short Answer
+                    {currentField.type === 'paragraph' ? 'Detailed Answer' : 'Short Answer'}
                   </span>
                 </div>
 
@@ -518,26 +519,57 @@ export default function TypeformRenderer({
                 )}
 
                 <div style={{ marginBottom: 24 }}>
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    value={(answers[currentField.id] as string) || ''}
-                    onChange={(e) => setAnswer(currentField.id, e.target.value)}
-                    placeholder={currentField.placeholder || 'Type your answer here...'}
-                    style={{
-                      width: '100%',
-                      background: 'transparent',
-                      border: 'none',
-                      borderBottom: `2px solid ${error ? '#F43F5E' : 'rgba(255,255,255,0.2)'}`,
-                      fontSize: 'clamp(1.25rem, 3vw, 1.75rem)',
-                      color: textColor,
-                      padding: '12px 0',
-                      outline: 'none',
-                      transition: 'border-color 0.2s ease',
-                    }}
-                    onFocus={(e) => { e.currentTarget.style.borderBottomColor = primaryColor; }}
-                    onBlur={(e) => { e.currentTarget.style.borderBottomColor = error ? '#F43F5E' : 'rgba(255,255,255,0.2)'; }}
-                  />
+                  {currentField.type === 'paragraph' ? (
+                    <textarea
+                      rows={4}
+                      value={(answers[currentField.id] as string) || ''}
+                      onChange={(e) => setAnswer(currentField.id, e.target.value)}
+                      placeholder={currentField.placeholder || 'Type your detailed answer here...'}
+                      style={{
+                        width: '100%',
+                        background: '#FFFFFF',
+                        border: `1.5px solid ${error ? '#F43F5E' : '#94A3B8'}`,
+                        borderRadius: 12,
+                        fontSize: 'clamp(1rem, 2.5vw, 1.25rem)',
+                        color: '#000000',
+                        WebkitTextFillColor: '#000000',
+                        caretColor: '#000000',
+                        padding: '14px 18px',
+                        outline: 'none',
+                        fontWeight: 500,
+                        resize: 'none',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                        transition: 'border-color 0.2s ease',
+                      }}
+                      onFocus={(e) => { e.currentTarget.style.borderColor = primaryColor; }}
+                      onBlur={(e) => { e.currentTarget.style.borderColor = error ? '#F43F5E' : '#94A3B8'; }}
+                    />
+                  ) : (
+                    <input
+                      ref={inputRef}
+                      type="text"
+                      value={(answers[currentField.id] as string) || ''}
+                      onChange={(e) => setAnswer(currentField.id, e.target.value)}
+                      placeholder={currentField.placeholder || 'Type your answer here...'}
+                      style={{
+                        width: '100%',
+                        background: '#FFFFFF',
+                        border: `1.5px solid ${error ? '#F43F5E' : '#94A3B8'}`,
+                        borderRadius: 12,
+                        fontSize: 'clamp(1.1rem, 2.5vw, 1.4rem)',
+                        color: '#000000',
+                        WebkitTextFillColor: '#000000',
+                        caretColor: '#000000',
+                        padding: '14px 18px',
+                        outline: 'none',
+                        fontWeight: 500,
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                        transition: 'border-color 0.2s ease',
+                      }}
+                      onFocus={(e) => { e.currentTarget.style.borderColor = primaryColor; }}
+                      onBlur={(e) => { e.currentTarget.style.borderColor = error ? '#F43F5E' : '#94A3B8'; }}
+                    />
+                  )}
                   {error && (
                     <div style={{ color: '#F43F5E', fontSize: 13, marginTop: 8 }}>{error}</div>
                   )}
@@ -873,6 +905,127 @@ export default function TypeformRenderer({
                   </button>
                   <span style={{ fontSize: 12, color: '#64748B' }}>
                     or press <strong>[1-5]</strong>
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* 6. DATE PICKER QUESTION */}
+            {(currentField.type === 'date_picker' || currentField.type === 'date') && (
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                  <span style={{ color: primaryColor, fontWeight: 700, fontSize: 16 }}>
+                    {currentIndex + 1} →
+                  </span>
+                  <span style={{ fontSize: 13, color: '#94A3B8', textTransform: 'uppercase', letterSpacing: 1, fontWeight: 600 }}>
+                    Select a Date
+                  </span>
+                </div>
+
+                <h2 style={{ fontSize: 'clamp(1.5rem, 4vw, 2.25rem)', fontWeight: 700, lineHeight: 1.25, marginBottom: 8 }}>
+                  {currentField.label}
+                  {currentField.required && <span style={{ color: '#F43F5E', marginLeft: 4 }}>*</span>}
+                </h2>
+
+                {currentField.description && (
+                  <p style={{ color: '#94A3B8', fontSize: 14, marginBottom: 28 }}>
+                    {currentField.description}
+                  </p>
+                )}
+
+                <div style={{ marginBottom: 28, maxWidth: 360, position: 'relative', display: 'flex', alignItems: 'center' }}>
+                  <input
+                    id={`typeform-date-${currentField.id}`}
+                    type="date"
+                    value={(answers[currentField.id] as string) || ''}
+                    onChange={(e) => setAnswer(currentField.id, e.target.value)}
+                    onClick={(e) => {
+                      if ('showPicker' in HTMLInputElement.prototype) {
+                        try {
+                          e.currentTarget.showPicker();
+                        } catch {}
+                      }
+                    }}
+                    style={{
+                      width: '100%',
+                      background: '#FFFFFF',
+                      border: `1.5px solid ${error ? '#F43F5E' : '#94A3B8'}`,
+                      borderRadius: 12,
+                      fontSize: 'clamp(1.1rem, 2.5vw, 1.3rem)',
+                      color: '#000000',
+                      WebkitTextFillColor: '#000000',
+                      caretColor: '#000000',
+                      colorScheme: 'light',
+                      padding: '14px 44px 14px 18px',
+                      outline: 'none',
+                      fontWeight: 600,
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                      transition: 'border-color 0.2s ease',
+                      cursor: 'pointer',
+                    }}
+                    onFocus={(e) => { e.currentTarget.style.borderColor = primaryColor; }}
+                    onBlur={(e) => { e.currentTarget.style.borderColor = error ? '#F43F5E' : '#94A3B8'; }}
+                  />
+                  <button
+                    type="button"
+                    tabIndex={-1}
+                    onClick={() => {
+                      const inputEl = document.getElementById(`typeform-date-${currentField.id}`) as HTMLInputElement | null;
+                      if (inputEl) {
+                        if ('showPicker' in HTMLInputElement.prototype) {
+                          try {
+                            inputEl.showPicker();
+                          } catch {
+                            inputEl.focus();
+                          }
+                        } else {
+                          inputEl.focus();
+                        }
+                      }
+                    }}
+                    style={{
+                      position: 'absolute',
+                      right: 12,
+                      background: 'none',
+                      border: 'none',
+                      color: '#0F766E',
+                      cursor: 'pointer',
+                      padding: 4,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                    title="Open calendar"
+                  >
+                    <Calendar size={20} />
+                  </button>
+                  {error && (
+                    <div style={{ color: '#F43F5E', fontSize: 13, marginTop: 8 }}>{error}</div>
+                  )}
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                  <button
+                    type="button"
+                    onClick={handleNext}
+                    style={{
+                      background: primaryColor,
+                      color: '#0F172A',
+                      fontWeight: 700,
+                      fontSize: 14,
+                      padding: '10px 22px',
+                      borderRadius: 10,
+                      border: 'none',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 6,
+                    }}
+                  >
+                    OK <Check size={16} />
+                  </button>
+                  <span style={{ fontSize: 12, color: '#64748B' }}>
+                    press <strong>Enter ↵</strong>
                   </span>
                 </div>
               </div>

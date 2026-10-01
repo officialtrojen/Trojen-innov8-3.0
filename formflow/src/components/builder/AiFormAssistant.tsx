@@ -100,7 +100,7 @@ export default function AiFormAssistant({
         style={{
           position: 'fixed',
           bottom: 24,
-          right: 24,
+          left: 24,
           zIndex: 1000,
           padding: '12px 22px',
           borderRadius: 99,
@@ -190,7 +190,7 @@ export default function AiFormAssistant({
       style={{
         position: 'fixed',
         bottom: 24,
-        right: 24,
+        left: 24,
         zIndex: 1000,
         width: isMinimized ? 300 : 380,
         maxHeight: isMinimized ? 56 : 580,

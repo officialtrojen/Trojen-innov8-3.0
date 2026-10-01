@@ -74,10 +74,16 @@ export default function ParallaxDeepSpaceLandingPage() {
     }
   };
 
+  const targetScrollYRef = useRef(0);
+  const smoothScrollYRef = useRef(0);
+  const targetMouseRef = useRef({ x: 0, y: 0 });
+  const smoothMouseRef = useRef({ x: 0, y: 0 });
+
   // Smooth scroll listener via requestAnimationFrame
   useEffect(() => {
     let ticking = false;
     const handleScroll = () => {
+      targetScrollYRef.current = window.scrollY;
       if (!ticking) {
         window.requestAnimationFrame(() => {
           setScrollY(window.scrollY);
@@ -97,6 +103,7 @@ export default function ParallaxDeepSpaceLandingPage() {
       const { innerWidth, innerHeight } = window;
       const x = (e.clientX - innerWidth / 2) / (innerWidth / 2);
       const y = (e.clientY - innerHeight / 2) / (innerHeight / 2);
+      targetMouseRef.current = { x, y };
       setMousePos({ x, y });
     };
 
@@ -131,56 +138,95 @@ export default function ParallaxDeepSpaceLandingPage() {
     };
     window.addEventListener('resize', handleResize);
 
-    // Create 180 stars with different depths (z: 1 to 4)
-    const stars = Array.from({ length: 180 }, () => ({
-      x: Math.random() * width,
-      y: Math.random() * height * 4,
-      z: Math.random() * 3 + 0.6,
-      radius: Math.random() * 1.3 + 0.3,
-      alpha: Math.random() * 0.7 + 0.2,
-      twinkleSpeed: Math.random() * 0.02 + 0.005,
-      twinkleOffset: Math.random() * Math.PI * 2,
-    }));
+    // Create 220 larger, more luminous stars with multi-depth parallax
+    const stars = Array.from({ length: 220 }, () => {
+      const z = Math.random() * 3.2 + 0.8;
+      // Noticeably bigger stars across all depth layers
+      let radius = Math.random() * 1.2 + 1.5; // base: 1.5px - 2.7px
+      if (z > 2.8) {
+        radius = Math.random() * 2.2 + 3.2; // hero stars: 3.2px - 5.4px
+      } else if (z > 1.8) {
+        radius = Math.random() * 1.6 + 2.2; // mid stars: 2.2px - 3.8px
+      }
+
+      return {
+        x: Math.random() * width,
+        y: Math.random() * height * 4,
+        z,
+        radius,
+        hasGlow: z > 2.6,
+        alpha: Math.random() * 0.5 + 0.5,
+        twinkleSpeed: Math.random() * 0.025 + 0.008,
+        twinkleOffset: Math.random() * Math.PI * 2,
+      };
+    });
 
     let frame = 0;
     const render = () => {
       frame++;
+
+      // Silky-smooth interpolation (LERP) for scroll and cursor movement
+      smoothScrollYRef.current += (targetScrollYRef.current - smoothScrollYRef.current) * 0.075;
+      smoothMouseRef.current.x += (targetMouseRef.current.x - smoothMouseRef.current.x) * 0.05;
+      smoothMouseRef.current.y += (targetMouseRef.current.y - smoothMouseRef.current.y) * 0.05;
+
+      const currentSmoothScroll = smoothScrollYRef.current;
+      const currentMouseX = smoothMouseRef.current.x;
+      const currentMouseY = smoothMouseRef.current.y;
+
       ctx.clearRect(0, 0, width, height);
 
-      // Deep pure space clear
+      // Deep obsidian space background
       ctx.fillStyle = '#020306';
       ctx.fillRect(0, 0, width, height);
 
-      // Draw each star with its parallax speed
+      // Draw each star with smooth parallax position
       stars.forEach((star) => {
-        // Multi-depth parallax calculation for starfield
-        const starParallaxSpeed = 0.06 * star.z;
-        const screenY = (star.y - scrollY * starParallaxSpeed) % (height * 3);
+        const starParallaxSpeed = 0.065 * star.z;
+        const screenY = (star.y - currentSmoothScroll * starParallaxSpeed) % (height * 3);
         const wrappedY = screenY < 0 ? screenY + height * 3 : screenY;
 
-        // Only draw if within visible viewport
-        if (wrappedY >= -10 && wrappedY <= height + 10) {
-          const mouseShiftX = mousePos.x * (star.z * 6);
-          const mouseShiftY = mousePos.y * (star.z * 6);
+        // Viewport bounds check
+        if (wrappedY >= -20 && wrappedY <= height + 20) {
+          const mouseShiftX = currentMouseX * (star.z * 7);
+          const mouseShiftY = currentMouseY * (star.z * 7);
+          const centerX = star.x + mouseShiftX;
+          const centerY = wrappedY + mouseShiftY;
 
           const brightness =
-            star.alpha + Math.sin(frame * star.twinkleSpeed + star.twinkleOffset) * 0.25;
-          const clampedBrightness = Math.max(0.1, Math.min(1, brightness));
+            star.alpha + Math.sin(frame * star.twinkleSpeed + star.twinkleOffset) * 0.28;
+          const clampedBrightness = Math.max(0.15, Math.min(1, brightness));
 
+          // Soft cosmic glow aura for larger hero stars
+          if (star.hasGlow) {
+            const glowRadius = star.radius * 2.8;
+            const glowGrad = ctx.createRadialGradient(
+              centerX,
+              centerY,
+              0,
+              centerX,
+              centerY,
+              glowRadius
+            );
+            glowGrad.addColorStop(0, `rgba(56, 189, 248, ${clampedBrightness * 0.45})`);
+            glowGrad.addColorStop(0.5, `rgba(139, 92, 246, ${clampedBrightness * 0.2})`);
+            glowGrad.addColorStop(1, 'rgba(2, 3, 6, 0)');
+
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, glowRadius, 0, Math.PI * 2);
+            ctx.fillStyle = glowGrad;
+            ctx.fill();
+          }
+
+          // Crisp luminous star core
           ctx.beginPath();
-          ctx.arc(
-            star.x + mouseShiftX,
-            wrappedY + mouseShiftY,
-            star.radius,
-            0,
-            Math.PI * 2
-          );
+          ctx.arc(centerX, centerY, star.radius, 0, Math.PI * 2);
           ctx.fillStyle =
-            star.z > 2.5
-              ? `rgba(224, 242, 254, ${clampedBrightness})`
-              : star.z > 1.5
-              ? `rgba(203, 213, 225, ${clampedBrightness * 0.8})`
-              : `rgba(148, 163, 184, ${clampedBrightness * 0.5})`;
+            star.z > 2.8
+              ? `rgba(255, 255, 255, ${clampedBrightness})`
+              : star.z > 1.8
+              ? `rgba(224, 242, 254, ${clampedBrightness * 0.95})`
+              : `rgba(186, 230, 253, ${clampedBrightness * 0.75})`;
           ctx.fill();
         }
       });
@@ -194,7 +240,7 @@ export default function ParallaxDeepSpaceLandingPage() {
       window.removeEventListener('resize', handleResize);
       cancelAnimationFrame(animationId);
     };
-  }, [scrollY, mousePos]);
+  }, []);
 
   return (
     <div

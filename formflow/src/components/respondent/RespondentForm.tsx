@@ -30,6 +30,7 @@ export const RespondentForm: React.FC<RespondentFormProps> = ({ form }) => {
   const [submitted, setSubmitted] = useState(false);
   const [startTime] = useState(Date.now());
   const [uploadedFiles, setUploadedFiles] = useState<Record<string, string>>({});
+  const [dragOverFieldId, setDragOverFieldId] = useState<string | null>(null);
 
   const { theme, fields, logicRules } = form;
   const isConversational = theme.layoutMode === 'conversational';
@@ -176,7 +177,8 @@ export const RespondentForm: React.FC<RespondentFormProps> = ({ form }) => {
             value={val}
             onChange={(e) => handleAnswerChange(field.id, e.target.value)}
             placeholder={field.placeholder || 'Type your response here...'}
-            className="w-full bg-black/30 border border-white/20 rounded-xl px-4 py-3.5 text-base sm:text-lg text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition-all backdrop-blur-sm"
+            className="w-full bg-white border border-slate-300 rounded-xl px-4 py-3.5 text-base sm:text-lg text-black placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition-all shadow-sm font-medium"
+            style={{ color: '#000000', WebkitTextFillColor: '#000000', backgroundColor: '#FFFFFF' }}
             autoFocus={isConversational}
           />
         );
@@ -188,7 +190,8 @@ export const RespondentForm: React.FC<RespondentFormProps> = ({ form }) => {
             value={val}
             onChange={(e) => handleAnswerChange(field.id, e.target.value)}
             placeholder={field.placeholder || 'Type detailed response here...'}
-            className="w-full bg-black/30 border border-white/20 rounded-xl p-4 text-sm sm:text-base text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition-all backdrop-blur-sm resize-none"
+            className="w-full bg-white border border-slate-300 rounded-xl p-4 text-sm sm:text-base text-black placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition-all shadow-sm resize-none font-medium"
+            style={{ color: '#000000', WebkitTextFillColor: '#000000', backgroundColor: '#FFFFFF' }}
             autoFocus={isConversational}
           />
         );
@@ -209,23 +212,24 @@ export const RespondentForm: React.FC<RespondentFormProps> = ({ form }) => {
                       setTimeout(handleNextCard, 200);
                     }
                   }}
-                  className={`flex items-center gap-3 p-3.5 sm:p-4 rounded-xl border text-left transition-all cursor-pointer backdrop-blur-sm ${
+                  className={`flex items-center gap-3 p-3.5 sm:p-4 rounded-xl border text-left transition-all cursor-pointer shadow-sm ${
                     isSelected
-                      ? 'border-indigo-400 bg-indigo-500/20 text-white ring-2 ring-indigo-400/50 shadow-lg shadow-indigo-500/10'
-                      : 'border-white/10 bg-black/25 text-zinc-300 hover:border-white/30 hover:bg-black/40'
+                      ? 'border-indigo-600 bg-indigo-50 text-indigo-950 ring-2 ring-indigo-400/50 shadow-md'
+                      : 'border-slate-300 bg-white text-black hover:border-slate-400 hover:bg-slate-50'
                   }`}
+                  style={{ color: '#000000' }}
                 >
                   <span
                     className={`w-6 h-6 rounded-md flex items-center justify-center text-xs font-mono font-bold border transition-colors ${
                       isSelected
-                        ? 'border-indigo-400 bg-indigo-500 text-white'
-                        : 'border-white/20 bg-white/5 text-zinc-400'
+                        ? 'border-indigo-600 bg-indigo-600 text-white'
+                        : 'border-slate-300 bg-slate-100 text-black font-semibold'
                     }`}
                   >
                     {letter}
                   </span>
-                  <span className="text-sm sm:text-base font-medium">{opt}</span>
-                  {isSelected && <Check className="w-4 h-4 ml-auto text-indigo-400" />}
+                  <span className="text-sm sm:text-base font-semibold text-black">{opt}</span>
+                  {isSelected && <Check className="w-4 h-4 ml-auto text-indigo-600" />}
                 </button>
               );
             })}
@@ -273,9 +277,43 @@ export const RespondentForm: React.FC<RespondentFormProps> = ({ form }) => {
           </div>
         );
 
-      case 'file_upload':
+      case 'file_upload': {
+        const isDraggingThis = dragOverFieldId === field.id;
         return (
-          <div className="p-6 rounded-2xl border-2 border-dashed border-white/20 bg-black/25 hover:bg-black/40 text-center transition-all cursor-pointer">
+          <div
+            onDragOver={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setDragOverFieldId(field.id);
+            }}
+            onDragEnter={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setDragOverFieldId(field.id);
+            }}
+            onDragLeave={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setDragOverFieldId(null);
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setDragOverFieldId(null);
+              const file = e.dataTransfer.files?.[0];
+              if (file) {
+                setUploadedFiles((prev) => ({ ...prev, [field.id]: file.name }));
+                handleAnswerChange(field.id, file.name);
+              }
+            }}
+            className={`p-7 sm:p-9 rounded-2xl border-2 border-dashed transition-all cursor-pointer text-center ${
+              isDraggingThis
+                ? 'border-indigo-400 bg-indigo-500/25 scale-[1.01]'
+                : uploadedFiles[field.id]
+                ? 'border-emerald-500/60 bg-emerald-500/10'
+                : 'border-white/25 bg-black/30 hover:bg-black/45 hover:border-indigo-400/50'
+            }`}
+          >
             <input
               type="file"
               id={`file_${field.id}`}
@@ -288,30 +326,49 @@ export const RespondentForm: React.FC<RespondentFormProps> = ({ form }) => {
                 }
               }}
             />
-            <label htmlFor={`file_${field.id}`} className="cursor-pointer block space-y-2">
-              <UploadCloud className="w-8 h-8 mx-auto text-indigo-400" />
+            <label htmlFor={`file_${field.id}`} className="cursor-pointer block space-y-2.5">
+              <UploadCloud
+                className={`w-10 h-10 mx-auto transition-transform ${
+                  isDraggingThis ? 'scale-125 text-indigo-300' : 'text-indigo-400'
+                }`}
+              />
               <div className="text-sm font-semibold text-white">
-                {uploadedFiles[field.id] ? (
-                  <span className="text-emerald-400">✓ {uploadedFiles[field.id]}</span>
+                {isDraggingThis ? (
+                  <span className="text-indigo-300 font-bold">Release to drop your file here!</span>
+                ) : uploadedFiles[field.id] ? (
+                  <span className="text-emerald-400 font-bold">✓ {uploadedFiles[field.id]}</span>
                 ) : (
-                  'Click to select file'
+                  <span>
+                    Drag & drop your files or images here, or{' '}
+                    <span className="underline text-indigo-400 font-bold">browse</span>
+                  </span>
                 )}
               </div>
               <div className="text-xs text-zinc-400">
-                PDF, PNG, JPG, or ZIP up to 25MB
+                Supports images, documents, and archives up to 25MB
               </div>
             </label>
           </div>
         );
+      }
 
       case 'date':
+      case 'date_picker':
         return (
           <div className="relative max-w-sm">
             <input
               type="date"
               value={val}
               onChange={(e) => handleAnswerChange(field.id, e.target.value)}
-              className="w-full bg-black/30 border border-white/20 rounded-xl px-4 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all backdrop-blur-sm"
+              onClick={(e) => {
+                if ('showPicker' in HTMLInputElement.prototype) {
+                  try {
+                    e.currentTarget.showPicker();
+                  } catch {}
+                }
+              }}
+              className="w-full bg-white border border-slate-300 rounded-xl px-4 py-3 text-base text-black focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all shadow-sm font-medium cursor-pointer"
+              style={{ color: '#000000', WebkitTextFillColor: '#000000', backgroundColor: '#FFFFFF', colorScheme: 'light' }}
             />
           </div>
         );
@@ -422,7 +479,10 @@ export const RespondentForm: React.FC<RespondentFormProps> = ({ form }) => {
               </div>
 
               {/* Title & Description */}
-              <h2 className="text-xl sm:text-2xl font-bold mb-2 text-white">
+              <h2
+                className="text-xl sm:text-2xl font-bold mb-2 text-white"
+                style={{ fontFamily: activeCurrentField.fontFamily || undefined }}
+              >
                 {activeCurrentField.label}
               </h2>
 
@@ -533,6 +593,7 @@ export const RespondentForm: React.FC<RespondentFormProps> = ({ form }) => {
               style={{
                 backgroundColor: theme.cardBackground,
                 borderColor: `${theme.primaryColor}22`,
+                fontFamily: field.fontFamily || undefined,
               }}
             >
               <div className="flex items-baseline gap-2 mb-2">

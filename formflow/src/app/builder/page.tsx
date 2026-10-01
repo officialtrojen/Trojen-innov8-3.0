@@ -898,7 +898,7 @@ function BuilderCanvasInner() {
               style={{
                 fontSize: 16,
                 fontWeight: 700,
-                color: '#263B3B',
+                color: '#000000',
                 border: 'none',
                 background: 'transparent',
                 outline: 'none',
@@ -1166,7 +1166,7 @@ function BuilderCanvasInner() {
 
         {/* Builder Body or Preview Body */}
         {mode === 'preview' ? (
-          <div style={{ flex: 1, overflowY: 'auto' }}>
+          <div style={{ flex: 1, overflowY: 'auto' }} className="builder-preview-wrapper">
             <FormRenderer schema={schema} />
           </div>
         ) : (

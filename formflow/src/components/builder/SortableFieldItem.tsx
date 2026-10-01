@@ -101,10 +101,11 @@ export const SortableFieldItem: React.FC<SortableFieldItemProps> = ({
           </div>
         );
       case 'date':
+      case 'date_picker':
         return (
-          <div className="w-full h-10 px-3 rounded-lg border border-zinc-700 bg-zinc-950/40 text-xs text-zinc-500 flex items-center justify-between">
+          <div className="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-xs text-black font-semibold flex items-center justify-between">
             <span>YYYY-MM-DD</span>
-            <Calendar className="w-4 h-4 text-zinc-500" />
+            <Calendar className="w-4 h-4 text-slate-700" />
           </div>
         );
       default:
@@ -119,7 +120,8 @@ export const SortableFieldItem: React.FC<SortableFieldItemProps> = ({
       case 'multiple_choice': return CheckSquare;
       case 'rating': return Star;
       case 'file_upload': return UploadCloud;
-      case 'date': return Calendar;
+      case 'date':
+      case 'date_picker': return Calendar;
       default: return Type;
     }
   };

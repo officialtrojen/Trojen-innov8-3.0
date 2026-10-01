@@ -3,7 +3,7 @@
 import React, { useState, useCallback } from 'react';
 import { FormSchema, FormField } from '@/lib/types';
 import { getVisibleFields, getNextQuestion } from '@/lib/logic-engine';
-import { Star, Upload, CheckCircle2, Image as ImageIcon } from 'lucide-react';
+import { Star, Upload, CheckCircle2, Image as ImageIcon, X, FileText, Calendar } from 'lucide-react';
 import { getBackgroundStyle, getCardStyle, isDarkColor } from '@/lib/theme-presets';
 import TypeformRenderer from './TypeformRenderer';
 
@@ -65,7 +65,7 @@ export default function FormRenderer({ schema, onSubmit, readOnly = false }: For
       }
     }
 
-    if (field.type === 'date_picker' && strValue) {
+    if ((field.type === 'date_picker' || field.type === 'date') && strValue) {
       const date = new Date(strValue);
       if (field.validation?.minDate && date < new Date(field.validation.minDate)) {
         return 'Please select a valid date.';
@@ -172,19 +172,230 @@ export default function FormRenderer({ schema, onSubmit, readOnly = false }: For
     );
   }
 
+  // ---------- Interactive Drag & Drop File Upload Field ----------
+  function DragDropUploadField({
+    field,
+    value,
+    onChange,
+    onError,
+    error,
+    readOnly,
+  }: {
+    field: FormField;
+    value: AnswerValue;
+    onChange: (file: File | null) => void;
+    onError: (msg: string | null) => void;
+    error?: string;
+    readOnly?: boolean;
+  }) {
+    const [isDragging, setIsDragging] = useState(false);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+    const handleFile = (file: File) => {
+      // Validate file size
+      const maxSize = (field.validation?.maxFileSize || 10) * 1024 * 1024;
+      if (file.size > maxSize) {
+        onError(`File exceeds maximum size of ${field.validation?.maxFileSize || 10}MB.`);
+        return;
+      }
+      // Validate file type
+      if (field.validation?.allowedFileTypes?.length) {
+        const ext = file.name.split('.').pop()?.toLowerCase();
+        if (ext && !field.validation.allowedFileTypes.includes(ext)) {
+          onError(`This file type is not supported. Allowed: ${field.validation.allowedFileTypes.join(', ')}`);
+          return;
+        }
+      }
+      onError(null);
+      onChange(file);
+      if (file.type.startsWith('image/')) {
+        const url = URL.createObjectURL(file);
+        setPreviewUrl(url);
+      } else {
+        setPreviewUrl(null);
+      }
+    };
+
+    const handleDragOver = (e: React.DragEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (!readOnly) setIsDragging(true);
+    };
+
+    const handleDragLeave = (e: React.DragEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setIsDragging(false);
+    };
+
+    const handleDrop = (e: React.DragEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setIsDragging(false);
+      if (readOnly) return;
+      const file = e.dataTransfer.files?.[0];
+      if (file) {
+        handleFile(file);
+      }
+    };
+
+    const currentFile = value instanceof File ? value : null;
+
+    return (
+      <div style={{ marginTop: 4 }}>
+        <div
+          onDragOver={handleDragOver}
+          onDragEnter={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          onClick={() => {
+            if (!readOnly && !currentFile) {
+              document.getElementById(`file-${field.id}`)?.click();
+            }
+          }}
+          style={{
+            border: `2px dashed ${
+              error
+                ? '#EF4444'
+                : isDragging
+                ? '#0F766E'
+                : currentFile
+                ? '#10B981'
+                : '#94A3B8'
+            }`,
+            borderRadius: 14,
+            padding: '24px 20px',
+            textAlign: 'center',
+            cursor: readOnly ? 'default' : currentFile ? 'default' : 'pointer',
+            background: isDragging
+              ? 'rgba(15, 118, 110, 0.08)'
+              : currentFile
+              ? 'rgba(16, 185, 129, 0.05)'
+              : 'rgba(255, 255, 255, 0.85)',
+            transition: 'all 0.2s ease',
+            boxShadow: isDragging ? '0 0 0 4px rgba(15, 118, 110, 0.15)' : 'none',
+          }}
+        >
+          <input
+            id={`file-${field.id}`}
+            type="file"
+            accept={field.validation?.allowedFileTypes?.map((t) => `.${t}`).join(',') || undefined}
+            style={{ display: 'none' }}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleFile(file);
+            }}
+          />
+
+          {currentFile ? (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, flexWrap: 'wrap' }}>
+              {previewUrl ? (
+                <img
+                  src={previewUrl}
+                  alt="Upload preview"
+                  style={{ width: 56, height: 56, borderRadius: 8, objectFit: 'cover', border: '1px solid #CBD5E1' }}
+                />
+              ) : (
+                <div
+                  style={{
+                    width: 48,
+                    height: 48,
+                    borderRadius: 8,
+                    background: '#E2E8F0',
+                    color: '#0F766E',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <FileText size={24} />
+                </div>
+              )}
+              <div style={{ textAlign: 'left', minWidth: 0, flex: 1, maxWidth: 320 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: '#0F172A', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {currentFile.name}
+                </div>
+                <div style={{ fontSize: 11, color: '#64748B', marginTop: 2 }}>
+                  {(currentFile.size / (1024 * 1024)).toFixed(2)} MB • Ready
+                </div>
+              </div>
+              {!readOnly && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onChange(null);
+                    setPreviewUrl(null);
+                  }}
+                  style={{
+                    background: '#FEE2E2',
+                    color: '#DC2626',
+                    border: 'none',
+                    borderRadius: 8,
+                    padding: '6px 12px',
+                    fontSize: 12,
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 4,
+                  }}
+                >
+                  <X size={14} /> Remove
+                </button>
+              )}
+            </div>
+          ) : (
+            <div>
+              <div
+                style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 24,
+                  background: isDragging ? '#0F766E' : '#E2E8F0',
+                  color: isDragging ? '#FFFFFF' : '#0F766E',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: 10,
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                <Upload size={22} />
+              </div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#0F172A', marginBottom: 4 }}>
+                {isDragging ? 'Drop file to upload!' : 'Drag & drop your files or images here'}
+              </div>
+              <div style={{ fontSize: 12, color: '#64748B' }}>
+                or <span style={{ color: '#0F766E', fontWeight: 600, textDecoration: 'underline' }}>browse from your device</span>
+              </div>
+              <div style={{ fontSize: 11, color: '#94A3B8', marginTop: 8 }}>
+                Max size: {field.validation?.maxFileSize || 10}MB
+                {field.validation?.allowedFileTypes?.length
+                  ? ` • Allowed: ${field.validation.allowedFileTypes.join(', ')}`
+                  : ''}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   // ---------- Render Fields ----------
   const renderField = (field: FormField) => {
     const value = answers[field.id];
     const error = errors[field.id];
 
     return (
-      <div key={field.id} style={{ marginBottom: 28 }}>
+      <div key={field.id} style={{ marginBottom: 28, fontFamily: field.fontFamily || undefined }}>
         <label
           style={{
             display: 'block',
             fontSize: baseFontSize,
             fontWeight: 500,
             color: schema.theme.text,
+            fontFamily: field.fontFamily || undefined,
             marginBottom: 8,
           }}
         >
@@ -200,7 +411,14 @@ export default function FormRenderer({ schema, onSubmit, readOnly = false }: For
             onChange={(e) => updateAnswer(field.id, e.target.value)}
             placeholder={field.placeholder}
             readOnly={readOnly}
-            style={{ borderColor: error ? '#e74c3c' : undefined }}
+            style={{
+              borderColor: error ? '#EF4444' : '#94A3B8',
+              color: '#000000',
+              WebkitTextFillColor: '#000000',
+              caretColor: '#000000',
+              backgroundColor: '#FFFFFF',
+              fontWeight: 500,
+            }}
           />
         )}
 
@@ -211,7 +429,14 @@ export default function FormRenderer({ schema, onSubmit, readOnly = false }: For
             onChange={(e) => updateAnswer(field.id, e.target.value)}
             placeholder={field.placeholder}
             readOnly={readOnly}
-            style={{ borderColor: error ? '#e74c3c' : undefined }}
+            style={{
+              borderColor: error ? '#EF4444' : '#94A3B8',
+              color: '#000000',
+              WebkitTextFillColor: '#000000',
+              caretColor: '#000000',
+              backgroundColor: '#FFFFFF',
+              fontWeight: 500,
+            }}
           />
         )}
 
@@ -276,7 +501,7 @@ export default function FormRenderer({ schema, onSubmit, readOnly = false }: For
                     }}
                     style={{ display: 'none' }}
                   />
-                  {opt}
+                  <span style={{ color: '#000000', fontWeight: 600 }}>{opt}</span>
                 </label>
               );
             })}
@@ -323,7 +548,7 @@ export default function FormRenderer({ schema, onSubmit, readOnly = false }: For
                 ⭐ {value as number} of 5 stars selected
               </span>
             ) : (
-              <span style={{ fontSize: 12, color: '#52796F' }}>
+              <span style={{ fontSize: 12, color: '#0F766E', fontWeight: 600 }}>
                 Tap a star to rate (1 to 5)
               </span>
             )}
@@ -331,102 +556,110 @@ export default function FormRenderer({ schema, onSubmit, readOnly = false }: For
         )}
 
         {field.type === 'file_upload' && (
-          <div
-            style={{
-              border: `2px dashed ${error ? '#e74c3c' : 'var(--input-border)'}`,
-              borderRadius: 10,
-              padding: 24,
-              textAlign: 'center',
-              cursor: readOnly ? 'default' : 'pointer',
-              background: 'rgba(255,255,255,0.5)',
-            }}
-            onClick={() => {
-              if (readOnly) return;
-              document.getElementById(`file-${field.id}`)?.click();
-            }}
-            onDragOver={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              if (!readOnly) {
-                e.currentTarget.style.borderColor = 'var(--primary)';
-                e.currentTarget.style.background = 'rgba(255,255,255,0.8)';
-              }
-            }}
-            onDragLeave={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              if (!readOnly) {
-                e.currentTarget.style.borderColor = error ? '#e74c3c' : 'var(--input-border)';
-                e.currentTarget.style.background = 'rgba(255,255,255,0.5)';
-              }
-            }}
-            onDrop={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              if (!readOnly) {
-                e.currentTarget.style.borderColor = error ? '#e74c3c' : 'var(--input-border)';
-                e.currentTarget.style.background = 'rgba(255,255,255,0.5)';
-              }
-              if (readOnly) return;
-              const file = e.dataTransfer.files?.[0];
-              if (file) {
-                const maxSize = (field.validation?.maxFileSize || 10) * 1024 * 1024;
-                if (file.size > maxSize) {
-                  setErrors((prev) => ({ ...prev, [field.id]: `File exceeds maximum size of ${field.validation?.maxFileSize || 10}MB.` }));
-                  return;
-                }
-                if (field.validation?.allowedFileTypes?.length) {
-                  const ext = file.name.split('.').pop()?.toLowerCase();
-                  if (ext && !field.validation.allowedFileTypes.includes(ext)) {
-                    setErrors((prev) => ({ ...prev, [field.id]: 'This file type is not supported.' }));
-                    return;
-                  }
-                }
-                updateAnswer(field.id, file);
-              }
-            }}
-          >
-            <Upload size={24} style={{ color: '#B8CECF', marginBottom: 8 }} />
-            <div style={{ fontSize: 13, color: '#52796F' }}>
-              {value instanceof File ? (value as File).name : 'Click or drag to upload a file'}
-            </div>
-            <input
-              id={`file-${field.id}`}
-              type="file"
-              style={{ display: 'none' }}
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  const maxSize = (field.validation?.maxFileSize || 10) * 1024 * 1024;
-                  if (file.size > maxSize) {
-                    setErrors((prev) => ({ ...prev, [field.id]: `File exceeds maximum size of ${field.validation?.maxFileSize || 10}MB.` }));
-                    return;
-                  }
-                  if (field.validation?.allowedFileTypes?.length) {
-                    const ext = file.name.split('.').pop()?.toLowerCase();
-                    if (ext && !field.validation.allowedFileTypes.includes(ext)) {
-                      setErrors((prev) => ({ ...prev, [field.id]: 'This file type is not supported.' }));
-                      return;
-                    }
-                  }
-                  updateAnswer(field.id, file);
-                }
-              }}
-            />
+          <DragDropUploadField
+            field={field}
+            value={value}
+            onChange={(file) => updateAnswer(field.id, file)}
+            onError={(msg) => setErrors((prev) => ({ ...prev, [field.id]: msg || '' }))}
+            error={error}
+            readOnly={readOnly}
+          />
+        )}
+
+        {field.type === 'yes_no' && (
+          <div style={{ display: 'flex', gap: 12 }}>
+            {['Yes', 'No'].map((opt) => {
+              const isSelected = value === opt;
+              return (
+                <button
+                  key={opt}
+                  type="button"
+                  onClick={() => !readOnly && updateAnswer(field.id, opt)}
+                  style={{
+                    padding: '10px 24px',
+                    borderRadius: 8,
+                    border: `1.5px solid ${isSelected ? schema.theme.primary : '#94A3B8'}`,
+                    background: isSelected ? `${schema.theme.primary}18` : '#FFFFFF',
+                    color: '#000000',
+                    fontWeight: 700,
+                    fontSize: 14,
+                    cursor: readOnly ? 'default' : 'pointer',
+                    transition: 'all 0.15s ease',
+                  }}
+                >
+                  {opt === 'Yes' ? '✓ Yes' : '✗ No'}
+                </button>
+              );
+            })}
           </div>
         )}
 
-        {field.type === 'date_picker' && (
-          <input
-            type="date"
-            className="input"
-            value={(value as string) || ''}
-            onChange={(e) => updateAnswer(field.id, e.target.value)}
-            readOnly={readOnly}
-            min={field.validation?.minDate}
-            max={field.validation?.maxDate}
-            style={{ borderColor: error ? '#e74c3c' : undefined }}
-          />
+        {(field.type === 'date_picker' || field.type === 'date') && (
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center', width: '100%' }}>
+            <input
+              id={`date-field-${field.id}`}
+              type="date"
+              className="input"
+              value={(value as string) || ''}
+              onChange={(e) => updateAnswer(field.id, e.target.value)}
+              onClick={(e) => {
+                if (!readOnly && 'showPicker' in HTMLInputElement.prototype) {
+                  try {
+                    e.currentTarget.showPicker();
+                  } catch {}
+                }
+              }}
+              readOnly={readOnly}
+              min={field.validation?.minDate}
+              max={field.validation?.maxDate}
+              style={{
+                borderColor: error ? '#EF4444' : '#94A3B8',
+                color: '#000000',
+                WebkitTextFillColor: '#000000',
+                backgroundColor: '#FFFFFF',
+                colorScheme: 'light',
+                fontWeight: 600,
+                fontSize: 14,
+                cursor: readOnly ? 'default' : 'pointer',
+                paddingRight: 42,
+              }}
+            />
+            <button
+              type="button"
+              tabIndex={-1}
+              onClick={() => {
+                if (!readOnly) {
+                  const inputEl = document.getElementById(`date-field-${field.id}`) as HTMLInputElement | null;
+                  if (inputEl) {
+                    if ('showPicker' in HTMLInputElement.prototype) {
+                      try {
+                        inputEl.showPicker();
+                      } catch {
+                        inputEl.focus();
+                      }
+                    } else {
+                      inputEl.focus();
+                    }
+                  }
+                }
+              }}
+              style={{
+                position: 'absolute',
+                right: 10,
+                background: 'none',
+                border: 'none',
+                color: '#0F766E',
+                cursor: readOnly ? 'default' : 'pointer',
+                padding: 6,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+              title="Open calendar"
+            >
+              <Calendar size={18} />
+            </button>
+          </div>
         )}
 
         {error && <div className="error-text">{error}</div>}
@@ -448,6 +681,7 @@ export default function FormRenderer({ schema, onSubmit, readOnly = false }: For
   // ---------- Single Page Layout ----------
   return (
     <div
+      className="form-live-render"
       style={{
         minHeight: '100vh',
         fontFamily: schema.theme.fontFamily,

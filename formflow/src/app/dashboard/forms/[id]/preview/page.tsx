@@ -107,7 +107,7 @@ export default function PreviewFormPage() {
           border: '1px solid rgba(255, 255, 255, 0.1)',
         }}
       >
-        <FormRenderer schema={form.schema} readOnly />
+        <FormRenderer schema={form.schema} readOnly={false} />
       </div>
     </div>
   );

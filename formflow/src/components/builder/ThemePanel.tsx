@@ -632,11 +632,17 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
                         gap: 8,
                         marginBottom: 12,
                         fontSize: 12,
-                        padding: '9px 14px',
+                        fontWeight: 700,
+                        padding: '10px 14px',
+                        background: '#FFFFFF',
+                        color: '#0F172A',
+                        border: '1.5px solid #0F766E',
+                        borderRadius: 8,
+                        cursor: 'pointer',
                       }}
                     >
-                      <Upload size={14} />
-                      + Upload Background Image
+                      <Upload size={15} style={{ color: '#0F766E' }} />
+                      <span style={{ color: '#0F172A' }}>+ Upload Background Image</span>
                     </button>
 
                     <div style={{ fontSize: 11, color: '#52796F', marginBottom: 6, fontWeight: 600 }}>
@@ -731,11 +737,17 @@ export default function ThemePanel({ theme, onUpdate }: ThemePanelProps) {
                   gap: 8,
                   marginBottom: 14,
                   fontSize: 12,
+                  fontWeight: 700,
                   padding: '10px 14px',
+                  background: '#FFFFFF',
+                  color: '#0F172A',
+                  border: '1.5px solid #0F766E',
+                  borderRadius: 8,
+                  cursor: 'pointer',
                 }}
               >
-                <Upload size={14} />
-                Upload Background Image
+                <Upload size={15} style={{ color: '#0F766E' }} />
+                <span style={{ color: '#0F172A' }}>Upload Background Image</span>
               </button>
 
               {/* Curated Presets Grid */}

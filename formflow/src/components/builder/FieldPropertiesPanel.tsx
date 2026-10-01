@@ -2,7 +2,45 @@
 
 import React from 'react';
 import { FormField } from '@/types/form';
-import { Plus, Trash2, X, Sliders, CheckCircle2 } from 'lucide-react';
+import { Plus, Trash2, X, Sliders, CheckCircle2, Type, Check } from 'lucide-react';
+
+const FONT_OPTIONS = [
+  {
+    name: 'Inter',
+    label: 'Inter',
+    category: 'Modern Sans',
+    sample: 'Ag',
+    family: "'Inter', sans-serif",
+  },
+  {
+    name: 'Poppins',
+    label: 'Poppins',
+    category: 'Geometric Rounded',
+    sample: 'Ag',
+    family: "'Poppins', sans-serif",
+  },
+  {
+    name: 'Outfit',
+    label: 'Outfit',
+    category: 'Clean Display',
+    sample: 'Ag',
+    family: "'Outfit', sans-serif",
+  },
+  {
+    name: 'Playfair Display',
+    label: 'Playfair Display',
+    category: 'Editorial Serif',
+    sample: 'Ag',
+    family: "'Playfair Display', serif",
+  },
+  {
+    name: 'Space Grotesk',
+    label: 'Space Grotesk',
+    category: 'Neo-Brutalist',
+    sample: 'Ag',
+    family: "'Space Grotesk', sans-serif",
+  },
+];
 
 interface FieldPropertiesPanelProps {
   field: FormField | null;
@@ -75,7 +113,8 @@ export const FieldPropertiesPanel: React.FC<FieldPropertiesPanelProps> = ({
             type="text"
             value={field.label}
             onChange={(e) => onUpdateField({ ...field, label: e.target.value })}
-            className="w-full bg-zinc-950 border border-zinc-700/80 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-black focus:outline-none focus:ring-2 focus:ring-indigo-500 font-semibold"
+            style={{ color: '#000000', WebkitTextFillColor: '#000000', backgroundColor: '#FFFFFF' }}
           />
         </div>
 
@@ -89,8 +128,67 @@ export const FieldPropertiesPanel: React.FC<FieldPropertiesPanelProps> = ({
             value={field.description || ''}
             onChange={(e) => onUpdateField({ ...field, description: e.target.value })}
             placeholder="Optional context for respondent..."
-            className="w-full bg-zinc-950 border border-zinc-700/80 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-black focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium"
+            style={{ color: '#000000', WebkitTextFillColor: '#000000', backgroundColor: '#FFFFFF' }}
           />
+        </div>
+
+        {/* 5 Fonts Typography Option */}
+        <div>
+          <div className="flex items-center justify-between mb-1.5">
+            <label className="text-[11px] font-medium text-zinc-400 flex items-center gap-1.5">
+              <Type className="w-3.5 h-3.5 text-indigo-400" />
+              <span>Field Font (5 Options)</span>
+            </label>
+            {field.fontFamily && (
+              <button
+                type="button"
+                onClick={() => onUpdateField({ ...field, fontFamily: undefined })}
+                className="text-[10px] text-zinc-400 hover:text-zinc-200 underline"
+                title="Reset to default theme font"
+              >
+                Reset to default
+              </button>
+            )}
+          </div>
+          <div className="grid grid-cols-1 gap-1.5">
+            {FONT_OPTIONS.map((font) => {
+              const isSelected = field.fontFamily === font.name;
+              return (
+                <button
+                  key={font.name}
+                  type="button"
+                  onClick={() => onUpdateField({ ...field, fontFamily: font.name })}
+                  className={`flex items-center justify-between p-2.5 rounded-lg border text-left transition-all ${
+                    isSelected
+                      ? 'border-indigo-500 bg-indigo-500/10 text-white'
+                      : 'border-zinc-800 bg-zinc-950/60 text-zinc-300 hover:border-zinc-700'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <span
+                      style={{ fontFamily: font.family }}
+                      className={`w-7 h-7 rounded flex items-center justify-center text-xs font-bold ${
+                        isSelected ? 'bg-indigo-600 text-white' : 'bg-zinc-800 text-zinc-300'
+                      }`}
+                    >
+                      {font.sample}
+                    </span>
+                    <div>
+                      <div
+                        style={{ fontFamily: font.family }}
+                        className="text-xs font-semibold"
+                      >
+                        {font.label}
+                      </div>
+                      <div className="text-[10px] text-zinc-500">{font.category}</div>
+                    </div>
+                  </div>
+                  {isSelected && <Check className="w-3.5 h-3.5 text-indigo-400" />}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {/* Placeholder (for text fields) */}
@@ -104,7 +202,8 @@ export const FieldPropertiesPanel: React.FC<FieldPropertiesPanelProps> = ({
               value={field.placeholder || ''}
               onChange={(e) => onUpdateField({ ...field, placeholder: e.target.value })}
               placeholder="e.g. Type your answer..."
-              className="w-full bg-zinc-950 border border-zinc-700/80 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-black focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium"
+              style={{ color: '#000000', WebkitTextFillColor: '#000000', backgroundColor: '#FFFFFF' }}
             />
           </div>
         )}
@@ -147,7 +246,8 @@ export const FieldPropertiesPanel: React.FC<FieldPropertiesPanelProps> = ({
                     type="text"
                     value={opt}
                     onChange={(e) => handleOptionChange(idx, e.target.value)}
-                    className="flex-1 bg-zinc-900 border border-zinc-700 rounded-md px-2.5 py-1 text-xs text-zinc-200 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                    className="flex-1 bg-white border border-slate-300 rounded-md px-2.5 py-1 text-xs text-black focus:outline-none focus:ring-1 focus:ring-indigo-500 font-medium"
+                    style={{ color: '#000000', WebkitTextFillColor: '#000000', backgroundColor: '#FFFFFF' }}
                   />
                   {(field.options || []).length > 1 && (
                     <button
@@ -206,7 +306,8 @@ export const FieldPropertiesPanel: React.FC<FieldPropertiesPanelProps> = ({
                       },
                     })
                   }
-                  className="w-full bg-zinc-900 border border-zinc-700 rounded-md px-2 py-1 text-xs text-zinc-200"
+                  className="w-full bg-white border border-slate-300 rounded-md px-2 py-1 text-xs text-black font-semibold"
+                  style={{ color: '#000000', WebkitTextFillColor: '#000000', backgroundColor: '#FFFFFF' }}
                 />
               </div>
               <div>
@@ -224,7 +325,8 @@ export const FieldPropertiesPanel: React.FC<FieldPropertiesPanelProps> = ({
                       },
                     })
                   }
-                  className="w-full bg-zinc-900 border border-zinc-700 rounded-md px-2 py-1 text-xs text-zinc-200"
+                  className="w-full bg-white border border-slate-300 rounded-md px-2 py-1 text-xs text-black font-semibold"
+                  style={{ color: '#000000', WebkitTextFillColor: '#000000', backgroundColor: '#FFFFFF' }}
                 />
               </div>
             </div>

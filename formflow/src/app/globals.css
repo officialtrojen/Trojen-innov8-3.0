@@ -213,6 +213,149 @@ input::placeholder, textarea::placeholder,
 }
 .error-text { color: #FCA5A5; font-size: 13px; margin-top: 4px; }
 
+/* ---------- Builder Light Panels & Form Inputs (Build View & Live Preview) ---------- */
+.builder-right-panel,
+.builder-left-panel {
+  color: #0F172A;
+}
+
+.builder-right-panel .label,
+.builder-left-panel .label {
+  color: #1E293B !important;
+  font-weight: 700 !important;
+  font-size: 13px !important;
+  letter-spacing: 0.2px;
+}
+
+.builder-right-panel input,
+.builder-right-panel textarea,
+.builder-right-panel select,
+.builder-right-panel .input,
+.builder-right-panel .textarea,
+.builder-left-panel input,
+.builder-left-panel textarea,
+.builder-left-panel .input,
+.builder-left-panel .textarea,
+.builder-canvas-wrapper input,
+.builder-canvas-wrapper textarea,
+.builder-canvas-wrapper select,
+.builder-canvas-wrapper .input,
+.builder-canvas-wrapper .textarea,
+.builder-preview-wrapper input,
+.builder-preview-wrapper textarea,
+.builder-preview-wrapper select,
+.builder-preview-wrapper .input,
+.builder-preview-wrapper .textarea,
+.form-live-render input,
+.form-live-render textarea,
+.form-live-render select,
+.form-live-render .input,
+.form-live-render .textarea {
+  background-color: #FFFFFF !important;
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  caret-color: #000000 !important;
+  border: 1.5px solid #94A3B8 !important;
+  border-radius: 8px !important;
+  font-size: 13.5px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+}
+
+.builder-right-panel input:focus,
+.builder-right-panel textarea:focus,
+.builder-right-panel select:focus,
+.builder-right-panel .input:focus,
+.builder-right-panel .textarea:focus,
+.builder-canvas-wrapper input:focus,
+.builder-canvas-wrapper textarea:focus,
+.builder-preview-wrapper input:focus,
+.builder-preview-wrapper textarea:focus,
+.form-live-render input:focus,
+.form-live-render textarea:focus {
+  border-color: #0F766E !important;
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.2) !important;
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  background-color: #FFFFFF !important;
+}
+
+.builder-right-panel input::placeholder,
+.builder-right-panel textarea::placeholder,
+.builder-right-panel .input::placeholder,
+.builder-right-panel .textarea::placeholder,
+.builder-canvas-wrapper input::placeholder,
+.builder-canvas-wrapper textarea::placeholder,
+.builder-preview-wrapper input::placeholder,
+.builder-preview-wrapper textarea::placeholder,
+.form-live-render input::placeholder,
+.form-live-render textarea::placeholder {
+  color: #475569 !important;
+  -webkit-text-fill-color: #475569 !important;
+  font-weight: 500 !important;
+  opacity: 1 !important;
+}
+
+/* ---------- Date Picker Light Scheme & Input Handling ---------- */
+input[type="date"],
+.input[type="date"],
+.form-live-render input[type="date"],
+.builder-canvas-wrapper input[type="date"],
+.builder-preview-wrapper input[type="date"] {
+  color-scheme: light !important;
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  background-color: #FFFFFF !important;
+  font-family: inherit;
+  font-weight: 600 !important;
+  cursor: pointer;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator,
+.form-live-render input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: invert(0) !important;
+  opacity: 0.85 !important;
+  transition: opacity 0.15s ease;
+  padding: 4px;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover,
+.form-live-render input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1 !important;
+}
+
+input[type="date"]::-webkit-datetime-edit,
+input[type="date"]::-webkit-datetime-edit-fields-wrapper,
+input[type="date"]::-webkit-datetime-edit-text,
+input[type="date"]::-webkit-datetime-edit-month-field,
+input[type="date"]::-webkit-datetime-edit-day-field,
+input[type="date"]::-webkit-datetime-edit-year-field {
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  font-weight: 600 !important;
+}
+
+.builder-right-panel .btn-secondary,
+.builder-right-panel .btn-ghost,
+.builder-left-panel .btn-secondary,
+.builder-left-panel .btn-ghost {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+  border: 1.5px solid #94A3B8 !important;
+  font-weight: 700 !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+.builder-right-panel .btn-secondary:hover,
+.builder-right-panel .btn-ghost:hover,
+.builder-left-panel .btn-secondary:hover,
+.builder-left-panel .btn-ghost:hover {
+  background-color: #F0FDFA !important;
+  border-color: #0F766E !important;
+  color: #0F766E !important;
+}
+
 /* ---------- Badge ---------- */
 .badge {
   display: inline-flex;
