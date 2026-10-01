@@ -816,6 +816,7 @@ function BuilderCanvasInner() {
 
   return (
     <DndContext
+      id="builder-dnd-context"
       sensors={sensors}
       collisionDetection={handleCollisionDetection}
       onDragStart={handleDragStart}
